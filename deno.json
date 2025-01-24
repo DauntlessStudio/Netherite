@@ -2,7 +2,7 @@
   "name": "@calebcoldiron/netherite",
   "version": "0.0.0",
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "dev": "deno run --allow-read --allow-write --allow-run src/cli/cli.ts"
   },
   "exports": {
     "./cli": "./src/cli.ts",

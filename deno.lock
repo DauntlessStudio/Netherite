@@ -8,6 +8,7 @@
     "jsr:@std/cli@^1.0.10": "1.0.10",
     "jsr:@std/encoding@^1.0.5": "1.0.6",
     "jsr:@std/internal@^1.0.5": "1.0.5",
+    "jsr:@std/path@*": "1.0.8",
     "jsr:@std/path@^1.0.6": "1.0.8",
     "npm:esbuild@*": "0.24.2",
     "npm:esbuild@~0.24.2": "0.24.2"
@@ -18,7 +19,7 @@
       "dependencies": [
         "jsr:@std/bytes",
         "jsr:@std/encoding",
-        "jsr:@std/path"
+        "jsr:@std/path@^1.0.6"
       ]
     },
     "@std/assert@1.0.10": {
