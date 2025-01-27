@@ -1,5 +1,5 @@
-import type { ParseOptions } from "@std/cli/parse-args";
-import { parseArgs } from "@std/cli/parse-args";
+import type { ParseOptions } from "jsr:@std/cli/parse-args";
+import { parseArgs } from "jsr:@std/cli/parse-args";
 
 export interface CommandData {
     arguments: (number|string|boolean)[];
@@ -21,7 +21,7 @@ export interface CommandOptions<T extends CommandData> {
     name: string;
     usage: CommandUsage;
     parse?: ParseOptions;
-    subcommands?: Command<CommandData>[];
+    parent?: Command<CommandData>;
     validateArgs: (args: T) => boolean;
     action?: (args: T) => void;
 }
@@ -30,23 +30,40 @@ export class Command<T extends CommandData> {
     private static registry: Command<CommandData>[] = [];
 
     public static parseCommands(args: string[]): boolean {
-        return this.registry.some((command) => command.parse(args));
+        if (this.registry.some((command) => command.parse(args))) {
+            return true;
+        } else {
+            this.registry.forEach((command) => command.printHelp());
+            return false;
+        }
     }
 
+    private readonly subcommands: Command<CommandData>[] = [];
+
     constructor(private readonly options: CommandOptions<T>) {
-        Command.registry.push(this as unknown as Command<CommandData>);
+        if (this.options.parent) {
+            this.options.parent.addSubCommand(this as unknown as Command<CommandData>);
+        } else {
+            Command.registry.push(this as unknown as Command<CommandData>);
+        }
+    }
+
+    public addSubCommand(command: Command<CommandData>): void {
+        this.subcommands.push(command);
     }
 
     public parse(args: string[]): boolean {
         if (args[0] === this.options.name) {
             args = args.slice(1);
 
-            if (this.options.subcommands) {
-                for (const subcommand of this.options.subcommands) {
+            if (this.subcommands.length) {
+                for (const subcommand of this.subcommands) {
                     if (subcommand.parse(args)) {
                         return true;
                     }
                 }
+
+                args.push("--help");
             }
 
             this.options.parse = this.options.parse ?? {};
@@ -84,8 +101,8 @@ export class Command<T extends CommandData> {
     }
 
     protected printUsage(): void {
-        console.log(`Usage: netherite ${this.options.name} ${this.options.usage.usage}`);
         console.log(this.options.usage.description);
+        console.log(`Usage: netherite ${this.options.name} ${this.options.usage.usage}`);
         if (this.options.usage.argument) console.log(`Arguments: ${this.options.usage.argument}`);
         if (this.options.usage.flags) {
             console.log("Flags:");
@@ -93,5 +110,15 @@ export class Command<T extends CommandData> {
                 console.log(`  --${key} (${value.type})${value.optional ? ' [optional]' : ''}: ${value.description}`);
             }
         }
+        if (this.subcommands.length) {
+            console.log("Subcommands:");
+            for (const subcommand of this.subcommands) {
+                subcommand.printHelp("\t");
+            }
+        }
+    }
+
+    protected printHelp(prefix: string = ""): void {
+        console.log(prefix + `netherite ${this.options.name} ${this.options.usage.usage}`);
     }
 }

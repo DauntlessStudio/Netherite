@@ -25,32 +25,32 @@ new Command<InitCommandData>({
         },
 	},
 	usage: {
-		description: "Initialize a new project",
-		usage: "init",
+		description: "Initializes a new project",
+		usage: "[options]",
 		flags: {
 			name: {
 				type: "string",
-				description: "The name of the project",
+				description: "The name of the project, will prompt if missing",
 				optional: true,
 			},
 			author: {
 				type: "string",
-				description: "The author of the project",
+				description: "The author of the project, will prompt if missing",
 				optional: true,
 			},
 			namespace: {
 				type: "string",
-				description: "The namespace of the project",
+				description: "The namespace of the project, will prompt if missing",
 				optional: true,
 			},
 			formatVersion: {
 				type: "string",
-				description: "The format version of the project",
+				description: "The format version of the project, will prompt if missing",
 				optional: true,
 			},
 			type: {
 				type: "string",
-				description: "The type of the project",
+				description: "The type of the project, will prompt if missing",
 				optional: true,
 			},
 		},
