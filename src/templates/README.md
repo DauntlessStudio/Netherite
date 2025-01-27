@@ -1,4 +1,4 @@
-# PROJECTNAME
+# $PROJECTNAME$
 This is a Minecraft Bedrock project made using Netherite. It provides support for writing your game scripts in TypeScript and building them for you, as well as writing TypeScript modules that can be used to generate your project's files.
 
 ## Project Overview

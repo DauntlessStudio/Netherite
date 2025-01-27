@@ -1,3 +1,4 @@
+import { Config } from "../../core/config.ts";
 import { buildScripts } from "../../core/scripts_builder.ts";
 import { Command, type CommandData } from "../command.ts";
 
@@ -30,6 +31,7 @@ export default new Command<BuildCommandData>({
         return _args.options.watch === undefined || typeof _args.options.watch === "boolean";
     },
     action(_args) {
+        Config.ingestConfig();
         buildScripts(_args.options.watch);
     },
 });

@@ -1,6 +1,7 @@
 import * as path from "jsr:@std/path";
 import * as esbuild from "npm:esbuild";
 import {denoPlugins} from "jsr:@luca/esbuild-deno-loader";
+import { Config } from "./config.ts";
 
 export async function buildScripts(watch?: boolean): Promise<void> {
     try {
@@ -10,11 +11,14 @@ export async function buildScripts(watch?: boolean): Promise<void> {
         return;
     }
 
+    const outRoot = Config.Options.projectType === "world" ? "./dist/Content/world_template/" : "./dist/Content/";
+    const outfile = outRoot + `behavior_packs/${Config.Options.projectNamespace}_bp/scripts/main.js`;
+
     const buildOptions: esbuild.BuildOptions = {
         plugins: [...denoPlugins()],
         entryPoints: ["./src/behavior_pack/scripts/main.ts"],
         external: ["@minecraft/server", "@minecraft/server-ui"],
-        outfile: "./dist/Content/world_template/behavior_packs/folder_bp/scripts/main.js",
+        outfile,
         bundle: true,
         format: "esm",
         logLevel: "info",

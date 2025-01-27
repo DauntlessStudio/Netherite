@@ -1,4 +1,5 @@
 import * as path from "jsr:@std/path";
+import "jsr:@std/dotenv/load";
 
 export interface ProjectBuilderOptions {
     projectName: string;
@@ -26,6 +27,13 @@ export async function buildProject(options: ProjectBuilderOptions): Promise<void
     console.log(`Installing dependencies...`);
     await new Deno.Command("deno", {args: ["install", "npm:@minecraft/server"]}).output();
     await new Deno.Command("deno", {args: ["install", "npm:@minecraft/server-ui"]}).output();
+    if (Deno.env.get("LOCALAPI")) {
+        const denoFile = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
+        denoFile.imports["@coldiron/netherite"] = Deno.env.get("LOCALAPI");
+        Deno.writeTextFileSync(path.join(Deno.cwd(), "deno.json"), JSON.stringify(denoFile, null, "\t"));
+    } else {
+        // TODO: install the package from the registry
+    }
 
     console.log(`Project ${options.projectName} created successfully!`);
 }
@@ -55,16 +63,24 @@ function getProjectDirectories(options: Pick<ProjectBuilderOptions, "projectName
     }
 }
 
-function addProjectFiles(options: Pick<ProjectBuilderOptions, "projectName"|"projectType">): void {
-    const templateFiles = [
-        "deno.json",
-        "README.md",
-        ".gitignore",
-        "netherite.config.ts",
-    ];
+function addProjectFiles(options: ProjectBuilderOptions): void {
+    const templateFiles: Record<string, string> = {
+        "deno.json": "deno.json",
+        "README.md": "README.md",
+        ".gitignore": ".gitignore",
+        "netherite.config.txt": "netherite.config.ts",
+    }
 
-    templateFiles.forEach(file => {
-        const filePath = path.join(path.fromFileUrl(Deno.mainModule), "../..", "templates", file);
-        Deno.writeTextFileSync(path.join(Deno.cwd(), file), Deno.readTextFileSync(filePath).replace(/PROJECTNAME/g, options.projectName));
+    Object.entries(templateFiles).forEach(([src, dest]) => {
+        const filePath = path.join(path.fromFileUrl(Deno.mainModule), "../..", "templates", src);
+        Deno.writeTextFileSync(
+            path.join(Deno.cwd(), dest), Deno.readTextFileSync(filePath)
+            .replace(/\$PROJECTNAME\$/g, options.projectName)
+            .replace(/\$PROJECTAUTHOR\$/g, options.projectAuthor)
+            .replace(/\$PROJECTNAMESPACE\$/g, options.projectNamespace)
+            .replace(/\$PROJECTTYPE\$/g, options.projectType)
+            .replace(/\$FORMATVERSION\$/g, options.projectFormatVersion)
+            .replace(/\$UUID\$/g, crypto.randomUUID())
+        );
     });
 }
