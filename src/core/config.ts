@@ -1,6 +1,6 @@
 import * as uuid from "jsr:@std/uuid";
 import * as path from "jsr:@std/path";
-import type { ProjectBuilderOptions } from "./project_builder.ts";
+import type { ProjectBuilderOptions } from "./project_initializer.ts";
 
 export interface ConfigOptions extends ProjectBuilderOptions {
     uuid: string;

@@ -9,7 +9,7 @@ export interface ProjectBuilderOptions {
     projectType: "world"|"add-on"|"skin-pack";
 };
 
-export async function buildProject(options: ProjectBuilderOptions): Promise<void> {
+export async function initProject(options: ProjectBuilderOptions): Promise<void> {
     console.log(`Building project ${options.projectName}...`);
     
     const processDir = Deno.cwd();
