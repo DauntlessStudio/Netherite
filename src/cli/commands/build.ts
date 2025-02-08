@@ -1,4 +1,5 @@
 import { Config } from "../../core/config.ts";
+import { buildManifests } from "../../core/manifest_builder.ts";
 import { buildScripts } from "../../core/scripts_builder.ts";
 import { Command, type CommandData } from "../command.ts";
 
@@ -30,8 +31,9 @@ export default new Command<BuildCommandData>({
     validateArgs(_args) {
         return _args.options.watch === undefined || typeof _args.options.watch === "boolean";
     },
-    action(_args) {
-        Config.ingestConfig();
+    async action(_args) {
+        await Config.ingestConfig();
         buildScripts(_args.options.watch);
+        buildManifests();
     },
 });

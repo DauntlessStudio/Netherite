@@ -11,8 +11,7 @@ export async function buildScripts(watch?: boolean): Promise<void> {
         return;
     }
 
-    const outRoot = Config.Options.projectType === "world" ? "./dist/Content/world_template/" : "./dist/Content/";
-    const outfile = outRoot + `behavior_packs/${Config.Options.projectNamespace}_bp/scripts/main.js`;
+    const outfile = Config.Paths.bp.scripts + `/main.js`;
 
     const buildOptions: esbuild.BuildOptions = {
         plugins: [...denoPlugins()],

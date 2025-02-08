@@ -6,6 +6,17 @@ export interface ConfigOptions extends ProjectBuilderOptions {
     uuid: string;
 }
 
+interface ConfigPaths {
+    root: string;
+    bp: {
+        root: string;
+        scripts: string;
+    };
+    rp: {
+        root: string;
+    }
+}
+
 export class Config {
     private static options: ConfigOptions;
     
@@ -17,14 +28,32 @@ export class Config {
 
         return Object.freeze(this.options);
     }
+
+    public static get Paths(): ConfigPaths {
+        const root = this.Options.projectType === "world" ? "./dist/Content/world_template/" : "./dist/Content/";
+        const bpRoot = root + "behavior_packs/" + this.Options.projectNamespace + "_bp/";
+        const rpRoot = root + "resource_packs/" + this.Options.projectNamespace + "_rp/";
+
+        return {
+            root,
+            bp: {
+                root: bpRoot,
+                scripts: bpRoot + "scripts/",
+            },
+            rp: {
+                root: rpRoot,
+            }
+        }
+    }
     
     public static setOptions(options: ConfigOptions): void {
         this.options = options;
     }
 
-    public static ingestConfig(): void {
+    public static async ingestConfig(): Promise<void> {
         try {
-            import(path.join(Deno.cwd(), "netherite.config.ts"));
+            const url = new URL("file://" + path.join(Deno.cwd(), "netherite.config.ts"));
+            await import(url.toString());
         } catch (_error) {
             console.error("No config file found in the root of your project, please create a netherite.config.ts file.");
         }

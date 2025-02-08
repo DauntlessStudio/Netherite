@@ -5,12 +5,15 @@
     "jsr:@luca/esbuild-deno-loader@~0.11.1": "0.11.1",
     "jsr:@std/assert@1": "1.0.10",
     "jsr:@std/bytes@^1.0.2": "1.0.4",
+    "jsr:@std/cli@*": "1.0.11",
     "jsr:@std/cli@^1.0.11": "1.0.11",
     "jsr:@std/crypto@^1.0.3": "1.0.3",
+    "jsr:@std/dotenv@*": "0.225.3",
     "jsr:@std/encoding@^1.0.5": "1.0.6",
     "jsr:@std/internal@^1.0.5": "1.0.5",
     "jsr:@std/path@*": "1.0.8",
     "jsr:@std/path@^1.0.6": "1.0.8",
+    "jsr:@std/uuid@*": "1.0.4",
     "jsr:@std/uuid@^1.0.4": "1.0.4",
     "npm:esbuild@*": "0.24.2",
     "npm:esbuild@~0.24.2": "0.24.2"
@@ -38,6 +41,9 @@
     },
     "@std/crypto@1.0.3": {
       "integrity": "a2a32f51ddef632d299e3879cd027c630dcd4d1d9a5285d6e6788072f4e51e7f"
+    },
+    "@std/dotenv@0.225.3": {
+      "integrity": "a95e5b812c27b0854c52acbae215856d9cce9d4bbf774d938c51d212711e8d4a"
     },
     "@std/encoding@1.0.6": {
       "integrity": "ca87122c196e8831737d9547acf001766618e78cd8c33920776c7f5885546069"
