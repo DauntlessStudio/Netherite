@@ -90,5 +90,5 @@ async function buildResourceManifest(): Promise<void> {
         }
     }
 
-    Deno.writeTextFileSync(path.join(Config.Paths.bp.root, "manifest.json"), JSON.stringify(manifest, null, "\t"));
+    Deno.writeTextFileSync(path.join(Config.Paths.rp.root, "manifest.json"), JSON.stringify(manifest, null, "\t"));
 }

@@ -1,6 +1,7 @@
-import * as uuid from "jsr:@std/uuid";
+import { v4 } from "npm:uuid";
 import * as path from "jsr:@std/path";
 import type { ProjectBuilderOptions } from "./project_initializer.ts";
+import { Buffer } from "node:buffer";
 
 export interface ConfigOptions extends ProjectBuilderOptions {
     uuid: string;
@@ -60,6 +61,7 @@ export class Config {
     }
 
     public static async getUUID(category: string): Promise<string> {
-        return await uuid.v5.generate(this.Options.uuid, new TextEncoder().encode(category));
+        const hash = await crypto.subtle.digest("SHA-256", Buffer.from(category + Config.Options.uuid));
+        return v4({rng: () => Buffer.from(hash, 0, 16)});
     }
 }
