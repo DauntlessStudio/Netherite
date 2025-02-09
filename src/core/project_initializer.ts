@@ -48,9 +48,8 @@ function getProjectDirectories(options: Pick<ProjectBuilderOptions, "projectName
             return [
                 `src/modules`,
                 `src/behavior_pack`,
+                `src/resource_pack`,
                 `src/behavior_pack/scripts`,
-                `src/behavior_pack/text`,
-                `src/resource_pack/text`,
                 `dist/Content/behavior_packs/${options.projectNamespace}_bp`,
                 `dist/Content/resource_packs/${options.projectNamespace}_rp`,
             ];
@@ -58,9 +57,8 @@ function getProjectDirectories(options: Pick<ProjectBuilderOptions, "projectName
             return [
                 `src/modules`,
                 `src/behavior_pack`,
+                `src/resource_pack`,
                 `src/behavior_pack/scripts`,
-                `src/behavior_pack/text`,
-                `src/resource_pack/text`,
                 `dist/Content/world_template/behavior_packs/${options.projectNamespace}_bp`,
                 `dist/Content/world_template/resource_packs/${options.projectNamespace}_rp`,
             ];
