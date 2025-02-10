@@ -1,3 +1,5 @@
+import "jsr:@std/dotenv/load";
+import { platform } from 'node:process';
 import { v4 } from "npm:uuid";
 import * as path from "jsr:@std/path";
 import type { ProjectBuilderOptions } from "./project_initializer.ts";
@@ -29,6 +31,11 @@ export class Config {
         }
 
         return Object.freeze(this.options);
+    }
+
+    public static get MojangDirectory() : string {
+        const APPDATA = (Deno.env.get("LOCALAPPDATA") || (platform == 'darwin' ? Deno.env.get("HOME") + '/Library/Preferences' : Deno.env.get("HOME") + "/.local/share")).replace(/\\/g, '/');
+        return `${APPDATA}/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang`;
     }
 
     public static get Paths(): ConfigPaths {

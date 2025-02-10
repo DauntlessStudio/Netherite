@@ -22,6 +22,21 @@ export async function initProject(options: ProjectBuilderOptions): Promise<void>
     console.log(`Creating project directories...`);
     getProjectDirectories(options).forEach(dir => Deno.mkdirSync(path.join(Deno.cwd(), dir), {recursive: true}));
 
+    // Create development packs and symlink to dist
+    const mojangBP = path.join(Config.MojangDirectory, "development_behavior_packs", options.projectNamespace + "_bp");
+    const mojangRP = path.join(Config.MojangDirectory, "development_resource_packs", options.projectNamespace + "_rp");
+
+    Deno.mkdirSync(mojangBP, {recursive: true});
+    Deno.mkdirSync(mojangRP, {recursive: true});
+
+    if (options.projectType === "world") {
+        Deno.symlinkSync(mojangBP, path.join(Deno.cwd(), "dist/Content/world_template/behavior_packs", options.projectNamespace + "_bp"), {type: "dir"});
+        Deno.symlinkSync(mojangRP, path.join(Deno.cwd(), "dist/Content/world_template/resource_packs", options.projectNamespace + "_rp"), {type: "dir"});
+    } else {
+        Deno.symlinkSync(mojangBP, path.join(Deno.cwd(), "dist/Content/behavior_packs", options.projectNamespace + "_bp"), {type: "dir"});
+        Deno.symlinkSync(mojangRP, path.join(Deno.cwd(), "dist/Content/resource_packs", options.projectNamespace + "_rp"), {type: "dir"});
+    }
+
     console.log(`Adding project files...`);
     addProjectFiles(options);
 
@@ -50,8 +65,8 @@ function getProjectDirectories(options: Pick<ProjectBuilderOptions, "projectName
                 `src/behavior_pack`,
                 `src/resource_pack`,
                 `src/behavior_pack/scripts`,
-                `dist/Content/behavior_packs/${options.projectNamespace}_bp`,
-                `dist/Content/resource_packs/${options.projectNamespace}_rp`,
+                `dist/Content/behavior_packs`,
+                `dist/Content/resource_packs`,
             ];
         case "world":
             return [
@@ -59,8 +74,8 @@ function getProjectDirectories(options: Pick<ProjectBuilderOptions, "projectName
                 `src/behavior_pack`,
                 `src/resource_pack`,
                 `src/behavior_pack/scripts`,
-                `dist/Content/world_template/behavior_packs/${options.projectNamespace}_bp`,
-                `dist/Content/world_template/resource_packs/${options.projectNamespace}_rp`,
+                `dist/Content/world_template/behavior_packs`,
+                `dist/Content/world_template/resource_packs`,
             ];
         case "skin-pack":
             return [

@@ -5,6 +5,7 @@ import { buildScripts } from "../../core/scripts_builder.ts";
 import { buildStaticFiles } from "../../core/static_builder.ts";
 import { Command, type CommandData } from "../command.ts";
 import { buildModules } from "../../core/modules_builder.ts";
+import { emptyDirectorySync } from "../../core/utils/fileIO.ts";
 
 interface BuildCommandData extends CommandData {
     options: {
@@ -37,12 +38,8 @@ export default new Command<BuildCommandData>({
     async action(_args) {
         await Config.ingestConfig();
         // Delete dist directory
-        try {
-            Deno.removeSync(path.join(Deno.cwd(), Config.Paths.bp.root), {recursive: true});
-            Deno.removeSync(path.join(Deno.cwd(), Config.Paths.rp.root), {recursive: true});
-        } catch (_error) {
-            // Ignore error if directory doesn't exist
-        }
+        emptyDirectorySync(path.join(Deno.cwd(), Config.Paths.bp.root));
+        emptyDirectorySync(path.join(Deno.cwd(), Config.Paths.rp.root));
         // Copy static src files to dist
         buildStaticFiles();
         // Build dynamic src files
