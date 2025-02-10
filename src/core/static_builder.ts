@@ -50,7 +50,9 @@ function copyDirectoryRecursive(src: string, dest: string, excludeGlob: string[]
         } else {
             if (isTextFile(entry.name)) {
                 const content = Deno.readTextFileSync(srcPath);
-                const modifiedContent = content.replace(/NAMESPACE/g, Config.Options.projectNamespace);
+                const modifiedContent = content
+                    .replace(/NAMESPACE/g, Config.Options.projectNamespace)
+                    .replace(/FORMATVERSION/g, Config.Options.projectFormatVersion);
                 Deno.writeTextFileSync(destPath, modifiedContent);
             } else {
                 Deno.copyFileSync(srcPath, destPath);
