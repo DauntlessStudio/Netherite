@@ -4,6 +4,7 @@ import { buildManifests } from "../../core/manifest_builder.ts";
 import { buildScripts } from "../../core/scripts_builder.ts";
 import { buildStaticFiles } from "../../core/static_builder.ts";
 import { Command, type CommandData } from "../command.ts";
+import { buildModules } from "../../core/modules_builder.ts";
 
 interface BuildCommandData extends CommandData {
     options: {
@@ -45,6 +46,7 @@ export default new Command<BuildCommandData>({
         // Copy static src files to dist
         buildStaticFiles();
         // Build dynamic src files
+        await buildModules();
         buildManifests();
         // Build scripts
         buildScripts(_args.options.watch);
