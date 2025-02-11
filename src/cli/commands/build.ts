@@ -41,7 +41,7 @@ export default new Command<BuildCommandData>({
         emptyDirectorySync(path.join(Deno.cwd(), Config.Paths.bp.root));
         emptyDirectorySync(path.join(Deno.cwd(), Config.Paths.rp.root));
         // Copy static src files to dist
-        buildStaticFiles();
+        buildStaticFiles(_args.options.watch);
         // Build dynamic src files
         await buildModules();
         buildManifests();

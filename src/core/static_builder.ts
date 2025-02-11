@@ -1,18 +1,20 @@
 import * as path from "jsr:@std/path";
 import { Config } from "./config.ts";
+import { sendToDist } from "./utils/fileIO.ts";
+import { sleep } from "./utils/time.ts";
 
-export function buildStaticFiles(): void {
+export async function buildStaticFiles(watch?: boolean): Promise<void> {
     // Handles BP Root Files
     const behaviorPackPath = path.join(Deno.cwd(), "src/behavior_pack");
     const behaviorPackDest = path.join(Deno.cwd(), Config.Paths.bp.root);
     Deno.mkdirSync(behaviorPackDest, {recursive: true});
-    copyDirectoryRecursive(behaviorPackPath, behaviorPackDest, ["*.ts", "manifest.json"]);
+    sendToDist(behaviorPackPath, behaviorPackDest, ["*.ts", "manifest.json"]);
 
     // Handles RP Root Files
     const resourcePackPath = path.join(Deno.cwd(), "src/resource_pack");
     const resourcePackDest = path.join(Deno.cwd(), Config.Paths.rp.root);
     Deno.mkdirSync(resourcePackDest, {recursive: true});
-    copyDirectoryRecursive(resourcePackPath, resourcePackDest, ["manifest.json"]);
+    sendToDist(resourcePackPath, resourcePackDest, ["manifest.json"]);
 
     // Handles Module Files
     const modulePath = path.join(Deno.cwd(), "src/modules");
@@ -24,44 +26,72 @@ export function buildStaticFiles(): void {
                 const subPath = path.join(modulePath, entry.name, subEntry.name);
 
                 if (subEntry.isDirectory && /.+([bp]|[BP])/.test(subPath)) {
-                    copyDirectoryRecursive(subPath, behaviorPackDest, ["*.ts", "manifest.json"]);
+                    sendToDist(subPath, behaviorPackDest, ["*.ts", "manifest.json"]);
                 }
                 
                 if (subEntry.isDirectory && /.+([rp]|[RP])/.test(subPath)) {
-                    copyDirectoryRecursive(subPath, resourcePackDest, ["manifest.json"]);
+                    sendToDist(subPath, resourcePackDest, ["manifest.json"]);
                 }
             }
         }
     }
-}
 
-function copyDirectoryRecursive(src: string, dest: string, excludeGlob: string[] = []): void {
-    for (const entry of Deno.readDirSync(src)) {
-        const srcPath = path.join(src, entry.name);
-        const destPath = path.join(dest, entry.name);
+    // Handles file watching
+    if (!watch) return;
 
-        if (excludeGlob.some(glob => path.globToRegExp(glob).test(entry.name))) {
-            continue;
+    const sync = (event: Deno.FsEvent) => {
+        const src = event.paths[0];
+        let dest = src
+        .replace(behaviorPackPath, behaviorPackDest)
+        .replace(resourcePackPath, resourcePackDest);
+
+        if (dest.startsWith(modulePath)) {
+            dest = dest
+            .replace(/.+([bp]|[BP])/, behaviorPackDest)
+            .replace(/.+([rp]|[RP])/, resourcePackDest);
         }
 
-        if (entry.isDirectory) {
-            Deno.mkdirSync(destPath, {recursive: true});
-            copyDirectoryRecursive(srcPath, destPath);
-        } else {
-            if (isTextFile(entry.name)) {
-                const content = Deno.readTextFileSync(srcPath);
-                const modifiedContent = content
-                    .replace(/NAMESPACE/g, Config.Options.projectNamespace)
-                    .replace(/FORMATVERSION/g, Config.Options.projectFormatVersion);
-                Deno.writeTextFileSync(destPath, modifiedContent);
-            } else {
-                Deno.copyFileSync(srcPath, destPath);
+        switch (event.kind) {
+            case "create": {
+                sendToDist(src, dest);
+                break;
             }
+            case "modify": {
+                const stat = Deno.statSync(src);
+                if (stat.isDirectory) return;
+                if (!writeModifiedFile(src, dest)) return;
+                break;
+            }
+            case "rename": {
+                sendToDist(src, dest);
+                break;
+            }
+            case "remove": {
+                Deno.removeSync(dest, {recursive: true});
+                break;
+            }
+            default:
+                break;
         }
+
+        console.log("[%s] %s", event.kind, event.paths[0]);
+    };
+      
+    const watcher = Deno.watchFs(path.join(Deno.cwd(), "src"), {recursive: true});
+    
+    for await (const event of watcher) {
+      sync(event);
     }
 }
 
-function isTextFile(filename: string): boolean {
-    const textFileExtensions = [".ts", ".json", ".txt", ".md", ".lang"];
-    return textFileExtensions.some(ext => filename.endsWith(ext));
+const pendingChanges = new Map<string, boolean>();
+
+function writeModifiedFile(src: string, dest: string): boolean {
+    if (pendingChanges.has(src)) return false;
+
+    pendingChanges.set(src, true);
+    writeModifiedFile(src, dest);
+    sleep(200).then(() => pendingChanges.delete(src));
+
+    return true;
 }

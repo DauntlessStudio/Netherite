@@ -1,11 +1,40 @@
 import * as path from "jsr:@std/path";
+import { Config } from "../config.ts";
 
 export function emptyDirectorySync(dir: string): void {
     for (const entry of Deno.readDirSync(dir)) {
         const entryPath = path.join(dir, entry.name);
-        if (entry.isDirectory) {
-            emptyDirectorySync(entryPath);
-            Deno.removeSync(entryPath);
+        Deno.removeSync(entryPath, {recursive: true});
+    }
+}
+
+export function sendToDist(src: string, dest: string, excludeGlob: string[] = []): void {
+    const stat = Deno.statSync(src);
+
+    if (excludeGlob.some(glob => path.globToRegExp(glob).test(src))) {
+        return;
+    }
+    
+    if (stat.isDirectory) {
+        Deno.mkdirSync(dest, {recursive: true});
+        for (const entry of Deno.readDirSync(src)) {
+            sendToDist(path.join(src, entry.name), path.join(dest, entry.name));
+        }
+    } else {
+        if (isTextFile(src)) {
+            const content = Deno.readTextFileSync(src);
+            const modifiedContent = content
+                .replace(/NAMESPACE/g, Config.Options.projectNamespace)
+                .replace(/FORMATVERSION/g, Config.Options.projectFormatVersion);
+                
+            Deno.writeTextFileSync(dest, modifiedContent);
+        } else {
+            Deno.copyFileSync(src, dest);
         }
     }
+}
+
+export function isTextFile(filename: string): boolean {
+    const textFileExtensions = [".ts", ".json", ".txt", ".md", ".lang"];
+    return textFileExtensions.some(ext => filename.endsWith(ext));
 }
