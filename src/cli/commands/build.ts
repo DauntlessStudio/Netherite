@@ -43,7 +43,7 @@ export default new Command<BuildCommandData>({
         // Copy static src files to dist
         buildStaticFiles(_args.options.watch);
         // Build dynamic src files
-        await buildModules();
+        await buildModules(_args.options.watch);
         buildManifests();
         // Build scripts
         buildScripts(_args.options.watch);

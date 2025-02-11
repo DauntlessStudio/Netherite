@@ -41,6 +41,9 @@ export async function buildStaticFiles(watch?: boolean): Promise<void> {
 
     const sync = (event: Deno.FsEvent) => {
         const src = event.paths[0];
+        
+        if (src.endsWith(".ts")) return;
+
         let dest = src
         .replace(behaviorPackPath, behaviorPackDest)
         .replace(resourcePackPath, resourcePackDest);
