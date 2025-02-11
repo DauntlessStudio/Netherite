@@ -40,11 +40,11 @@ async function buildBehaviorManifest(): Promise<void> {
             },
             {
                 module_name: "@minecraft/server",
-                version: "1.16.0", // TODO: Get this from the project options
+                version: getVersionNumber("@minecraft/server"),
             },
             {
                 module_name: "@minecraft/server-ui",
-                version: "1.3.0", // TODO: Get this from the project options
+                version: getVersionNumber("@minecraft/server-ui"),
             },
         ],
     };
@@ -91,4 +91,16 @@ async function buildResourceManifest(): Promise<void> {
     }
 
     Deno.writeTextFileSync(path.join(Config.Paths.rp.root, "manifest.json"), JSON.stringify(manifest, null, "\t"));
+}
+
+function getVersionNumber(module: string): string {
+    try {
+        const deno = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
+        const value = deno.imports[module] as string|undefined;
+
+        if (!value) throw new Error(`Could not find module ${module} in deno.json`);
+        return value.split("@^")[1]; // TODO: handle beta versions correctly
+    } catch (_error) {
+        throw new Error(`Could not get version number for module ${module} as deno.json doesn't exist`);
+    }
 }
