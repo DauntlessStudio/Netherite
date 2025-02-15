@@ -282,3 +282,128 @@ interface AttackCooldown {
     attack_cooldown_complete_event: string;
     attack_cooldown_time: [number, number];
 }
+
+/**
+ * Enables the entity to drop an item as a barter exchange
+ */
+interface Barter {
+    /**
+     * A loot table used to drop a random item
+     */
+    barter_table: string;
+    /**
+     * Duration in seconds that the mob won't barter after being hurt
+     * @default 0
+     */
+    cooldown_after_being_attacked: number
+}
+
+/**
+ * Allows the player to detect and maneuver on the scaffold block
+ */
+interface BlockClimber {}
+
+/**
+ * Fires an event when a block is broken in range
+ */
+interface BlockSensor {
+    /**
+     * A list of blocks and events to fire when a block is broken. If a block is in multiple lists, multiple events will be fired
+     */
+    on_break: {
+        /**
+         * List of blocks to fire the event for
+         */
+        block_list: string[];
+        /**
+         * The event to fire when a block is broken
+         */
+        on_block_broken: string;
+    }[];
+    /**
+     * The range in blocks that the sensor will detect block breaks. Max range is 32.0
+     * @default 16.0
+     */
+    sensor_radius: number;
+    /**
+     * Filters applied to the entity breaking the block to determine if the event should be fired
+     */
+    sources: ServerFilters|ServerFilters[];
+}
+
+/**
+ * A rideable entity's boost
+ */
+interface Boostable {
+    /** 
+     * List of items that can be used to boost while riding this entity.
+    */
+    boost_items: {
+        /**
+         * The damage the item will take each time it is used
+         * @default 1
+         */
+        damage: number;
+        /**
+         * The item name
+         */
+        item: string;
+        /**
+         * The item will transform into this item when used up
+         */
+        replace_item: string;
+    };
+    /**
+     * The duration of the boost in seconds
+     */
+    duration: number;
+    /**
+     * Factor of speed increase. TODO: account for absence in format verions below 1.20.x
+     * @default 1.35
+     */
+    speed_multiplier: number;
+}
+
+/**
+ * Defines the effects for boss entities
+ */
+interface Boss {
+    /**
+     * The max distance in blocks that the boss can be from the player for the health bar to be displayed
+     * @default 55
+     */
+    hud_range: number;
+    /**
+     * The name that will be displayed above the boss's health bar
+     */
+    name: string;
+    /**
+     * Should the sky darken if the boss is present
+     */
+    should_darken_sky: boolean;
+}
+
+/**
+ * Specifies the blocks this entity can break as it moves around
+ */
+interface BreakBlocks {
+    /**
+     * A list of the blocks that can be broken when the entity moves
+     */
+    breakable_blocks: string[];
+}
+
+/**
+ * Defines what blocks the entity can breathe in and gives them the ability to suffocate
+ */
+interface Breathable {
+    breathe_blocks: string[];
+    breathes_air: boolean;
+    breathes_lava: boolean;
+    breathes_water: boolean;
+    breathes_solids: boolean;
+    generate_bubbles: boolean;
+    inhale_time: number;
+    non_breathe_blocks: string[];
+    suffocate_time: number;
+}
