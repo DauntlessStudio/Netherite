@@ -397,13 +397,305 @@ interface BreakBlocks {
  * Defines what blocks the entity can breathe in and gives them the ability to suffocate
  */
 interface Breathable {
+    /**
+     * List of blocks this entity can breathe in, in addition to the other parameters
+     */
     breathe_blocks: string[];
+    /**
+     * If true, the entity can breathe in air
+     * @default true
+     */
     breathes_air: boolean;
+    /**
+     * If true, the entity can breathe in lava
+     * @default true
+     */
     breathes_lava: boolean;
+    /**
+     * If true, the entity can breathe in water
+     * @default false
+     */
     breathes_water: boolean;
+    /**
+     * If true, the entity can breathe in solid blocks
+     * @default false
+     */
     breathes_solids: boolean;
+    /**
+     * If true, the entity can generate bubbles underwater
+     * @default true
+     */
     generate_bubbles: boolean;
+    /**
+     * The time in seconds the entity needs to recover its breath
+     * @default 0
+     */
     inhale_time: number;
+    /**
+     * List of blocks the entity cannot breathe in, in addition to the other parameters
+     */
     non_breathe_blocks: string[];
+    /**
+     * TODO: check if this is in seconds or ticks
+     * The time in seconds between taking suffocation damage
+     * @default 2
+     */
     suffocate_time: number;
+    /**
+     * The time in seconds the entity can hold its breath
+     * @default 15
+     */
+    total_supply: number;
+}
+
+/**
+ * Defines the way the entity can get into the "love" state
+ */
+interface Breedable {
+    /**
+     * If true, the entity can breed while sitting
+     * @default false
+     */
+    allow_sitting: boolean;
+    /**
+     * If true, the entity will blend their attributes in the offsprint
+     * @default true
+     */
+    blend_attributes: boolean;
+    /**
+     * Time in seconds before the entity can breed again
+     * @default 60
+     */
+    breed_cooldown: number;
+    /**
+     * List of items that can be used to get the entity into the "love" state
+     */
+    breed_items: string[];
+    /**
+     * List of entity definitions that this entity can breed with
+     */
+    breeds_with: {
+        /**
+         * The entity definition of the baby this will produce
+         */
+        baby_type: string;
+        /**
+         * The event to run when the entity breeds
+         */
+        breed_event: string;
+        /**
+         * The entity definition of the mate
+         */
+        mate_type: string;
+    }[];
+    /**
+     * If true, the entity will become pregnant instead of spawning a baby
+     * @default false
+     */
+    causes_pregnancy: boolean;
+    /**
+     * Determines the likelihood of a random variant mutation not shared by either parent
+     */
+    deny_parents_variant: {
+        /**
+         * The percentage chance of denying the parent's variant
+         */
+        chance: number;
+        /**
+         * The inclusive maximum of the variant range
+         */
+        max_variant: number;
+        /**
+         * The inclusive minimum of the variant range
+         */
+        min_variant: number;
+    };
+    /**
+     * The list of nearby block requirements to get the entity into the "love" state
+     */
+    environment_requirements: {
+        /**
+         * The list of blocks that must be nearby
+         */
+        blocks: string[];
+        /**
+         * The number of the required blocks that must be nearby
+         */
+        count: number;
+        /**
+         * The distance in blocks that the blocks must be within. Between 0-16
+         */
+        radius: number;
+    }[];
+    /**
+     * Chance that up to 16 babies will spawn. Between 0-1
+     * @default 0
+     */
+    extra_baby_chance: number;
+    /**
+     * If true, the babies will be automatically tamed if its parents are
+     * @default true
+     */
+    inherit_tamed: boolean;
+    /**
+     * The filters to run when attempting to fall in love
+     */
+    love_filters: ServerFilters|ServerFilters[];
+    /**
+     * Determines how likely the babies are to **not** inherite one of their parent's variances. Values between 0.0-1.0
+     */
+    mutation_factor: {
+        /**
+         * The percentage chance of the offspring getting its color as if spawned rather than inheriting color from its parents
+         * @default 0.0
+         */
+        color: number;
+        /**
+         * The percentage chance of a mutation on the entity's mark variant type
+         * TODO: Check if this means mark_variant
+         * @default 0.0
+         */
+        extra_variant: number;
+        /**
+         * The percentage chance of a mutation on the entity's variant type
+         * @default 0.0
+         */
+        variant: number;
+    };
+    /**
+     * Strategy used for mutating variants and mark variants for offpsring
+     */
+    mutation_strategy: "random"|"none";
+    /**
+     * [EXPERIMENTAL] List of attributes that should benefit from parent centric attribute blending
+     */
+    parent_centric_attribute_blending: string[];
+    /**
+     * List of entity  properties that should be inherited from the parent entities and potentially mutated
+     * TODO: look into what potential mutations it means
+     */
+    property_inheritance: string[];
+    /**
+     * Range used to determine random mark variant
+     * @default [0,0]
+     */
+    random_extra_variant_mutation_inverval: [number, number];
+    /**
+     * Range used to determine random variant
+     * @default [0,0]
+     */
+    random_variant_mutation_inverval: [number, number];
+    /**
+     * If true, the entity needs to be full health before it can breed
+     * @default false
+     */
+    require_full_health: boolean;
+    /**
+     * If true, the entity needs to be tamed before it can breed
+     * @default true
+     */
+    require_tame: boolean;
+    /**
+     * The breed item will transform to this item on successful interaction
+     */
+    transform_to_item: string;
+}
+
+/**
+ * Defines the way an entity can be bribed
+ */
+interface Bribeable {
+    /**
+     * Time in seconds before the entity can be bribed again
+     * @default 2.0
+     */
+    bribe_cooldown: number;
+    /**
+     * List of items that can be used to bribe the entity
+     */
+    bribe_items: string[];
+}
+
+/**
+ * Enables an entity to float on the specified liquid blocks
+ */
+interface Buoyant {
+    /**
+     * Applies gravity each tick. Causes more of a wave simulation but will cause more gravity to be applied outside liquids. Will override `gravity: false` on the `minecraft:physics` component
+     * @default true
+     */
+    apply_gravity: boolean;
+    /**
+     * Base buoyancy used to calculate how much an entity will float
+     * @default 1.0
+     */
+    base_buoyancy: number;
+    /**
+     * Probability for a big wave hitting the entity. Only used if `siumulate_waves` is true
+     * @default 0.03
+     */
+    big_wave_probability: number;
+    /**
+     * Multiplier for the speed to make a big wave
+     * @default 10.0
+     */
+    big_wave_speed: number;
+    /**
+     * How much an actor will be dragged down when this component is removed
+     * @default 0.0
+     */
+    drag_down_on_buoyancy_removed: number;
+    /**
+     * List of blocks this entity can float on. Must be a liquid block
+     */
+    liquid_blocks: string[];
+    /**
+     * Should the movement simulate waves going through
+     * @default true
+     */
+    simulate_waves: boolean;
+}
+
+/**
+ * Specifies if a mob burns in daylight
+ */
+interface BurnsInDaylight {}
+
+/**
+ * Determines if this entity can join an existing raid
+ */
+interface CanJoinRaid {}
+
+/**
+ * Specifies hunt celebration behavior
+ */
+interface CelebrateHunt {
+    /**
+     * If true, celebration will be broadcast to other entities in radius
+     * @default true
+     */
+    broadcast: boolean;
+    /**
+     * The list of conditions that the target of a hunt must satisfy to initiate a celebration
+     */
+    celebration_targets: ServerFilters|ServerFilters[];
+    /**
+     * The sound event to play when the entity celebrates
+     */
+    celebrate_sound: string;
+    /**
+     * Duration in seconds of the celebration
+     * @default 4
+     */
+    duration: number;
+    /**
+     * If `broadcast` is enabled, this specifies the radius in which it will notify other entities.
+     * @default 16
+     */
+    radius: number;
+    /**
+     * The range of time in seconds to randomly wait before playning the sound again
+     * @default [0,0]
+     */
+    sound_interval: [number, number];
 }
