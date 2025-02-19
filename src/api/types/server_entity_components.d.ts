@@ -1,8 +1,8 @@
 // deno-lint-ignore-file no-empty-interface
 import type { DamageType } from "./damage_type.d.ts";
 import type { ServerFilters } from "./filters.d.ts";
-import type { MobEffect } from "./mob_effects.d.ts";
-import { Molang } from "./molang.d.ts";
+import type { MobEffects } from "./mob_effects.d.ts";
+import type { Molang } from "./molang.d.ts";
 
 interface ComponentEvent {
     filters?: ServerFilters|ServerFilters[];
@@ -275,7 +275,7 @@ interface Attack {
     /**
      * A mob effect that is applied to the target
      */
-    effect_name?: MobEffect;
+    effect_name?: MobEffects;
     /**
      * The duration of the mob effect in seconds
      */
@@ -1804,4 +1804,622 @@ interface Inventory {
      * @default false
      */
     restrict_to_owner: boolean;
+}
+
+/**
+ * Defines that this entity is an item hopper
+ */
+interface ItemHopper {}
+
+/**
+ * Defines a dynamic jump type based on the entity's movement speed
+ */
+interface JumpDynamic {}
+
+/**
+ * Defines the entity's ability to jump
+ */
+interface JumpStatic {
+    /**
+     * The initial vertical velocity for the jump
+     * @default 0.42
+     */
+    jump_power: number;
+}
+
+/**
+ * Defines this entity's leashing properties
+ */
+interface Leashable {
+    /**
+     * If true, players can leash this entity even if already leashed to another mob
+     * @default false
+     */
+    can_be_stolen: boolean;
+    /**
+     * Distance in blocks at which the leash stiffens, restricting movement
+     * @default 6
+     */
+    hard_distance: number;
+    /**
+     * Distance in blocks at which the leash breaks
+     * @default 10
+     */
+    max_distance: number;
+    /**
+     * Event to fire when the entity is leashed
+     */
+    on_leash: string;
+    /**
+     * Event to fire when the entity is unleashed
+     */
+    on_unleash: string;
+    /**
+     * Distance in blocks at which the `spring` effect starts acting to keep this entity close to the entity it is leashed to
+     * @default 4
+     */
+    soft_distance: number;
+}
+
+/**
+ * Defines the behavior when the entity is looked at
+ */
+interface LookedAt {
+    /**
+     * The FOV in degrees that the entity can be looked at
+     * @default 26
+     */
+    field_of_view: number;
+    /**
+     * The list of filters that must be satisfied for the entity to be looked at
+     */
+    filters: ServerFilters|ServerFilters[];
+    /**
+     * Limits the search to only the nearest player that meets the `filters` rather than all nearby entities
+     * @default false
+     */
+    find_players_only: boolean;
+    /**
+     * Defines the type of block shape used to check for line of sight obstructions
+     * TODO: Find out what these are
+     * @default "collision"
+     */
+    line_of_sight_obstruction_type: "outline"|"collision"|"collision_for_camera";
+    /**
+     * A list of locations at which the line of sight checks are made. At least one location must be unobstructed for the entity to be considered looked at
+     */
+    look_at_locations: string[];
+    /**
+     * Specifies the range fo the random number of seconds between checks
+     * @default [0,0]
+     */
+    looked_at_cooldown: [number, number];
+    /**
+     * The event to fire when the entity is looked at
+     */
+    looked_at_event: string;
+    /**
+     * Defines the minimum continuous an entity must be looking at this entity to be considered looked at
+     * @default 0
+     */
+    min_looked_at_duration: number;
+    /**
+     * Defines the event to trigger when the entity is not being looked at
+     * TODO: find out if this fires every frame or just once
+     */
+    not_looked_at_event: string;
+    /**
+     * If true, the FOV narrows as the looking entity gets closer to this entity
+     * @default true
+     */
+    scale_fov_by_distance: boolean;
+    /**
+     * Maximum distance this entity will look for looking entities
+     * @default 10
+     */
+    search_radius: number;
+    /**
+     * Defines if and how the owner entity will set entities that are looking at it as its combat targets
+     * - `never` - Looking entities are never set as targets, but events are fired
+     * - `once_and_stop_scanning` - The first entity that looks at this entity is set as the target and scanning stops
+     * - `once_and_keep_scanning` - The first entity that looks at this entity is set as the target and scanning continues
+     */
+    set_target: "never"|"once_and_stop_scanning"|"once_and_keep_scanning";
+}
+
+/**
+ * Defines that the entity should use wandering trader behavior
+ */
+interface ManagedWanderingTrader {}
+
+/**
+ * Defines how mob effects might be applied to nearby entities
+ */
+interface MobEffect {
+    /**
+     * Time in seconds between effect applications
+     * @default 0.0
+     */
+    cooldown_time: number;
+    /**
+     * How close an entity must be to have the effect applied
+     * @default 0.2
+     */
+    effect_range: number;
+    /**
+     * How long the applied mob effect lasts in seconds
+     * @default 10
+     */
+    effect_time: number;
+    /**
+     * Filters to determine which entities are affected by the mob effect
+     */
+    entity_filter: ServerFilters|ServerFilters[];
+    /**
+     * The effect to apply
+     */
+    mob_effect: MobEffects;
+}
+
+/**
+ * Defines the entity's mob effect immunities
+ */
+interface MobEffectImmunity {
+    /**
+     * List of mob effects that the entity is immune to
+     */
+    mob_effects: MobEffects[];
+}
+
+interface SharedMovement {
+    /**
+     * The maximum number in degrees the entity can turn per tick
+     * @default 30.0
+     */
+    max_turn: number;
+}
+
+/**
+ * Allows the entity to swim in water and on land
+ */
+interface MovementAmphibious extends SharedMovement {}
+
+/**
+ * Accentsthe movement of an entity
+ */
+interface MovementBasic extends SharedMovement {}
+
+/**
+ * Allows the entity to fly
+ */
+interface MovementFly extends SharedMovement {}
+
+/**
+ * Allows the entity to fly, swim, climb, etc.
+ */
+interface MovementGeneric extends SharedMovement {}
+
+/**
+ * Allows the entity to hover
+ */
+interface MovementHover extends SharedMovement {}
+
+/**
+ * Allows the entity to hop as it moves (i.e. Slimes)
+ */
+interface MovementJump extends SharedMovement {}
+
+/**
+ * Allows the entity to sway side to side giving the impression of swimming
+ */
+interface MovementSway extends SharedMovement {}
+
+/**
+ * Allows the entity to be named
+ */
+interface Nameable {
+    /**
+     * If true, the entity can be renamed with a name tag
+     * @default true
+     */
+    allow_name_tag_renaming: boolean;
+    /**
+     * If true, the name will always be shown
+     * @default false
+     */
+    always_show: boolean;
+    /**
+     * Event to fire when the entity is named
+     */
+    default_trigger: string;
+    /**
+     * Defines special names for this entity and the events to fire when named these
+     */
+    name_actions: {
+        /**
+         * List of special names to fire the `on_named` event
+         */
+        name_filter: string[];
+        /**
+         * Event to fire when the entity is named one of the names in `name_filter`
+         */
+        on_named: string;
+    }
+}
+
+interface SharedNavigation {
+    /**
+     * Tells the pathfinder to avoid blocks that cause damage
+     * @default false
+     */
+    avoid_damage_blocks: boolean;
+    /**
+     * Tells the pathfinder to avoid portals
+     * @default false
+     */
+    avoid_portals: boolean;
+    /**
+     * Tells the pahtfinder to avoid tiles exposed to the sun
+     * @default false
+     */
+    avoid_sun: boolean;
+    /**
+     * Tells the pathfinder to avoid water
+     * @default false
+     */
+    avoid_water: boolean;
+    /**
+     * Tells the pathfinder to avoid these blocks
+     */
+    blocks_to_avoid: string[];
+    /**
+     * Tells the pathfinder it can jump out of water
+     * @default false
+     */
+    can_breach: boolean;
+    /**
+     * Tells the pathfinder it can break doors and pass through them
+     * @default false
+     */
+    can_break_doors: boolean;
+    /**
+     * Tells the pathfinder it can jump up on blocks
+     * @default true
+     */
+    can_jump: boolean;
+    /**
+     * Tells the pathfinder it can path through a closed door
+     * @default false
+     */
+    can_open_doors: boolean;
+    /**
+     * Tells the pathfinder it can path through a closed iron door
+     * @default false
+     */
+    can_open_iron_doors: boolean;
+    /**
+     * Tells the pathfinder it can path through open doors
+     * @default true
+     */
+    can_pass_doors: boolean;
+    /**
+     * Tells the pathfinder it can pathfind from the air
+     * @default false
+     */
+    can_path_from_air: boolean;
+    /**
+     * Tells the pathfinder it can path over the surface of lava
+     * @default false
+     */
+    can_path_over_lava: boolean;
+    /**
+     * Tells the pathfinder it can path of the surface of water
+     * @default false
+     */
+    can_path_over_water: boolean;
+    /**
+     * Tells the pathfinder it will be pulled down by gravity while in water
+     * @default true
+     */
+    can_sink: boolean;
+    /**
+     * Tells the pathfinder it can path from anywhere through water
+     * @default false
+     */
+    can_swim: boolean;
+    /**
+     * Tells the pathfinder it can walk on the ground outside of water
+     * @default true
+     */
+    can_walk: boolean;
+    /**
+     * Tells the pathfinder it can travel in lava like walking on the ground
+     * @default false
+     */
+    can_walk_in_lava: boolean;
+    /**
+     * Tells the pathfinder it can walk on the ground underwater
+     * @default false
+     */
+    is_amphibious: boolean;
+}
+
+/**
+ * Allows this entity to generate paths that include vertical walls like a Spider
+ */
+interface NavigationClimb extends SharedNavigation {}
+
+/**
+ * Allows this entity to generate paths while floating through the air like a Ghast
+ */
+interface NavigationFloat extends SharedNavigation {}
+
+/**
+ * Allows this entity to generate paths while floating through the air like a Parrot
+ */
+interface NavigationFly extends SharedNavigation {}
+
+/**
+ * Allows this entity to generate paths by walking, swimming, flying, climbing, and jumping
+ */
+interface NavigationGeneric extends SharedNavigation {}
+
+/**
+ * Allows this entity to generate paths while in the air like a Bee
+ */
+interface NavigationHover extends SharedNavigation {}
+
+/**
+ * Allows this entity to generate paths in water
+ */
+interface NavigationSwim extends SharedNavigation {}
+
+/**
+ * Allows this entity to generate paths by walking around
+ */
+interface NavigationWalk extends SharedNavigation {}
+
+/**
+ * Defines the entity's "out of control" state
+ */
+interface OutOfControl {}
+
+/**
+ * Defines the entity's peek behavior
+ */
+interface Peek {
+    /**
+     * Event to call when the entity is done peeking
+     */
+    on_close: string;
+    /**
+     * Event to call when the entity starts peeking
+     */
+    on_open: string;
+    /**
+     * Event to call when the entity's target entity starts peeking
+     */
+    on_target_open: string;
+}
+
+/**
+ * Defines that an entity should be persistent in the game world
+ */
+interface Persistent {}
+
+/**
+ * Defines physics properties of an entity
+ */
+interface Physics {
+    /**
+     * If true, the entity will collide with things
+     * @default true
+     */
+    has_collision: boolean;
+    /**
+     * If true, the entity will be affected by gravity
+     * @default true
+     */
+    has_gravity: boolean;
+    /**
+     * If true, the entity should be pushed towards the nearest open area when stuck inside a block
+     * @default false
+     */
+    push_towards_closest_space: boolean;
+}
+
+/**
+ * Defines the cost information for the entity to walk on preferred blocks
+ */
+interface PreferredPath {
+    /**
+     * The cost of non-preferred blocks
+     * @default 0
+     */
+    default_block_cost: number;
+    /**
+     * Addec cost for jumping up a node
+     * @default 0
+     */
+    jump_cost: number;
+    /**
+     * Distance mob can fall without taking damage
+     * @default 3
+     */
+    max_fall_blocks: number;
+    /**
+     * A list of blocks with their associated cost
+     */
+    preferred_path_blocks: {
+        /**
+         * The pathfinding cost of these blocks
+         */
+        cost: number;
+        /**
+         * The list of blocks to apply the cost to
+         */
+        blocks: string[];
+    };
+}
+
+/**
+ * Defines the entity as a fireable projectile
+ */
+interface Projectile {
+    /**
+     * Determines the angel at which the projectile is fired
+     * @default 0
+     */
+    angle_offset: number;
+    /**
+     * If true, the hit entity will be set on fire
+     * @default false
+     */
+    catch_fire: boolean;
+    /**
+     * If true, the projectile will produce addditional particles when a critical hit happens
+     * @default false
+     */
+    crit_particle_on_hurt: boolean;
+    /**
+     * If true, this entity will be destroyed if hurt
+     * @default false
+     */
+    destroy_on_hurt: boolean;
+    /**
+     * The entity defined here can't be hurt by the projectile
+     */
+    filter: string;
+    /**
+     * If true, the projectile's ability to cause fire is dictated by the mob griefing game rule
+     * @default false
+     */
+    fire_affect_by_griefing: boolean;
+    /**
+     * The gravity applied to the entity when fired, higher values make the entity fall faster
+     * @default 0.05
+     */
+    gravity: number;
+    /**
+     * If true, when hitting a vehicle with at least one passanger, the damage will be applied to the nearest passanger
+     * @default false
+     */
+    hit_nearest_passenger: boolean;
+    /**
+     * The sound that plays when the projectile hits something
+     */
+    hit_sound: string;
+    /**
+     * If true, the projectile homes in
+     * @default false
+     */
+    homing: boolean;
+    /**
+     * An array of entities that the projectile will ignore
+     */
+    ignored_entities: string[];
+    /**
+     * The fraction of the projectile's speed maintained every frame in air
+     * @default 0.99
+     */
+    inertia: number;
+    /**
+     * If true, the projectile will be treated as dangerous to players
+     * @default false
+     */
+    is_dangerous: boolean;
+    /**
+     * If true, the projectile will knock back the entity it hits
+     * @default true
+     */
+    knockback: boolean;
+    /**
+     * If true, hit entities will be struck by lightning
+     * @default false
+     */
+    lightning: boolean;
+    /**
+     * The fraction of the projectile's speed maintained every frame in liquid
+     * @default 0.6
+     */
+    liquid_inertia: number;
+    /**
+     * If true, the projectile can hit multiple entities per flight
+     * @default true
+     */
+    multiple_targets: boolean;
+    /**
+     * The offset from the entity's anchor where the projectile will spawn
+     * @default [0,0,0]
+     */
+    offset: [number, number, number];
+    /**
+     * Time in seconds that the entity hit will be on fire for
+     * @default 5.0
+     */
+    on_fire_time: number;
+    /**
+     * Particle to use on collision
+     * @default "iconcrack"
+     */
+    particle: string;
+    /**
+     * Defines the effect the projectile will apply to the hit entity
+     * @default -1
+     */
+    potion_effect: number;
+    /**
+     * Determines the velocity of the projectile
+     * @default 1.3
+     */
+    power: number;
+    /**
+     * During the specified time, in seconds, the projectile cannot be reflected by being hit
+     * @default 0
+     */
+    reflect_immunity: number;
+    /**
+     * If true, the entity will be reflected back when hit
+     * @default false
+     */
+    reflect_on_hurt: boolean;
+    /**
+     * If true, damage will be randomized based on damage and speed
+     * @default false
+     */
+    semi_random_diff_damaage: boolean;
+    /**
+     * The sound that plays when the projectile is shot
+     */
+    shoot_sound: string;
+    /**
+     * If true, the projectile will be shot toward the target of the entity firing it
+     * @default true
+     */
+    shoot_target: boolean;
+    /**
+     * If true, the projectile will bounce on hit
+     * @default false
+     */
+    should_bounce: boolean;
+    /**
+     * If true, the projectile will be treated like a splash potion
+     * @default false
+     */
+    splash_potion: boolean;
+    /**
+     * Radius in blocks of the "splash" effect
+     * @default 4
+     */
+    splash_range: number;
+    /**
+     * The base accuracy. Accuracy is determined by the formula `uncertaintyBase` - `difficultyLevel` * `uncertaintyMultiplier`
+     * @default 0
+     */
+    uncertainty_base: number;
+    /**
+     * Determines how much difficulty affects accuracy. Accuracy is determined by the formula `uncertaintyBase` - `difficultyLevel` * `uncertaintyMultiplier`
+     * @default 0
+     */
+    uncertainty_multiplier: number;
 }

@@ -1,4 +1,4 @@
-export type MobEffect = 
+export type MobEffects = 
 | "absorption"
 | "bad_omen"
 | "blindness"
