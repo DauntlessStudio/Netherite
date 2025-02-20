@@ -2842,3 +2842,415 @@ interface SpawnEntity {
  * Allows the entity to remember suspicious locations
  */
 interface SuspectTracking {}
+
+/**
+ * Defines the entity's ability to be tamed
+ */
+interface Tameable {
+    /**
+     * The chance of taming the entity with each item use, 0.0 is 0% and 1.0 is 100%
+     * @default 1.0
+     */
+    probability: number;
+    /**
+     * The event to fire when the entity is tamed
+     */
+    tame_event: string;
+    /**
+     * The list of items that can be used to tame the entity
+     */
+    tame_items: string[];
+}
+
+/**
+ * Allows the entity to be tamed by mounting it
+ */
+interface TameMount {
+    /**
+     * The amount the entity's temper will be modified by when a player attempts to tame it
+     * @default 5
+     */
+    attempt_temper_mod: number;
+    /**
+     * The list of items that, if used to interact with the entity, will anger it
+     */
+    auto_reject_items: {
+        /**
+         * The rejected item name
+         */
+        item: string;
+    }[];
+    /**
+     * The list of items that can be used to lower the entity's temper and speed up the taming
+     */
+    feed_items: {
+        /**
+         * The item that lowers temper
+         */
+        item: string;
+        /**
+         * The amount of temper reduced when fed this item
+         * @default 0
+         */
+        temper_mod: number;
+    }[];
+    /**
+     * Text to be displayed when attempting to feed the entity on touch controls
+     */
+    feed_text: string;
+    /**
+     * The maximum for the random starting temper
+     * @default 100
+     */
+    max_temper: number;
+    /**
+     * The minimum for the random starting temper
+     * @default 0
+     */
+    min_temper: number;
+    /**
+     * Text to be displayed when attempting to ride the entity on touch controls
+     */
+    ride_text: string;
+    /**
+     * The event to fire when the entity is tamed
+     */
+    tame_event: string;
+}
+
+/**
+ * Defines the entity's range within which it can sense other entities to target
+ */
+interface TargetNearbySensor {
+    /**
+     * Max distance in blocks that another entity will be considered `inside` the range
+     * @default 1
+     */
+    inside_range: number;
+    /**
+     * If true, the entity will only target entities that it can see
+     * @default false
+     */
+    must_see: boolean;
+    /**
+     * Event to fire when an entity is inside the range
+     */
+    on_inside_range: ComponentEvent|string;
+    /**
+     * Event to fire when an entity is inside the range
+     */
+    on_outside_range: ComponentEvent|string;
+    /**
+     * Event to fire when an entity exits the visual range
+     */
+    on_vision_lost_inside_range: ComponentEvent|string;
+    /**
+     * Max distance in blocks that another entity will be considered `outside` the range
+     * @default 5
+     */
+    outside_range: number;
+}
+
+/**
+ * Defines an entity's teleporting behavior
+ */
+interface Teleport {
+    /**
+     * The percentage chance that the entity will teleport while in darkness
+     * @default 0.01
+     */
+    dark_teleport_chance: number;
+    /**
+     * The percentage chance that the entity will teleport while in daylight
+     * @default 0.01
+     */
+    light_teleport_chance: number;
+    /**
+     * Max time in seconds between random teleports
+     * @default 20
+     */
+    max_random_teleport_time: number;
+    /**
+     * Min time in seconds between random teleports
+     * @default 0
+     */
+    min_random_teleport_time: number;
+    /**
+     * Entity will teleport to a random location within this cube
+     * @default [32,16,32]
+     */
+    random_teleport_cube: [number, number, number];
+    /**
+     * If true, the entity will teleport randomly
+     * @default true
+     */
+    random_teleports: boolean;
+    /**
+     * Max distance the entity will teleport when chasing a target
+     * @default 16
+     */
+    target_distance: number;
+    /**
+     * The chance that the entity will teleport, 0.0 is 0% and 1.0 is 100%
+     * @default 1.0
+     */
+    target_teleport_chance: number;
+}
+
+/**
+ * Defines if the entity ticks the world around it
+ */
+interface TickWorld {
+    /**
+     * The distance at whih the closest player has to be before this entity dispawns, ignored if `never_despawn` is true. Minimum is 128
+     * @default 128
+     */
+    distance_to_players: number;
+    /**
+     * If true, the entity will not despawn even if players are far away
+     * @default true
+     */
+    never_despawn: boolean;
+    /**
+     * The area around the entity to tick
+     * TODO: determine if this radius in in blocks or chunks
+     * @default 2
+     */
+    radius: 2|3|4|5|6;
+}
+
+/**
+ * Defines a timer which fires an event after counting down
+ */
+interface Timer {
+    /**
+     * If true, the timer will restart every time it fires
+     * @default true
+     */
+    looping: boolean;
+    /**
+     * If true, the amount of time on the timer will be random between the min and max in `time`
+     * @default true
+     */
+    randomInterval: boolean;
+    /**
+     * A list of times that will be randomly selected from
+     * TODO: determine what syntax is expected here
+     * @default []
+     */
+    random_time_choices: number[];
+    /**
+     * Amount of time in seconds for the timer, incompatible with `random_time_choices`
+     */
+    time: [number, number]|number;
+    /**
+     * Event to fire when the timer is done
+     */
+    time_down_event: string|ComponentEvent;
+}
+
+/**
+ * Defines the entity's ability to trade with players
+ */
+interface TradeTable {
+    /**
+     * If true, the trades are converted when the entity transforms into one that has an {@link EconomyTradeTable} component
+     * @default false
+     */
+    convert_trades_economy: boolean;
+    /**
+     * Name to be displayed while trading with this entity
+     */
+    display_name: string;
+    /**
+     * If true, will use the new UI trade screen
+     * @default false
+     */
+    new_screen: boolean;
+    /**
+     * If true, the trades persist if the enity transforms
+     * @default false
+     */
+    persist_trades: boolean;
+    /**
+     * File path relative to the behavior pack root for this entity's trades
+     */
+    table: string;
+}
+
+/**
+ * Causes an entity to leave a trail of blocks as it moves around the world
+ */
+interface Trail {
+    /**
+     * The type of block left by the entity as a trail. Solid blocks may not be spawned at an offset of `[0,0,0]`
+     * @default "minecraft:air"
+     */
+    block_type: string;
+    /**
+     * The filter conditions that must be met in order to spawn blocks
+     */
+    spawn_filter: ServerFilters|ServerFilters[];
+    /**
+     * The distance from the entity's origin to spawn the block, capped at 16 blocks distance
+     * @default [0,0,0]
+     */
+    spawn_offset: [number, number, number];
+}
+
+/**
+ * Defines an entity's transformation into another
+ */
+interface Transformation {
+    /**
+     * List of component groups to add to the entity after transform
+     */
+    add: {
+        /**
+         * Names of component groups to add to the entity
+         */
+        component_groups: string[];
+    };
+    /**
+     * Sound to play when the entity begins transforming
+     */
+    begin_transform_sound: string;
+    /**
+     * Defines the properties of the delay for the transformation
+     */
+    delay: {
+        /**
+         * Chance that the entity will look for nearby blocks that can speed up the transformation, 0.0 is 0% and 1.0 is 100%
+         * @default 0.0
+         */
+        block_assist_chance: number;
+        /**
+         * Chance that, once a block is found it will speed up the transformation, 0.0 is 0% and 1.0 is 100%
+         * @default 0.0
+         */
+        block_chance: number;
+        /**
+         * Max number of blocks the entity will look for to speed up the transformation
+         * @default `block_radius`
+         */
+        block_max: number;
+        /**
+         * Distance in blocks the entity will search for blocks to speed up the transformation
+         * @default 0
+         */
+        block_radius: number;
+        /**
+         * List of blocks that can speed up the transformation
+         */
+        block_types: string[];
+        /**
+         * Max random time in seconds before the entity can transform
+         * @default 0
+         */
+        range_max: number;
+        /**
+         * Min random time in seconds before the entity can transform
+         * @default 0
+         */
+        range_min: number;
+        /**
+         * Time in seconds before the entity can transform
+         * @default 0
+         */
+        value: number;
+    };
+    /**
+     * If true, the entity drops all equipment on transform
+     * @default false
+     */
+    drop_equipment: boolean;
+    /**
+     * If true, the entity drops all inventory on transform
+     * @default false
+     */
+    drop_inventory: boolean;
+    /**
+     * The entity identifier to transform into
+     */
+    into: string;
+    /**
+     * If true, the entity will keep its trade levels
+     * @default false
+     */
+    keep_level: boolean;
+    /**
+     * If true and the entity is owned, the owner will be kept
+     * @default false
+     */
+    keep_owner: boolean;
+    /**
+     * If true, the entity will keep its equipment on transform
+     * @default false
+     */
+    preserve_equipment: boolean;
+    /**
+     * The sound to play when the entity is done transforming
+     */
+    transform_sound: string;
+}
+
+/**
+ * Defines that the entity will not be saved, despawning when unloaded
+ */
+interface Transient {}
+
+/**
+ * Defines the entity's ability to trust players
+ */
+interface Trusting {
+    /**
+     * The chance of the entity trusting with each item use, 0.0 is 0% and 1.0 is 100%
+     * @default 1.0
+     */
+    probability: number;
+    /**
+     * Event to fire when the entity trusts a player
+     */
+    trust_event: string;
+    /**
+     * The list of items that can be used by players to gain the entity's trust
+     */
+    trust_items: string[];
+}
+
+/**
+ * Entities with this component wil have a max auto step height depending on if the block they stand on prevents jumping
+ */
+interface VariableMaxAutoStep {
+    /**
+     * The max auto step height when on any block that does not prevent jumping
+     * @default 0.5625
+     */
+    base_value: number;
+    /**
+     * The max auto step height when on any block that does not prevent jumping and controlled by the player
+     * @default 0.5625
+     */
+    controlled_value: number;
+    /**
+     * The max auto step height when on any block that prevents jumping
+     * @default 0.5625
+     */
+    jump_prevented_value: number;
+}
+
+/**
+ * Vibrations emitted by the entity will be ignored
+ */
+interface VibrationDamper {}
+
+/**
+ * Defines water movement properties for the entity
+ */
+interface WaterMovement {
+    /**
+     * Drag factor to determine movement speed when in water
+     * @default 0.8
+     */
+    drag_factor: number;
+}
