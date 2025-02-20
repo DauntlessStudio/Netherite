@@ -2423,3 +2423,422 @@ interface Projectile {
      */
     uncertainty_multiplier: number;
 }
+
+/**
+ * Defines the entity's ability to be pushed
+ */
+interface Pushable {
+    /**
+     * If true, this entity can be pushed by other entities
+     * @default true
+     */
+    is_pushable: boolean;
+    /**
+     * If true, this entity can be pushed by pistons
+     * @default true
+     */
+    is_pushable_by_piston: boolean;
+}
+
+/**
+ * Attempts to trigger a raid at the entity's location
+ */
+interface RaidTrigger {
+    /**
+     * Event to fire when a raid is triggered on a village
+     */
+    triggered_event: string;
+}
+
+/**
+ * Defines the entity's moveent on rails. An entity with this component is **only** allowed to move on rails
+ */
+interface RailMovement {
+    /**
+     * Maximum speed this entity will move when on rails
+     * @default 0.4
+     */
+    max_speed: number;
+}
+
+/**
+ * TODO: Find out what this component is for, assuming something to do with minecarts and sensor rails
+ */
+interface RailSensor {
+    /**
+     * If true, this entity will trigger its `on_deactivate` behavior
+     * @default false
+     */
+    check_block_types: boolean;
+    /**
+     * If true, this entity will eject all of its riders when it passes over an active Activator Rail
+     * @default true
+     */
+    eject_on_activate: boolean;
+    /**
+     * If true, this entity will eject all of its riders when it passes over a deactive Activator Rail
+     * @default false
+     */
+    eject_on_deactivate: boolean;
+    /**
+     * Event to fire when the rail is activated
+     */
+    on_activate: string;
+    /**
+     * Event to fire when the rail is deactivated
+     */
+    on_deactivate: string;
+    /**
+     * If true, command blocks will start ticking when passing over an activated rail
+     * @default true
+     */
+    tick_command_block_on_activate: boolean;
+    /**
+     * If true, command blocks will stop ticking when passing over a deactivated rail
+     * TODO: verify this description is correct
+     * @default false
+     */
+    tick_command_block_on_deactivate: boolean;
+}
+
+/**
+ * [EXPERIMENTAL] Allows an entity to reflect projectiles
+ */
+interface ReflectProjectiles {
+    /**
+     * [EXPERIMENTAL] A Molang expression defining the angle in degreees to add to the projectile's y axis rotation
+     * @default "0"
+     */
+    azimuth_angle: Molang;
+    /**
+     * [EXPERIMENTAL] A Molang expression defining the angle in degrees to add to the projectile's x axis rotation
+     * @default "0"
+     */
+    elevation_angle: Molang;
+    /**
+     * [EXPERIMENTAL] The list of projectiles that can be reflected
+     */
+    reflected_projectiles: string[];
+    /**
+     * [EXPERIMENTAL] A Molang expression defining the velocity of the reflected projectiles. Values below 1.0 will slow the projectile down and values above 1.0 will speed it up
+     * @default "1.0"
+     */
+    reflection_scale: Molang;
+    /**
+     * [EXPERIMENTAL] The sound event to be played when the projectile is reflected
+     * @default "reflect"
+     */
+    reflection_sound: string;
+}
+
+/**
+ * Defines the entity's ability to be ridden
+ */
+interface Rideable {
+    /**
+     * The seat index designating the driver
+     * @default 0
+     */
+    controlling_seat: number;
+    /**
+     * If true, this entity can't be interacted with if the interactor is crouching
+     * @default true
+     */
+    crouching_skip_interact: boolean;
+    /**
+     * List of entity family types that can ride this entity
+     */
+    family_types: string[];
+    /**
+     * Text to display when the player can interact with the ntity when playing with Touch controls
+     */
+    interact_text: string;
+    /**
+     * The max width a mob can be to be a passenger. A value of 0 ignores this parameter
+     * @default 0
+     */
+    passenger_max_width: number;
+    /**
+     * @deprecated
+     */
+    priority: number;
+    /**
+     * If true, the entity will pull in entities that are of the correct `family_type` into an available seat
+     * @default false
+     */
+    pull_in_entities: boolean;
+    /**
+     * If true, the rider can still interact with this entity
+     * @default false
+     */
+    rider_can_interact: boolean;
+    /**
+     * The number of riders that can ride this entity simultaneously
+     * @default 1
+     */
+    seat_count: number;
+    /**
+     * Defines data for individual seats
+     */
+    seats: {
+        /**
+         * Angle in degrees that a rider is allowed to rotate while riding this entity
+         * @default 181
+         */
+        lock_rider_rotation: number;
+        /**
+         * Defines the maximum number of riders that can be riding this entity for this seat to be valid
+         * @default index
+         */
+        max_rider_count: number;
+        /**
+         * Defines the minimum number of riders that must be riding this entity for this seat to be valid
+         * @default 0
+         */
+        min_rider_count: number;
+        /**
+         * Position of this seat origin relative to this entity's origin
+         * @default [0,0,0]
+         */
+        position: [number, number, number];
+        /**
+         * Offset to rotate riders by
+         * @default "0"
+         */
+        rotate_rider_by: Molang;
+    }[];
+}
+
+/**
+ * Defines the entity's size interpolation based on the entity's age
+ */
+interface ScaleByAge {
+    /**
+     * Ending scale of the entity when it's fully grown
+     * @default 1
+     */
+    end_scale: number;
+    /**
+     * Initial scale of the newborn entity
+     * @default 1
+     */
+    start_scale: number;
+}
+
+/**
+ * Fires of events at scheduled times
+ */
+interface Scheduler {
+    /**
+     * UNKNOWN
+     */
+    min_delay_secs: number;
+    /**
+     * UNKNOWN
+     */
+    max_delay_secs: number;
+    /**
+     * The events to fire off when the filters are met
+     */
+    scheduled_events: ComponentEvent[];
+}
+
+/**
+ * Defines a list of items the mob wants to share or pick up
+ */
+interface Shareables {
+    /**
+     * If true, all items not specified in `items` will also be shareable, but with lower priority than those in `items`
+     * @default false
+     */
+    all_items: boolean;
+    /**
+     * Maximum number of this item the entity will hold
+     * @default -1
+     */
+    all_items_max_amount: number;
+    /**
+     * Number of this item considered "extra" that the entity wants to share
+     * @default -1
+     */
+    all_items_surplus_amount: number;
+    /**
+     * Number of this item the entity wants to share
+     * @default -1
+     */
+    all_items_want_amount: number;
+    /**
+     * List of items the entity wants to share
+     */
+    items: {
+        /**
+         * If true and the entity has the {@link AdmireItem} component and the Admire goal, the mob will admire the item after picking it up by looking at it
+         */
+        admire: boolean;
+        /**
+         * If true and the entity has the {@link Barter} component and the Barter goal, the entity will barter for the item after picking it up
+         */
+        barter: boolean;
+        /**
+         * If true, the entity will consume the item
+         */
+        consume_item: boolean;
+        /**
+         * Defines the item this entity wants to craft with the `item`
+         */
+        craft_into: string;
+        /**
+         * The name of the item. Aux value can be specified, for instance `minecraft:skull:1
+         */
+        item: string;
+        /**
+         * Maximum number of this item the entity will hold
+         */
+        max_amount: number;
+        /**
+         * Maximum number of this item the entity will pick up during a single goal tick
+         */
+        pickup_limit: number;
+        /**
+         * If true, the entity can only pick up the item and not drop it
+         */
+        pickup_only: boolean;
+        /**
+         * Prioritizes which items the entity prefers. 0 is the highest priority
+         */
+        priority: number;
+        /**
+         * If true and the entity has the {@link Inventory} component and the item cannot be equipped, the mob will try to put the item in its inventory
+         */
+        stored_in_inventory: boolean;
+        /**
+         * Number of this item considered "extra" that the entity wants to share
+         */
+        surplus_amount: number;
+        /**
+         * Number of this item the entity wants to have
+         */
+        want_amount: number;
+    }[];
+    /**
+     * If true, the entity is able to pick up more of the same item if it is already holding that item
+     * @default false
+     */
+    singular_pickup: boolean;
+}
+
+/**
+ * Defines the entity's abiltity to shoot projectiles. Required by the {@link BehaviorRangedAttack} component
+ */
+interface Shooter {
+    /**
+     * ID of the Potion effect for the default projectile to be applied on hit
+     * @default -1
+     */
+    aux_val: number;
+    /**
+     * The entity id of the projectile to shoot, the entity must have the {@link Projectile} component
+     */
+    def: string;
+    /**
+     * If true, the projectiles are flagged as "magic" which prevents other "magic" being used at the same time, i.e. {@link BehaviorDrinkPotion}
+     * @default false
+     */
+    magic: boolean;
+    /**
+     * Velocity with which the projectiles will be shot, a power of 0 will use the {@link Projectile.power} instead
+     * @default 0
+     */
+    power: number;
+    /**
+     * List of projectiles that can be used by the shooter, using the first valid projectile
+     * TODO: Figure out what the syntax expected here is
+     */
+    projectiles: string[];
+    /**
+     * Sound that is played when this entity shoots a projectile
+     */
+    sound: string;
+}
+
+/**
+ * Defines the entity's "sit" state
+ */
+interface Sittable {
+    /**
+     * Event to fire when the entity enters the "sit" state
+     */
+    sit_event: string;
+    /**
+     * Event to fire when the entity exits the "sit" state
+     */
+    stand_event: string;
+}
+
+/**
+ * Defines the ability for the entity to spawn another entity or item on a timer
+ */
+interface SpawnEntity {
+    /**
+     * Filters determining of the entity can perform a spawn
+     */
+    filters: ServerFilters|ServerFilters[];
+    /**
+     * Maximum amount of time to randomly wait in seconds before another entity is spawned
+     * @default 600
+     */
+    max_wait_time: number;
+    /**
+     * Minimum amount of time to randomly wait in seconds before another entity is spawned
+     * @default 300
+     */
+    min_wait_time: number;
+    /**
+     * The number of entities to spawn each time that this triggers
+     * @default 1
+     */
+    num_to_spawn: number;
+    /**
+     * If true, spawned entities will be leashed to this entity
+     * @default false
+     */
+    should_leash: boolean;
+    /**
+     * If true, this component will only ever spawn an entity once
+     * @default false
+     */
+    single_use: boolean;
+    /**
+     * Identifier of the entity to spawn, leave empty to use `spawn_item` instead
+     */
+    spawn_entity: string;
+    /**
+     * Event to fire on the spawned entity
+     * @default "minecraft:entity_born"
+     */
+    spawn_event: string;
+    /**
+     * Identifier of the item to spawn, leave empty to use `spawn_entity` instead
+     * @default "minecraft:egg"
+     */
+    spawn_item: string;
+    /**
+     * Event to fire on this entity when it spawns an item
+     */
+    spawn_item_event: string;
+    /**
+     * Method used to spawn the entity
+     * @default "born"
+     */
+    spawn_method: string;
+    /**
+     * The sound effect to play when the entity is spawned
+     * @default "plop"
+     */
+    spawn_sound: string;
+}
+
+/**
+ * Allows the entity to remember suspicious locations
+ */
+interface SuspectTracking {}
