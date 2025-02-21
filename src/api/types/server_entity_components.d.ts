@@ -80,16 +80,6 @@ interface Ageable {
     transform_to_item: string|`${string}:${number}`;
 }
 
-interface AmbientSoundInterval {
-    value: number;
-    range: number;
-    event_name: string;
-    event_names: {
-        event_name: string;
-        condition: string;
-    }[];
-}
-
 /**
  * Allows this entity to track anger towards a set of nuisances
  */
@@ -3253,4 +3243,165 @@ interface WaterMovement {
      * @default 0.8
      */
     drag_factor: number;
+}
+
+// #region Properties
+
+/**
+ * Defines the entity's ambient sound and its intervals
+ */
+interface AmbientSoundInterval {
+    /**
+     * Random max time in seconds between ambient sound events
+     * @default 16.0
+     */
+    value: number;
+    /**
+     * Random min time in seconds between ambient sound events
+     * @default 8.0
+     */
+    range: number;
+    /**
+     * Sound event to be played as the ambient sound
+     * @default "ambient"
+     */
+    event_name: string;
+    /**
+     * List of dynamic sounds events with conditions to play them
+     */
+    event_names: {
+        /**
+         * The sound event to play
+         */
+        event_name: string;
+        /**
+         * The conditions that must be met to play the event
+         */
+        condition: ServerFilters|ServerFilters[];
+    }[];
+}
+
+/**
+ * When set, the entity will no longer visually rotate their body to match their facing direction
+ */
+interface BodyRotationBlocked {}
+
+/**
+ * Allows this entity to climb ladders
+ */
+interface CanClimb {}
+
+/**
+ * Marks the entity as being able to fly for the pathfinder
+ */
+interface CanFly {}
+
+/**
+ * Allows the entity to power jump like Horses
+ */
+interface CanPowerJump {}
+
+/**
+ * When set, blocks entities from attacking the owner unless they have the {@link IgnoreCannotBeAttacked} component
+ */
+interface CannotBeAttacked {}
+
+/**
+ * Defines the entity's color. Requires specific materials on the client entity
+ */
+interface Color {
+    /**
+     * The palette color index
+     * @default 0
+     */
+    value: number;
+}
+
+/**
+ * Defines the entity's secondary color. Only works with `runtime_identifier: "tropicalfish"`
+ */
+interface Color2 {
+    /**
+     * The palette color index
+     * @default 0
+     */
+    value: number;
+}
+
+/**
+ * Sets the entity's default head rotation angle
+ */
+interface DefaultLookAngle {
+    /**
+     * Angle, in degrees
+     * @default 0
+     */
+    value: number;
+}
+
+/**
+ * Sets the equipment table to use for the entity
+ */
+interface Equipment {
+    /**
+     * A list of slots with the chance to drop an equipped item from that slot
+     */
+    slot_drop_chance: string[];
+    /**
+     * The file path to the equipment table, relative to the behavior pack root
+     */
+    table: string;
+}
+
+/**
+ * Marks the entity as not being able to set on fire or taking fire damage
+ */
+interface FireImmune {}
+
+/**
+ * Sets that this entity can float in liquid blocks
+ */
+interface FloatsInLiquid {}
+
+/**
+ * Speed in blocks the mob flies at
+ */
+interface FlyingSpeed {
+    /**
+     * Speed in blocks per tick
+     * @default 0.02
+     */
+    value: number;
+}
+
+/**
+ * Defines how much friction affects this entity
+ */
+interface FrictionModifier {
+    /**
+     * The amount of friction to apply to the entity
+     * @default 1.0
+     */
+    value: number;
+}
+
+/**
+ * Sets the offset from the ground that the entity is actually at
+ */
+interface GroundOffset {
+    /**
+     * The value of the entity's offset from the ground, in blocks
+     * @default 0
+     */
+    value: number;
+}
+
+/**
+ * Defines exceptions to the {@link CannotBeAttacked} component
+ */
+interface IgnoreCannotBeAttacked {
+    /**
+     * Defines which entities are exceptions and are allowed to be attacked by the owner entity, potentially attacked entity is `subject: "other"`
+     */
+    filters: ServerFilters|ServerFilters[];
 }
