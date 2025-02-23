@@ -3405,3 +3405,213 @@ interface IgnoreCannotBeAttacked {
      */
     filters: ServerFilters|ServerFilters[];
 }
+
+/**
+ * Allows the entity to be controlled by the rider's input if the have the {@link Rideable} component
+ */
+interface InputGroundControlled {}
+
+/**
+ * Defines the entity as a baby
+ */
+interface IsBaby {}
+
+/**
+ * Defines the entity as charged
+ */
+interface IsCharged {}
+
+/**
+ * Defines the entity as carrying a chest
+ */
+interface IsChested {}
+
+/**
+ * Defines the entity as able to change color with dyes
+ */
+interface IsDyeable {
+    /**
+     * The text displayed when interacting with Touch controls
+     */
+    interact_text: string;
+}
+
+/**
+ * Defines the entity as can hide from hostile mobs while invisible
+ */
+interface IsHiddenWhenInvisible {}
+
+/**
+ * Defines the entity as currently on fire
+ */
+interface IsIgnited {}
+
+/**
+ * Defines the entity as an Illager Captain
+ */
+interface IsIllagerCaptain {}
+
+/**
+ * Defines the entity as pregnant
+ */
+interface IsPregnant {}
+
+/**
+ * Defines the entity as wearing a saddle
+ */
+interface IsSaddled {}
+
+/**
+ * Defines the entity as currently shaking
+ */
+interface IsShaking {}
+
+/**
+ * Defines the entity as sheared
+ */
+interface IsSheared {}
+
+/**
+ * Defines the entity as stackable
+ */
+interface IsStackable {}
+
+/**
+ * Defines the entity as stunned
+ */
+interface IsStunned {}
+
+/**
+ * Defines the entity as tamed
+ */
+interface IsTamed {}
+
+/**
+ * Defines what items can be used to control this entity while ridden
+ */
+interface ItemControllable {
+    /**
+     * The list of items that can be used to control the entity
+     */
+    control_items: string[];
+}
+
+/**
+ * Defines the entity's loot table dropped on death
+ */
+interface Loot {
+    /**
+     * The file path to the loot table, relative to the behavior pack root
+     */
+    table: string;
+}
+
+/**
+ * Defines the entity's auxiliary variant
+ */
+interface MarkVariant {
+    /**
+     * The value of the entity's mark variant
+     * @default 0
+     */
+    value: number;
+}
+
+/**
+ * Defines the offset used to determine the next step distance to play a movement sound
+ */
+interface MovementSoundDistanceOffset {
+    /**
+     * The higher the number, the less often the sound will play
+     * @default 1.0
+     */
+    value: number;
+}
+
+/**
+ * Defines the distance through which the entity can push through
+ */
+interface PushTrough {
+    /**
+     * Value of the entity's push-through, in blocks
+     * @default 0
+     */
+    value: number;
+}
+
+/**
+ * Defines the entity as rendering even when invisible, allowing it to be handled by the client entity
+ */
+interface RendersWhenInvisible {}
+
+/**
+ * Defines the entity's scale, both for rendering and hitbox
+ */
+interface Scale {
+    /**
+     * The scale of the entity
+     * @default 1.0
+     */
+    value: number;
+}
+
+/**
+ * Defines the entity's skin id
+ */
+interface SkinID {
+    /**
+     * The value of the entity's skin id
+     * @default 0
+     */
+    value: number;
+}
+
+/**
+ * Defines the entity's base volume for sound effects
+ */
+interface SoundVolume {
+    /**
+     * The value of the entity's sound volume
+     * @default 1.0
+     */
+    value: number;
+}
+
+/**
+ * Defines the families this entity belongs to
+ */
+interface TypeFamily {
+    /**
+     * The family types of the entity
+     */
+    family: string[];
+}
+
+/**
+ * Defines the entity's variant
+ */
+interface Variant {
+    /**
+     * The value of the entity's variant
+     * @default 0
+     */
+    value: number;
+}
+
+/**
+ * Sets the speed multiplier for this entity's walk animation
+ */
+interface WalkAnimationSpeed {
+    /**
+     * The speed multiplier for the entity's walk animation
+     * @default 1.0
+     */
+    value: number;
+}
+
+/**
+ * Defines the entity as wanting to become a jockey
+ */
+interface WantsJocky {}
+
+// #endregion
