@@ -4,11 +4,540 @@ import type { ServerFilters } from "./filters.d.ts";
 import type { MobEffects } from "./mob_effects.d.ts";
 import type { Molang } from "./molang.d.ts";
 
-interface ComponentEvent {
+interface Trigger {
+    /**
+     * The list of conditions for this trigger to fire
+     */
     filters?: ServerFilters|ServerFilters[];
+    /**
+     * The target who will fire the event
+     * @default "self"
+     */
     target?: "block"|"damager"|"self"|"other"|"player"|"parent"|"target";
+    /**
+     * The event to fire when the conditions are met
+     */
     event?: string;
 }
+
+// #region Attributes
+
+/**
+ * Defines the entity's melee attack and any additional effects
+ */
+interface Attack {
+    /**
+     * Range of random damage to deal, negative values can heal the target
+     */
+    damage: number|[number, number];
+    /**
+     * The effect to apply to the target
+     */
+    effect_name: MobEffects;
+    /**
+     * The duration of the effect in seconds
+     */
+    effect_duration: number;
+}
+
+/**
+ * Defines what mob effects to add/remove when this component is added
+ */
+interface SpellEffects {
+    /**
+     * List of effects to add
+     */
+    add_effects: {
+        /**
+         * The id of the effect
+         */
+        effect: MobEffect;
+        /**
+         * The duration of the effect in seconds
+         */
+        duration: number;
+        /**
+         * The amplifier of the effect
+         */
+        amplifier: number;
+        /**
+         * If true, the effect will be displayed on the screen
+         */
+        display_on_screen_animation: boolean;
+    }[];
+    /**
+     * A list of effect ids to remove
+     */
+    remove_effects: string[];
+}
+
+/**
+ * Defines the entity's strength to carry items
+ */
+interface Strength {
+    /**
+     * The max strength of the entity
+     */
+    max: number;
+    /**
+     * The initial value of the strength
+     */
+    value: number;
+}
+
+// #endregion
+
+// #region Behaviors
+
+/**
+ * Can cause entity to admire items configured as admireable, requires {@link AdmireItem}
+ */
+interface BehaviorAdmireItem {
+    /**
+     * The sound event to play when admiring the item
+     */
+    admire_item_sound: string;
+    /**
+     * The range of time in seconds to randomly wait before playing the sound again.
+     */
+    sound_interval: [number, number];
+}
+
+/**
+ * Can cause this entity to avoid certain blocks
+ */
+interface BehaviorAvoidBlock {
+    /**
+     * The sound event to play when avoiding the block
+     */
+    avoid_block_sound: string;
+    /**
+     * The event trigger to fire when escaping
+     */
+    on_escape: Trigger;
+    /**
+     * Max block distance on the y axis to search
+     * @default 0
+     */
+    search_height: number;
+    /**
+     * Max block distance on the x and z axis to search
+     * @default 0
+     */
+    search_range: number;
+    /**
+     * The range of time in seconds to randomly wait before playing the sound again.
+     * @default [3.0,8.0]
+     */
+    sound_interval: [number, number];
+    /**
+     * Modifier for sprint speed
+     * @default 1.0
+     */
+    sprint_speed_modifier: number;
+    /**
+     * List of blocks to avoid
+     */
+    target_blocks: string[];
+    /**
+     * Block search method
+     * @default "nearest"
+     */
+    target_selection_method: "nearest"|"random";
+    /**
+     * Interval for starting to search for a new block to avoid
+     * @default 1
+     */
+    tick_interval: number;
+    /**
+     * Modifier for walk speed
+     * @default 1.0
+     */
+    walk_speed_modifier: number;
+}
+
+/**
+ * Can cause the entity to run away from other entities that match the criteria
+ */
+interface BehaviorAvoidMobType {
+    /**
+     * The sound event to play when avoiding the mob
+     */
+    avoid_mob_sound: string;
+    /**
+     * The x and z axis distance to avoid the target
+     * @default 16
+     */
+    avoid_target_xz: number;
+    /**
+     * The y axis distance to avoid the target
+     * @default 7
+     */
+    avoid_target_y: number;
+    /**
+     * Conditions to determine if the entity should avoid the target
+     */
+    entity_types: ServerFilters|ServerFilters[];
+    /**
+     * If true, ignore whether the entity has a direct line of sight to the target
+     * @default false
+     */
+    ignore_visibility: boolean;
+    /**
+     * Maximum distance to look for an avoid target
+     * @default 3
+     */
+    max_dist: number;
+    /**
+     * How many blocks from the avoid target the entity must be to stop fleeing
+     * @default 10
+     */
+    max_flee: number;
+    /**
+     * Event trigger to fire when escaping from a mob
+     */
+    on_escape_event: Trigger;
+    /**
+     * Percent chance the entity will stop avoiding another based on that entity's strength, where 0 is 0% and 1 is 100%
+     * @default 1.0
+     */
+    probability_per_strength: number;
+    /**
+     * If true, the entity's target is removed when it starts fleeing
+     * @default false
+     */
+    remove_target: boolean;
+    /**
+     * The range of time in seconds to randomly wait before playing the sound again.
+     * @default [3.0,8.0]
+     */
+    sound_interval: [number, number];
+    /**
+     * How many blocks within range of its avoid target the entity must be for it to begin sprinting away from the avoid target
+     * @default 7.0
+     */
+    sprint_distance: number;
+    /**
+     * Multiplier for sprint speed
+     * @default 1.0
+     */
+    sprint_speed_multiplier: number;
+    /**
+     * Multiplier for walk speed
+     * @default 1.0
+     */
+    walk_speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to barter. Requires {@link Barter}
+ */
+interface BehaviorBarter {}
+
+/**
+ * Can cause the entity to look at and follow a player holding certain items
+ */
+interface BehaviorBeg {
+    /**
+     * List of items the mob likes
+     */
+    items: string[];
+    /**
+     * Distance in blocks the entity will beg from
+     * @default 8.0
+     */
+    look_distance: number;
+    /**
+     * The range of time in seconds this mob will stare at the player
+     * @default [2.0,4.0]
+     */
+    look_time: [number, number];
+}
+
+/**
+ * Can cause the entity to break doors
+ */
+interface BehaviorBreakDoor {}
+
+/**
+ * Can cause the entity to breed. Requires {@link Breedable}
+ */
+interface BehaviorBreed {
+    /**
+     * Multiplier for movement speed
+     * @default 1.0
+     */
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to celebrate surviving a raid with sounds and jumping
+ */
+interface BehaviorCelebrate {
+    /**
+     * The sound event to play when celebrating
+     */
+    celebrate_sound: string;
+    /**
+     * Duration in seconds that the celebration lasts
+     * @default 30.0
+     */
+    duration: number;
+    /**
+     * Random range in seconds between jumps
+     * @default [1.0,3.5]
+     */
+    jump_interval: [number, number];
+    /**
+     * The trigger to fire when the goal's duration expires
+     */
+    on_celebration_end_event: Trigger;
+    /**
+     * The range of time in seconds to randomly wait before playing the sound again.
+     * @default [2.0,7.0]
+     */
+    sound_interval: [number, number];
+}
+
+/**
+ * Can cause the entity to celebrate surviving a raid by shooting fireworks
+ */
+interface BehaviorCelebrateSurvive {
+    /**
+     * Duration in seconds that the celebration lasts
+     * @default 30.0
+     */
+    duration: number;
+    /**
+     * Random range in seconds between fireworks
+     * @default [10.0,20.0]
+     */
+    fireworks_interval: [number, number];
+    /**
+     * The trigger to fire when the goal's duration expires
+     */
+    on_celebration_end_event: Trigger;
+}
+
+/**
+ * Can cause the entity to damage a target by using a charging attack
+ */
+interface BehaviorChargeAttack {
+    /**
+     * The max distance the entity can be from its target to start this behavior
+     * @default 3.0
+     */
+    max_distance: number;
+    /**
+     * The min distance the entity can be from its target to start this behavior
+     * @default 2.0
+     */
+    min_distance: number;
+    /**
+     * Multiplier for movement speed
+     * @default 1.0
+     */
+    speed_multiplier: number;
+    /**
+     * Percant chance the entity will charge if not already attacking, where 0 is 0% and 1 is 100%
+     * @default 0.1428
+     */
+    success_rate: number;
+}
+
+/**
+ * Can cause the entity to charge and use their held item
+ */
+interface BehaviorChargeHeldItem {
+    items: string[];
+}
+
+/**
+ * Causes an entity to circle around an anchor point placed near a point or target
+ */
+interface BehaviorCircleAroundAnchor {
+    /**
+     * Number of degrees to change this entity's facing by when it selects its next anchor point
+     * @default 15
+     */
+    angle_change: number;
+    /**
+     * Max distance from the anchor-point in which the entity considers itself to have reached the anchor point
+     * @default 0.5
+     */
+    goal_radius: number;
+    /**
+     * The number of blocks above the target that the next anchor point can be set
+     * @default [0,0]
+     */
+    height_above_target_range: [number, number];
+    /**
+     * Percent chance to determine how often to increase or decrease the current height around the anchor point. 0 is 0% and 1 is 100%
+     */
+    height_adjustment_chance: number;
+    /**
+     * @deprecated use `height_adjustment_chance` instead
+     */
+    height_offset_range: [number, number];
+    /**
+     * Percent chance to determine how often to increase the size of the current movement radius around the anchor point. 0 is 0% and 1 is 100%
+     * @default 0.004
+     */
+    radius_adjustment_chance: number;
+    /**
+     * Vertical distance from the anchor point this entity must stay within, upon a successful height adjustment
+     * @default [0,0]
+     */
+    radius_offset_range: number;
+    /**
+     * Number of blocks to increase the current movement radius upon successful `radius_adjustment_chance`
+     * @default 1
+     */
+    radius_change: number;
+    /**
+     * Horizontal distance from the anchor point this entity must stay within
+     * @default [5.0,15.0]
+     */
+    radius_range: [number, number];
+    /**
+     * Multiplier for movement speed
+     * @default 1.0
+     */
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to be controlled by the player using an item. Requires {@link Rideable} and {@link ItemControllable}
+ */
+interface BehaviorControlledByPlayer {
+    /**
+     * The entity will attempt to rate to face where the player is facing each tick, a normalized range where 1 matches the player's facing exactly
+     * @default 0.5
+     */
+    fractional_rotation: number;
+    /**
+     * Limits the total degrees the entity can rotate per tick
+     * @default 5.0
+     */
+    fractional_rotation_limit: number;
+    /**
+     * Speed multiplier for movement when controlled by the player
+     * @default 1.0
+     */
+    mount_speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to croak at a random inverval
+ */
+interface BehaviorCroak {
+    /**
+     * Random duration in seconds after which croaking stops
+     * @default 4.5
+     */
+    duration: [number, number]|number;
+    /**
+     * Conditions for starting and running the behavior
+     */
+    filters: ServerFilters|ServerFilters[];
+    /**
+     * Random range in seconds between runs of this behavior
+     * @default [10.0,20.0]
+     */
+    interval: [number, number];
+}
+
+/**
+ * Can cause the entity to target another entity that hurts an entity it trusts
+ */
+interface BehaviorDefendTrustedTarget {
+    /**
+     * Sound event to play while defending
+     */
+    aggro_sound: string;
+    /**
+     * Time in seconds between attacks
+     * @default 0
+     */
+    attack_interval: number;
+    /**
+     * Options to use under certain conditions
+     */
+    entity_types: {
+        cooldown: number;
+        filters: ServerFilters|ServerFilters[];
+        max_dist: number;
+        must_see: boolean;
+        must_see_forget_duration: number;
+        reevaluate_description: boolean;
+        sprint_speed_multiplier: number;
+        walk_speed_multiplier: number;
+    }[];
+    /**
+     * If true, only entities in viewing range can be selected as targets
+     * @default false
+     */
+    must_see: boolean;
+    /**
+     * Determines the amount of time in seconds before the entity forgets the target that it can no longer see
+     * @default 3.0
+     */
+    must_see_forget_duration: number;
+    /**
+     * Event trigger to fire when the entity starts defending
+     */
+    on_defend_start: Trigger;
+    /**
+     * Distance in blocks the target can be within in order to attack
+     * @default 0
+     */
+    within_radius: number;
+}
+
+/**
+ * Can cause the entity to stay in a village and defend it from aggressors
+ */
+interface BehaviorDefendVillageTarget {
+    /**
+     * Percent chance of attacking aggressors, where 0 is 0% and 1 is 100%
+     * @default 0.05
+     */
+    attack_chance: number;
+}
+
+/**
+ * Can cause the entity to attack while delaying the damage dealing in order to sync it with an animation
+ */
+interface BehaviorDelayedAttack {
+    attack_duration: number;
+    attack_once: boolean;
+    attack_types: string[];
+    can_spread_on_fire: boolean;
+    hit_delay_pct: number;
+    inner_boundary_time_increase: number;
+    max_dist: number;
+    max_path_time: number;
+    melee_fov: number;
+    min_path_time: number;
+    on_attack: Trigger;
+    outer_boundary_time_increase: number;
+    path_fail_time_increase: number;
+    path_innter_boundary: number;
+    path_outer_boundary: number;
+    random_stop_interval: number;
+    reach_multiplier: number;
+    require_complete_path: boolean;
+    set_persistent: boolean;
+    speed_multiplier: number;
+    target_dist: number;
+    track_target: boolean;
+    x_max_rotation: number;
+    y_max_head_rotation: number;
+}
+
+// #endregion
+
+// #region Components
 
 /**
  * Adds a rider to the entity. Requires `minecraft:rideable`
@@ -252,24 +781,6 @@ interface AreaAttack {
      * @default true
      */
     play_attack_sound: boolean;
-}
-
-/**
- * Defines the entity's attack
- */
-interface Attack {
-    /**
-     * The amount of damage the attack deals
-     */
-    damage: number;
-    /**
-     * A mob effect that is applied to the target
-     */
-    effect_name?: MobEffects;
-    /**
-     * The duration of the mob effect in seconds
-     */
-    effect_duration?: number;
 }
 
 /**
@@ -842,7 +1353,7 @@ interface DamageSensor {
         /**
          * Defines event triggers and damage filters. All filters must pass for the event to trigger
          */
-        on_damage: ComponentEvent;
+        on_damage: Trigger;
         /**
          * Defines what sound to playe when the `on_damage` filters are met
          */
@@ -1086,7 +1597,7 @@ interface EnvironmentSensor {
     /**
      * A list of triggers that fire when the conditions match the given filter criteria
      */
-    triggers: ComponentEvent[];
+    triggers: Trigger[];
 }
 
 /**
@@ -2630,7 +3141,7 @@ interface Scheduler {
     /**
      * The events to fire off when the filters are met
      */
-    scheduled_events: ComponentEvent[];
+    scheduled_events: Trigger[];
 }
 
 /**
@@ -2925,15 +3436,15 @@ interface TargetNearbySensor {
     /**
      * Event to fire when an entity is inside the range
      */
-    on_inside_range: ComponentEvent|string;
+    on_inside_range: Trigger|string;
     /**
      * Event to fire when an entity is inside the range
      */
-    on_outside_range: ComponentEvent|string;
+    on_outside_range: Trigger|string;
     /**
      * Event to fire when an entity exits the visual range
      */
-    on_vision_lost_inside_range: ComponentEvent|string;
+    on_vision_lost_inside_range: Trigger|string;
     /**
      * Max distance in blocks that another entity will be considered `outside` the range
      * @default 5
@@ -3036,7 +3547,7 @@ interface Timer {
     /**
      * Event to fire when the timer is done
      */
-    time_down_event: string|ComponentEvent;
+    time_down_event: string|Trigger;
 }
 
 /**
@@ -3244,6 +3755,8 @@ interface WaterMovement {
      */
     drag_factor: number;
 }
+
+// #endregion
 
 // #region Properties
 
@@ -3613,5 +4126,59 @@ interface WalkAnimationSpeed {
  * Defines the entity as wanting to become a jockey
  */
 interface WantsJocky {}
+
+// #endregion
+
+// #region Triggers
+
+/**
+ * Only usable by `minecraft:ender_dragon`. Adds a trigger to fire on the entity's death
+ */
+interface OnDeath extends Trigger {}
+
+/**
+ * Adds a trigger that will fire when a nearby entity of the same type becomes angry
+ */
+interface OnFriendlyAnger extends Trigger {}
+
+/**
+ * Adds a trigger that will fire when the entity takes damage
+ */
+interface OnHurt extends Trigger {}
+
+/**
+ * Adds a trigger that will fire when the entity is attacked by a player
+ */
+interface OnHurtByPlayer extends Trigger {}
+
+/**
+ * Adds a trigger that will fire when the entity is set on fire
+ */
+interface OnIgnite extends Trigger {}
+
+/**
+ * Only usable by `minecraft:ender_dragon`. Adds a trigger to fire when the entity lands
+ */
+interface OnStartLanding extends Trigger {}
+
+/**
+ * Only usable by `minecraft:ender_dragon`. Adds a trigger to fire when the entity starts flying
+ */
+interface OnStartTakeoff extends Trigger {}
+
+/**
+ * Adds a trigger that will fire when the entity finds a target
+ */
+interface OnTargetAcquired extends Trigger {}
+
+/**
+ * Adds a trigger that will fire when the entity loses its target
+ */
+interface OnTargetEscape extends Trigger {}
+
+/**
+ * Adds a trigger that will fire when this pet's owner wakes after sleeping with the pet
+ */
+interface OnWakeWithOwner extends Trigger {}
 
 // #endregion
