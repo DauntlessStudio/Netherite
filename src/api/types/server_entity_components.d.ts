@@ -4,6 +4,8 @@ import type { ServerFilters } from "./filters.d.ts";
 import type { MobEffects } from "./mob_effects.d.ts";
 import type { Molang } from "./molang.d.ts";
 
+type EventTarget = "block"|"damager"|"self"|"other"|"player"|"parent"|"target";
+
 interface Trigger {
     /**
      * The list of conditions for this trigger to fire
@@ -13,11 +15,53 @@ interface Trigger {
      * The target who will fire the event
      * @default "self"
      */
-    target?: "block"|"damager"|"self"|"other"|"player"|"parent"|"target";
+    target?: EventTarget;
     /**
      * The event to fire when the conditions are met
      */
     event?: string;
+}
+
+interface EntityType {
+    /**
+     * The amount of time in seconds to wait before selecting a target of the same type again
+     * @default 0
+     */
+    cooldown: number;
+    /**
+     * Conditions that make this entry valid
+     */
+    filters: ServerFilters|ServerFilters[];
+    /**
+     * Max distance away this entity can be from the target to be selected
+     * @default 16
+     */
+    max_dist: number;
+    /**
+     * If true, potential target must be visible to be selected
+     * @default false
+     */
+    must_see: boolean;
+    /**
+     * The amount of time in seconds before the entity forgets the target that it can no longer see
+     * @default 3
+     */
+    must_see_forget_duration: number;
+    /**
+     * If true, the target will be dropped if it no longer meets the conditions
+     * @default false
+     */
+    reevaluate_description: boolean;
+    /**
+     * Multiplier for the running speed
+     * @default 1.0
+     */
+    sprint_speed_multiplier: number;
+    /**
+     * Multiplier for the walking speed
+     * @default 1.0
+     */
+    walk_speed_multiplier: number;
 }
 
 // #region Attributes
@@ -177,7 +221,7 @@ interface BehaviorAvoidMobType {
     /**
      * Conditions to determine if the entity should avoid the target
      */
-    entity_types: ServerFilters|ServerFilters[];
+    entity_types: EntityType[];
     /**
      * If true, ignore whether the entity has a direct line of sight to the target
      * @default false
@@ -463,16 +507,7 @@ interface BehaviorDefendTrustedTarget {
     /**
      * Options to use under certain conditions
      */
-    entity_types: {
-        cooldown: number;
-        filters: ServerFilters|ServerFilters[];
-        max_dist: number;
-        must_see: boolean;
-        must_see_forget_duration: number;
-        reevaluate_description: boolean;
-        sprint_speed_multiplier: number;
-        walk_speed_multiplier: number;
-    }[];
+    entity_types: EntityType[];
     /**
      * If true, only entities in viewing range can be selected as targets
      * @default false
@@ -533,6 +568,1450 @@ interface BehaviorDelayedAttack {
     track_target: boolean;
     x_max_rotation: number;
     y_max_head_rotation: number;
+}
+
+/**
+ * Can cause the entity to dig into the ground before despawning
+ */
+interface BehaviorDig {
+    allow_dig_when_named: boolean;
+    digs_in_daylight: boolean;
+    duration: number;
+    idle_time: number;
+    on_start: Trigger;
+    suspicion_is_disturbance: boolean;
+    vibration_is_disturbance: boolean;
+}
+
+/**
+ * Can cause the enity to open and close doors
+ */
+interface BehaviorDoorInteract {}
+
+/**
+ * Can cause the entity to attack by charging. Can only be used by `minecraft:ender_dragon`
+ */
+interface BehaviorDragonChargePlayer {
+    active_speed: number;
+    continue_charge_threshold_time: number;
+    flight_speed: number;
+    target_zone: [number, number];
+    turn_speed: number;
+}
+
+/**
+ * Can cause the entity to use a special death animation. Can only be used by `minecraft:ender_dragon`
+ */
+interface BehaviorDragonDeath {}
+
+/**
+ * Can cause the entity to shoot flame-breath. Can only be used by `minecraft:ender_dragon`
+ */
+interface BehaviorDragonFlaming {}
+
+/**
+ * Can cause the entity to circle in a holding platform. Can only be used by `minecraft:ender_dragon`
+ */
+interface BehaviorDragonHoldingPattern {}
+
+/**
+ * Can cause the entity to transition into perch. Can only be used by `minecraft:ender_dragon`
+ */
+interface BehaviorDragonLanding {}
+
+/**
+ * Can cause the entity to look for a player while perched. Can only be used by `minecraft:ender_dragon`
+ */
+interface BehaviorDragonScanning {}
+
+/**
+ * Can cause the entity to look for player while flying. Can only be used by `minecraft:ender_dragon`
+ */
+interface BehaviorDragonStrafePlayer {
+    active_speed: number;
+    fireball_range: number;
+    flight_speed: number;
+    switch_direction_probability: number;
+    target_in_range_and_in_view_time: number;
+    target_zone: [number, number];
+    turn_speed: number;
+    view_angle: number;
+}
+
+/**
+ * Can cause the entity to transition out of perch. Can only be used by `minecraft:ender_dragon`
+ */
+interface BehaviorDragonTakeOff {}
+
+/**
+ * Can cause the entity to drink milk under certain conditions
+ */
+interface BehaviorDrinkMilk {
+    cooldown_seconds: number;
+    filters: ServerFilters|ServerFilters[];
+}
+
+/**
+ * Can cause the entity to drink potions under certain conditions
+ */
+interface BehaviorDrinkPotion {
+    potions: {
+        chance: number;
+        filters: ServerFilters|ServerFilters[];
+        id: number;
+    }[];
+    speed_modifier: number;
+}
+
+/**
+ * Can cause the entity to move towards a target and drop an item near them
+ */
+interface BehaviorDropItemFor {
+    cooldown: number;
+    drop_item_chance: number;
+    entity_types: ServerFilters|ServerFilters[];
+    goal_radius: number;
+    loot_table: string;
+    max_head_look_at_height: number;
+    minimum_teleport_distance: number;
+    offering_distance: number;
+    on_drop_attempt: Trigger;
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    seconds_before_pickup: number;
+    speed_multiplier: number;
+    target_range: [number, number];
+    teleport_offset: [number, number, number];
+    time_of_day_range: [number, number];
+}
+
+/**
+ * Can cause the entity to consume a block, replacing it with another block
+ */
+interface BehaviorEatBlock {
+    eat_and_replace_block_pairs: {
+        eat_block: string;
+        replace_block: string;
+    }[];
+    on_eat: Trigger;
+    success_chance: Molang;
+    time_until_eat: number;
+}
+
+/**
+ * Can cause the entity to eat food it is carrying
+ */
+interface BehaviorEatCarriedItem {
+    delay_before_eating: number;
+}
+
+/**
+ * Can cause the entity to eat another entity
+ */
+interface BehaviorEatMob {
+    eat_animation_time: number;
+    eat_mob_sound: string;
+    loot_table: string;
+    pull_in_force: number;
+    reach_mob_distance: number;
+    run_speed: number;
+}
+
+/**
+ * Can cause the entity to emerge from the ground
+ */
+interface BehaviorEmerge {
+    cooldown_time: number;
+    duration: number;
+    on_done: Trigger;
+}
+
+/**
+ * Can cause the entity to leave blocks. Can only be used by `minecraft:enderman`
+ */
+interface BehaviorEndermanLeaveBlock {}
+
+/**
+ * Can cause the entity to take blocks. Can only be used by `minecraft:enderman`
+ */
+interface BehaviorEndermanTakeBlock {}
+
+/**
+ * Can cause the entity to put on desired equipment
+ */
+interface BehaviorEquipItem {}
+
+/**
+ * Can cause the entity to first travel to a random point on the village outskirts. Requires {@link Dweller} and {@link SharedNavigation}
+ */
+interface BehaviorExploreOutskirts {
+    dist_from_boundary: [number, number, number];
+    explore_dist: number;
+    max_travel_time: number;
+    max_wait_time: number;
+    min_dist_from_target: number;
+    min_perimeter: number;
+    min_wait_time: number;
+    next_xz: number;
+    next_y: number;
+    speed_multiplier: number;
+    timer_ratio: number;
+}
+
+/**
+ * Can cause the entity to search wiehin an area for growable crops that they will fertilize
+ */
+interface BehaviorFertalizeFarmBlock {
+    goal_radius: number;
+    max_fertilizer_usage: number;
+    search_cooldown_max_seconds: number;
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to seek shade
+ */
+interface BehaviorFindCover {
+    cooldown_time: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to look for a mount
+ */
+interface BehaviorFindMount {
+    avoid_water: boolean;
+    mount_distance: number;
+    start_delay: number;
+    target_needed: boolean;
+    within_radius: number;
+}
+
+/**
+ * Can cause the entity to move towards the nearest underwater ruin or shipwreck
+ */
+interface BehaviorFindUnderwaterTreasure {
+    search_range: number;
+    speed_multiplier: number;
+    stop_distance: number;
+}
+
+/**
+ * Can cause the entity to attack by firing a shot with a delay
+ */
+interface BehaviorFireAtTarget {
+    attack_cooldown: number;
+    attack_range: [number, number];
+    filters: ServerFilters|ServerFilters[];
+    max_head_rotation_x: number;
+    max_head_rotation_y: number;
+    owner_anchor: number;
+    owner_offset: [number, number, number];
+    post_shoot_delay: number;
+    pre_shoot_delay: number;
+    projectile_def: string;
+    ranged_fov: number;
+    target_anchor: number;
+    target_offset: [number, number, number];
+}
+
+/**
+ * Can cause the entity to run from direct sunlight and seek shade
+ */
+interface BehaviorFleeSun {
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the mob to stay afloat while swimming
+ */
+interface BehaviorFloat {
+    sink_with_passengers: boolean;
+}
+
+/**
+ * Can cause the mob to float like a Ghast
+ */
+interface BehaviorFloatWander {
+    float_duration: [number, number];
+    must_reach: boolean;
+    random_reselect: boolean;
+    xz_dist: number;
+    y_dist: number;
+    y_offset: number;
+}
+
+/**
+ * Can cause the entity to follow a caravan
+ */
+interface BehaviorFollowCaravan {
+    entity_count: number;
+    entity_types: EntityType[];
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to follow other mobs
+ */
+interface BehaviorFollowMob {
+    search_range: number;
+    speed_multiplier: number;
+    stop_distance: number;
+}
+
+/**
+ * Can cause the entity to follow the owning player
+ */
+interface BehaviorFollowOwner {
+    can_teleport: boolean;
+    ignore_vibration: boolean;
+    max_distance: number;
+    post_teleport_distance: number;
+    speed_multiplier: number;
+    start_distance: number;
+    stop_distance: number;
+}
+
+/**
+ * Can cause the entity to follow its current target captain
+ */
+interface BehaviorFollowTargetCaptain {
+    follow_distance: number;
+    within_radius: number;
+}
+
+/**
+ * Can cause the entity to toss the items from its inventory to a recently played Noteblock
+ */
+interface BehaviorGoAndGiveItemsToNoteblock {
+    listen_time: number;
+    on_item_throw: Trigger;
+    reach_block_distance: number;
+    run_speed: number;
+    throw_force: number;
+    throw_sound: string;
+    vertical_throw_mul: number;
+}
+
+/**
+ * Can cause the entity to toss items from its inventory to its owner
+ */
+interface BehaviorGoAndGiveItemsToOwner {
+    on_item_throw: Trigger;
+    reach_block_distance: number;
+    run_speed: number;
+    throw_force: number;
+    throw_sound: string;
+    vertical_throw_mul: number;
+}
+
+/**
+ * Can cause the entity to go to the location where they were spawned. Requires {@link Home}
+ */
+interface BehaviorGoHome {
+    calculate_new_path_radius: number;
+    goal_radius: number;
+    interval: number;
+    on_failed: Trigger;
+    on_home: Trigger;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to use a laser beam attack. Can only be used by `minecraft:guardian` and `minecraft:elder_guardian`
+ */
+interface BehaviorGuardianAttack {
+    elder_extra_magic_damage: number;
+    hard_mode_extra_magic_damage: number;
+    magic_damage: number;
+    min_distance: number;
+    sound_delay_time: number;
+    x_max_rotation: number;
+    y_max_head_rotation: number;
+}
+
+/**
+ * Can cause the entity to search within an area for valid farmland to till. Requires {@link Inventory} and {@link SharedNavigation}
+ */
+interface BehaviorHarvestFarmBlock {
+    goal_radius: number;
+    max_seconds_before_search: number;
+    search_cooldown_max_seconds: number;
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    seconds_until_new_task: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to attempt to move to and hide at a POI
+ */
+interface BehaviorHide {
+    duration: number;
+    poi_type: string;
+    speed_multiplier: number;
+    timeout_cooldown: number;
+}
+
+/**
+ * Can cause the entity to freeze and look at their target
+ */
+interface BehaviorHoldGround {
+    broadcast: boolean;
+    broadcast_range: number;
+    min_radius: number;
+    within_radius_event: string;
+}
+
+/**
+ * Can cause the entity to target a mob that hurt them
+ */
+interface BehaviorHurtByTarget {
+    alert_same_type: boolean;
+    entity_types: EntityType[];
+    hurt_owner: boolean
+}
+
+/**
+ * Can cause the entity to inspect bookshelves
+ */
+interface BehaviorInspectBookshelf {
+    goal_radius: number;
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to move towards a suspicious position. Requires {@link SuspectTracking}
+ */
+interface BehaviorInvestigateSuspiciousLocation {
+    goal_radius: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to jump around a target
+ */
+interface BehaviorJumpAroundTarget {
+    check_collision: boolean;
+    entity_bounding_box_scale: number;
+    filters: ServerFilters|ServerFilters[];
+    jump_angles: number[];
+    jump_cooldown_duration: number;
+    landing_distance_from_target: [number, number];
+    landing_position_spread_degrees: number;
+    last_hurt_duration: number;
+    line_of_sight_obstruction_height_ignore: number;
+    max_jump_velocity: number;
+    prepare_jump_duration: number;
+    required_vertical_space: number;
+    snap_to_surface_block_range: number;
+    valid_distance_to_target: [number, number];
+}
+
+/**
+ * Can cause the entity to jump to another random block
+ */
+interface BehaviorJumpToBlock {
+    cooldown_range: [number, number];
+    forbidden_blocks: string[];
+    max_velocity: number;
+    minimum_distance: number;
+    minimum_path_length: number;
+    preferred_blocks: string[];
+    preferred_blocks_chance: number;
+    scale_factor: number;
+    search_height: number;
+    search_width: number;
+}
+
+/**
+ * Can cause the entity to perform a damaging knockback attack
+ */
+interface BehaviorKnockbackRoar {
+    attack_time: number;
+    cooldown_time: number;
+    damage_filters: ServerFilters|ServerFilters[];
+    duration: number;
+    knockback_damage: number;
+    knockback_filters: ServerFilters|ServerFilters[];
+    knockback_height_cap: number;
+    knockback_horizontal_strength: number;
+    knockback_range: number;
+    knockback_vertical_strength: number;
+    on_roar_end: Trigger;
+}
+
+/**
+ * Can cause the entity to lay down
+ */
+interface BehaviorLayDown {
+    interval: number;
+    random_stop_interval: number;
+}
+
+/**
+ * Can cause the entity to lay egg blocks if pregnant
+ */
+interface BehaviorLayEgg {
+    allow_laying_from_below: boolean;
+    egg_type: string;
+    goal_radius: number;
+    lay_egg_sound: string;
+    lay_seconds: number;
+    on_lay: Trigger;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+    target_blocks: string[];
+    target_materials_above_block: "Air"|"Water"|"Lava"[];
+    use_default_animation: boolean;
+}
+
+/**
+ * Can cause the entity to jump at and attack their target
+ */
+interface BehaviorLeapAtTarget {
+    must_be_on_ground: boolean;
+    set_persistent: boolean;
+    yd: number;
+}
+
+/**
+ * Can cause the entity to look at a nearby entity
+ */
+interface BehaviorLookAtEntity {
+    angle_of_view_horizontal: number;
+    angle_of_view_vertical: number;
+    filters: ServerFilters|ServerFilters[];
+    look_distance: number;
+    look_time: [number, number];
+    probability: number;
+}
+
+/**
+ * Can cause the entity to look at a nearby player
+ */
+interface BehaviorLookAtPlayer {
+    angle_of_view_horizontal: number;
+    angle_of_view_vertical: number;
+    look_distance: number;
+    look_time: [number, number];
+    probability: number;
+}
+
+/**
+ * Can cause the entity to look at a the player they are trading with
+ */
+interface BehaviorLookAtTradingPlayer {
+    angle_of_view_horizontal: number;
+    angle_of_view_vertical: number;
+    look_distance: number;
+    look_time: [number, number];
+    probability: number;
+}
+
+/**
+ * Allows the entity to look for a mate. Can only be used by `minecraft:villager`
+ */
+interface BehaviorMakeLove {}
+
+/**
+ * Can cause the entity to perform a melee attack
+ */
+interface BehaviorMeleeAttack {
+    attack_once: boolean;
+    attack_types: string[];
+    can_spread_on_fire: boolean;
+    cooldown_time: number;
+    inner_boundary_time_increase: number;
+    max_dist: number;
+    max_path_time: number;
+    melee_fov: number;
+    min_path_time: number;
+    on_attack: Trigger;
+    outer_boundary_time_increase: number;
+    path_fail_time_increase: number;
+    path_inner_boundary: number;
+    path_outer_boundary: number;
+    random_stop_interval: number;
+    reach_multiplier: number;
+    require_complete_path: boolean;
+    set_persistent: boolean;
+    speed_multiplier: number;
+    target_dist: number;
+    track_target: boolean;
+    x_max_rotation: number;
+    y_max_head_rotation: number;
+}
+
+/**
+ * Can cause the entity to perform a melee attack based on bounding box calculations
+ */
+interface BehaviorMeleeBoxAttack {
+    attack_once: boolean;
+    attack_types: string[];
+    can_spread_on_fire: boolean;
+    cooldown_time: number;
+    inner_boundary_time_increase: number;
+    max_dist: number;
+    max_path_time: number;
+    melee_fov: number;
+    min_path_time: number;
+    on_attack: Trigger;
+    outer_boundary_time_increase: number;
+    path_fail_time_increase: number;
+    path_inner_boundary: number;
+    path_outer_boundary: number;
+    random_stop_interval: number;
+    reach_multiplier: number;
+    require_complete_path: boolean;
+    set_persistent: boolean;
+    speed_multiplier: number;
+    target_dist: number;
+    track_target: boolean;
+    x_max_rotation: number;
+    y_max_head_rotation: number;
+}
+
+/**
+ * Can cause the entity to go to the village bell and mingle
+ */
+interface BehaviorMingle {
+    cooldown_time: number;
+    duration: number;
+    mingle_distance: number;
+    mingle_partner_type: string[];
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to move around on its own while mounted seeking a target to attack
+ */
+interface BehaviorMountPathing {
+    speed_multiplier: number;
+    target_dist: number;
+    track_target: boolean;
+}
+
+/**
+ * Can cause the entity to move around a target
+ */
+interface BehaviorMoveAroundTarget {
+    destination_pos_search_spread_degrees: number;
+    destination_position_range: [number, number];
+    filters: ServerFilters|ServerFilters[];
+    height_difference_limit: number;
+    horizontal_search_distance: number;
+    movement_speed: number;
+    vertical_search_distance: number;
+}
+
+/**
+ * Can cause the entity to move indoors
+ */
+interface BehaviorMoveIndoors {
+    speed_multiplier: number;
+    timeout_cooldown: number;
+}
+
+/**
+ * Can cause the entity to move outdoors
+ */
+interface BehaviorMoveOutoors {
+    goal_radius: number;
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+    timeout_cooldown: number;
+}
+
+/**
+ * Can cause the entity to move to a block
+ */
+interface BehaviorMoveToBlock {
+    goal_radius: number;
+    on_reach: Trigger;
+    on_stay_completed: Trigger;
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+    start_chance: number;
+    stay_duration: number;
+    target_blocks: string[];
+    target_offset: [number, number, number];
+    target_selection_method: "nearest"|"random";
+    tick_interval: number;
+}
+
+/**
+ * Can cause the entity to move into lava
+ */
+interface BehaviorMoveToLava {
+    goal_radius: number;
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to move into a liquid
+ */
+interface BehaviorMoveToLiquid {
+    goal_radius: number;
+    material_type: "Any"|"Water"|"Lava";
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+    timeout_cooldown: number;
+}
+
+/**
+ * Can cause the entity to move to a POI
+ */
+interface BehaviorMoveToPOI {
+    poi_type: string;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to move towards a random block
+ */
+interface BehaviorMoveToRandomBlock {
+    block_distance: number;
+    within_radius: number;
+}
+
+/**
+ * Can cause the entity to move to a random location within a village
+ */
+interface BehaviorMoveToVillage {
+    goal_radius: number;
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+    cooldown_time: number;
+}
+
+/**
+ * Can cause the entity to move to water
+ */
+interface BehaviorMoveToWater {
+    goal_radius: number;
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+    timeout_cooldown: number;
+}
+
+/**
+ * Can cause the entity to move towards their dwelling. Requires {@link Dweller} and {@link SharedNavigation}
+ */
+interface BehaviorMoveTowardsDwellingRestriction {
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to move towards their home. Requires {@link Home} and {@link SharedNavigation}
+ */
+interface BehaviorMoveTowardsHomeRestriction {
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to move towards its target
+ */
+interface BehaviorMoveTowardsDwellingRestriction {
+    within_radius: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to take naps
+ */
+interface BehaviorNap {
+    cooldown_max: number;
+    cooldown_min: number;
+    mob_detect_dist: number;
+    mob_detect_height: number;
+}
+
+/**
+ * Can cause the entity to attack the closest target that matches the conditions
+ */
+interface BehaviorNearestAttackableTarget {
+    attack_interval: number;
+    attack_interval_min: number;
+    attack_owner: boolean;
+    entity_types: EntityType[];
+    must_reach: boolean;
+    must_see: boolean;
+    must_see_forget_duration: number;
+    persist_time: number;
+    reselect_targets: boolean;
+    scan_interval: number;
+    set_persistent: boolean;
+    target_invisible_multiplier: number;
+    target_search_height: number;
+    target_sneak_visibility_multiplier: number;
+    within_radius: number;
+}
+
+/**
+ * Can cause the entity to attack the highest priority target that matches the conditions
+ */
+interface BehaviorNearestPrioritizedAttackableTarget {
+    attack_interval: number;
+    attack_interval_min: number;
+    attack_owner: boolean;
+    entity_types: (EntityType & {priority: number})[];
+    must_reach: boolean;
+    must_see: boolean;
+    must_see_forget_duration: number;
+    persist_time: number;
+    reselect_targets: boolean;
+    scan_interval: number;
+    set_persistent: boolean;
+    target_invisible_multiplier: number;
+    target_search_height: number;
+    target_sneak_visibility_multiplier: number;
+    within_radius: number;
+}
+
+/**
+ * Can cause the entity to sit in place like the Ocelot
+ */
+interface BehaviorOcelotSitOnBlock {
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to attack by sneaking and pouncing
+ */
+interface BehaviorOcelotAttack {
+    cooldown_time: number;
+    max_distance: number;
+    max_sneak_range: number;
+    max_sprint_range: number;
+    reach_multiplier: number;
+    sneak_speed_multiplier: number;
+    sprint_speed_multiplier: number;
+    walk_speed_multiplier: number;
+    x_max_rotation: number;
+    y_max_head_rotation: number;
+}
+
+/**
+ * Can cause the entity to offer a flower to a mob with {@link BehaviorTakeFlower}
+ */
+interface BehaviorOfferFlower {
+    chance_to_start: number;
+    filters: ServerFilters|ServerFilters[];
+    max_head_rotation_y: number;
+    max_offer_flower_duration: number;
+    max_rotation_x: number;
+    search_area: [number, number, number];
+}
+
+/**
+ * Can cause the entity to open doors if allowed by their navigation
+ */
+interface BehaviorOpenDoor {
+    close_door_after: boolean;
+}
+
+/**
+ * Can cause the entity to target entities that hurt their owner
+ */
+interface BehaviorOwnerHurtByTarget {
+    entity_types: EntityType[];
+}
+
+/**
+ * Can cause the entity to target entities that is hurt by their owner
+ */
+interface BehaviorOwnerHurtTarget {
+    entity_types: EntityType[];
+}
+
+/**
+ * Can cause the entity to enter a panic state, running form the damage source that made it enter the state
+ */
+interface BehaviorPanic {
+    damage_sources: MobEffect[];
+    force: boolean;
+    ignore_mob_damage: boolean;
+    prefer_water: boolean;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity as a pet to sleep in the bed with the owner
+ */
+interface BehaviorPetSleepWithOwner {
+    goal_radius: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to pick up items on the ground
+ */
+interface BehaviorPickupItems {
+    can_pickup_any_item: boolean;
+    can_pickup_to_hand_or_equipment: boolean;
+    excluded_items: string[];
+    goal_radius: number;
+    max_dist: number;
+    pickup_based_on_chance: boolean;
+    speed_multiplier: number;
+    track_target: boolean;
+}
+
+/**
+ * Can cause the entity to play with other entities by chasing them and moving randomly
+ */
+interface BehaviorPlay {
+    chance_to_start: number;
+    follow_distance: number;
+    friend_search_area: [number, number, number];
+    friend_types: string[];
+    max_play_duration_seconds: number;
+    random_pos_search_height: number;
+}
+
+/**
+ * Can cause the entity to pretend to be dead to avoid being attacked
+ */
+interface BehaviorPlayDead {
+    apply_regeneration: boolean;
+    damage_sources: DamageType[];
+    duration: number;
+    filters: ServerFilters|ServerFilters[];
+    force_below_health: number;
+    random_damage_range: [number, number];
+    random_start_chance: number;
+}
+
+/**
+ * Can cause the entity to be ridden by the player after being tamed
+ */
+interface BehaviorPlayerRideTamed {}
+
+/**
+ * Can cause the entity to raid crops out of farms while hungry
+ */
+interface BehaviorRaidGarden {
+    blocks: string[];
+    eat_delay: number;
+    full_delay: number;
+    goal_radius: number;
+    initial_eat_delay: number;
+    max_to_eat: number;
+    search_range: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to attack by ramming
+ */
+interface BehaviorRamAttack {
+    baby_knockback_modifier: number;
+    cooldown_range: [number, number];
+    knockback_force: number;
+    knockback_height: number;
+    min_ram_distance: number;
+    on_start: Trigger;
+    pre_ram_sound: string;
+    ram_distance: number;
+    ram_impact_sound: string;
+    ram_speed: number;
+    run_speed: number;
+}
+
+/**
+ * Can cause the entity to randomly breach the surface of water
+ */
+interface BehaviorRandomBreach {
+    cooldown_time: number;
+    interval: number;
+    speed_multiplier: number;
+    xz_dist: number;
+    y_dist: number;
+}
+
+/**
+ * Can cause the entity to randomly fly around
+ */
+interface BehaviorRandomFly {
+    can_land_on_trees: boolean;
+    cooldown_time: number;
+    interval: number;
+    speed_multiplier: number;
+    xz_dist: number;
+    y_dist: number;
+}
+
+/**
+ * Can cause the entity to randomly hover around
+ */
+interface BehaviorRandomBreach {
+    cooldown_time: number;
+    hover_height: [number, number];
+    interval: number;
+    speed_multiplier: number;
+    xz_dist: number;
+    y_dist: number;
+    y_offset: number;
+}
+
+/**
+ * Can cause the entity to randomly look around
+ */
+interface BehaviorRandomLookAround {
+    look_time: [number, number];
+    max_angle_of_view_horizontal: number;
+    max_angle_of_view_vertical: number;
+}
+
+/**
+ * Can cause the entity to randomly sit and look around
+ */
+interface BehaviorRandomLookAroundAndSit {
+    continue_if_leashed: boolean;
+    continue_sitting_on_reload: boolean;
+    max_angle_of_view_horizontal: number;
+    max_look_count: number;
+    max_look_time: number;
+    min_angle_of_view_horizontal: number;
+    min_look_count: number;
+    min_look_time: number;
+    probability: number;
+    random_look_around_cooldown: number;
+}
+
+/**
+ * Can cause the entity to randomly move to a block and dig up an item
+ */
+interface BehaviorRandomSearchAndDig {
+    cooldown_range: [number, number];
+    digging_duration_range: [number, number];
+    find_valid_position_retries: number;
+    goal_radius: number;
+    item_table: string;
+    on_digging_start: Trigger;
+    on_fail_during_digging: Trigger;
+    on_fail_during_searching: Trigger;
+    on_item_found: Trigger;
+    on_searching_start: Trigger;
+    on_success: Trigger;
+    search_range_xz: number;
+    search_range_y: number;
+    spawn_item_after_seconds: number;
+    spawn_item_pos_offset: number;
+    speed_multiplier: number;
+    target_blocks: string[];
+    target_dig_position_offset: number;
+}
+
+/**
+ * Can cause the entity to randomly sit for a duration
+ */
+interface BehaviorRandomSitting {
+    cooldown_time: number;
+    min_sit_time: number;
+    start_chance: number;
+    stop_chance: number;
+}
+
+/**
+ * Can cause the entity to randomly stroll around
+ */
+interface BehaviorRandomStroll {
+    cooldown_time: number;
+    interval: number;
+    speed_multiplier: number;
+    xz_dist: number;
+    y_dist: number;
+}
+
+/**
+ * Can cause the entity to randomly swim through water
+ */
+interface BehaviorRandomSwim {
+    cooldown_time: number;
+    interval: number;
+    speed_multiplier: number;
+    xz_dist: number;
+    y_dist: number;
+}
+
+/**
+ * Can cause the entity to attack using ranged shots
+ */
+interface BehaviorRangedAttack {
+    attack_interval: number;
+    attack_interval_max: number;
+    attack_interval_min: number;
+    attack_radius: number;
+    attack_radius_min: number;
+    burst_interval: number;
+    burst_shots: number;
+    charge_charged_trigger: number;
+    charge_shoot_trigger: number;
+    ranged_fov: number;
+    set_persistent: boolean;
+    speed_multiplier: number;
+    swing: boolean;
+    target_in_sight_time: number;
+    x_max_rotation: number;
+    y_max_head_rotation: number;
+}
+
+/**
+ * Can cause the entity to stop and mate with another entity. Can only be used by `minecraft:villager`
+ */
+interface BehaviorRecieveLove {}
+
+/**
+ * Can cause the entity to stay indoors during night time
+ */
+interface BehaviorRestrictOpenDoor {}
+
+/**
+ * Can cause the entity to avoid the direct sunlight
+ */
+interface BehaviorRestrictSun {}
+
+/**
+ * Can cause the entity to stay at a certain level in liquid
+ */
+interface BehaviorRiseToLiquidLevel {
+    liquid_y_offset: number;
+    rise_delta: number;
+    sink_delta: number;
+}
+
+/**
+ * Can cause the entity to roar based on {@link AngerLevel}
+ */
+interface BehaviorRoar {
+    duration: number;
+}
+
+/**
+ * Can cause the entity to roll forward
+ */
+interface BehaviorRoll {
+    probability: number;
+}
+
+/**
+ * Can cause the entity to run around aimlessly
+ */
+interface BehaviorRunAroundLikeCrazy {
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to become scared when the weather is thundering
+ */
+interface BehaviorScared {
+    sound_interval: number;
+}
+
+/**
+ * Can cause the entity to send an event to another mob
+ */
+interface BehaviorSendEvent {
+    cast_duration: number;
+    look_at_target: boolean;
+    sequence: {
+        base_delay: number;
+        event: string;
+        sound_event: string;
+    }[];
+}
+
+/**
+ * Can cause the entity to give its items to others
+ */
+interface BehaviorShareItems {
+    entity_types: EntityType[];
+    goal_radius: number;
+    max_dist: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to merge into stone. Can only be used by `minecraft:silverfish`
+ */
+interface BehaviorSilverfishMergeWithStone {}
+
+/**
+ * Can cause the entity to alert nearby entities in blocks. Can only be used by `minecraft:silverfish`
+ */
+interface BehaviorSilverfishWakeUpFriends {}
+
+/**
+ * Can cause the entity to be horse traps
+ */
+interface BehaviorSkeletonHorseTrap {
+    duration: number;
+    within_radius: number;
+}
+
+/**
+ * Can cause the entity to move to and sleep in its village bed
+ */
+interface BehaviorSleep {
+    can_sleep_while_riding: boolean;
+    cooldown_time: number;
+    sleep_collider_height: number;
+    sleep_collider_width: number;
+    sleep_y_offset: number;
+    speed_multiplier: number;
+    timeout_cooldown: number;
+}
+
+/**
+ * Can cause the entity to perfom a slime attack
+ */
+interface BehaviorSlimeAttack {
+    set_persistent: boolean;
+    speed_multiplier: number;
+    x_max_rotation: number;
+    y_max_rotation: number;
+}
+
+/**
+ * Can cause the entity to float in water or lava. Can only be used by `minecraft:slime`
+ */
+interface BehaviorSlimeFloat {
+    jump_chance_percentage: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to jump around. Can only be used by `minecraft:slime`
+ */
+interface BehaviorSlimeKeepOnJumping {
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to move in random directions. Can only be used by `minecraft:slime`
+ */
+interface BehaviorSlimeRandomDirection {
+    add_random_time_range: number;
+    min_change_direction_time: number;
+    turn_range: number;
+}
+
+/**
+ * Can cause the entity to take a load off and snack on food that it fond nearby
+ */
+interface BehaviorSnacking {
+    items: string[];
+    snacking_cooldown: number;
+    snacking_cooldown_min: number;
+    snacking_stop_chance: number;
+}
+
+/**
+ * Can cause the entity to stop and sneeze
+ */
+interface BehaviorSneeze {
+    cooldown_time: number;
+    drop_item_chance: number;
+    entity_types: EntityType[];
+    loot_table: string;
+    prepare_sound: string;
+    prepare_time: number;
+    probability: number;
+    sound: string;
+    within_radius: number;
+}
+
+/**
+ * Can cause the entity to sniff around
+ */
+interface BehaviorSniff {
+    cooldown_range: [number, number];
+    duration: number;
+    sniffing_radius: number;
+    suspicion_radius_horizontal: number;
+    suspicion_radius_vertical: number;
+}
+
+/**
+ * Can cause the entity to perform a sonic boom
+ */
+interface BehaviorSonicBoom {
+    attack_cooldown: number;
+    attack_damage: number;
+    attack_range_horizontal: number;
+    attack_range_vertical: number;
+    attack_sound: string;
+    charge_sound: string;
+    duration: number;
+    duration_until_attack_sound: number;
+    knockback_height_cap: number;
+    knockback_horizontal_strength: number;
+    knockback_vertical_strength: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to dive. Can only be used by `minecraft:squid`
+ */
+interface BehaviorSquidDive {}
+
+/**
+ * Allows the entity to swim away. Can only be used by `minecraft:squid`
+ */
+interface BehaviorSquidFlee {}
+
+/**
+ * Can cause the entity to swim in place. Can only be used by `minecraft:squid`
+ */
+interface BehaviorSquidIdle {}
+
+/**
+ * Can cause the entity to move back to water. Can only be used by `minecraft:squid`
+ */
+interface BehaviorSquidMoveAwayFromGround {}
+
+/**
+ * Can cause the entity to stick to the ground outside water. Can only be used by `minecraft:squid`
+ */
+interface BehaviorSquidOutOfWater {}
+
+/**
+ * Can cause the entity to stalk, then pounce on a target
+ */
+interface BehaviorStalkAndPounceOnTarget {
+    interest_time: number;
+    leap_distance: number;
+    leap_height: number;
+    max_stalk_dist: number;
+    pounce_max_dist: number;
+    set_persistent: boolean;
+    stalk_speed: number;
+    strike_dist: number;
+    struck_time: number;
+}
+
+/**
+ * Can cause the entity to attempt to toss the items from its inventory to a recently played Noteblock
+ */
+interface BehaviorStayNearNoteblock {
+    listen_time: number;
+    speed: number;
+    start_distance: number;
+    stop_distance: number;
+}
+
+/**
+ * Can cause the entity to stay put while sitting
+ */
+interface BehaviorStayWhileSitting {}
+
+/**
+ * Can cause the entity to attack using stop AoE damage
+ */
+interface BehaviorStompAttack {
+    attack_once: boolean;
+    attack_types: string[];
+    can_spread_on_fire: boolean;
+    cooldown_time: number;
+    inner_boundary_time_increase: number;
+    max_dist: number;
+    max_path_time: number;
+    min_path_time: number;
+    no_damage_range_multiplier: number;
+    on_attack: Trigger;
+    outer_boundary_time_increase: number;
+    path_fail_time_increase: number;
+    path_inner_boundary: number;
+    path_outer_boundary: number;
+    random_stop_interval: number;
+    reach_multiplier: number;
+    require_complete_path: boolean;
+    set_persistent: boolean;
+    speed_multiplier: number;
+    stomp_range_multiplier: number;
+    target_dist: number;
+    track_target: boolean;
+    x_max_rotation: number;
+    y_max_head_rotation: number;
+}
+
+/**
+ * Can cause the entity to stomp turtle eggs
+ */
+interface BehaviorStompTurtleEgg {
+    goal_radius: number;
+    interval: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to move to a random location within a village
+ */
+interface BehaviorStrollTowardsVillage {
+    cooldown_time: number;
+    goal_radius: number;
+    search_range: number;
+    speed_multiplier: number;
+    start_chance: number;
+}
+
+/**
+ * Can cause the entity to summon other entities
+ */
+interface BehaviorSummonEntity {
+    summon_choices: {
+        cast_duration: number;
+        cooldown_time: number;
+        co_casting: boolean;
+        filters: ServerFilters|ServerFilters[];
+        max_activation_range: number;
+        min_activation_range: number;
+        particle_color: number;
+        sequence: {
+            base_delay: number;
+            delay_per_summon: number;
+            entity_lifespan: number;
+            entity_type: string;
+            num_entities_spawned: number;
+            shape: "circle"|"line";
+            size: number;
+            sound_event: string;
+            summon_cap: number;
+            summon_cap_radius: number;
+            summon_event: string;
+            target: EventTarget;
+        }[];
+        start_sound_event: string;
+        weight: number;
+    }[];
 }
 
 // #endregion
@@ -1468,6 +2947,19 @@ interface DryingOutTimer {
      * @default 0.0
      */
     water_bottle_refill_time: number;
+}
+
+/**
+ * Defines the entity's dwelling
+ */
+interface Dweller {
+    dwelling_type: "village";
+    dweller_role: "hostile"|"inhabitant"|"defender"
+    update_interval_base: number;
+    update_interval_variant: number;
+    can_find_poi: boolean;
+    can_migrate: boolean;
+    first_founding_reward: number;
 }
 
 /**
