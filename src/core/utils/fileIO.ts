@@ -18,7 +18,7 @@ export function sendToDist(src: string, dest: string, excludeGlob: string[] = []
     if (stat.isDirectory) {
         Deno.mkdirSync(dest, {recursive: true});
         for (const entry of Deno.readDirSync(src)) {
-            sendToDist(path.join(src, entry.name), path.join(dest, entry.name));
+            sendToDist(path.join(src, entry.name), path.join(dest, entry.name), excludeGlob);
         }
     } else {
         if (isTextFile(src)) {

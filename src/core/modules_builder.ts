@@ -1,5 +1,6 @@
 import * as path from "jsr:@std/path";
 import { debounce } from "jsr:@std/async/debounce";
+import { ModuleWriter } from "./module_writer.ts";
 
 export async function buildModules(watch?: boolean): Promise<void> {
     const modulesDir = path.join(Deno.cwd(), "src/modules");
@@ -17,7 +18,7 @@ async function traverseDirectory(dir: string): Promise<void> {
             await traverseDirectory(entryPath);
         } else if (dirEntry.isFile && dirEntry.name.endsWith(".mod.ts")) {
             const url = new URL("file://" + entryPath);
-            await import(url.toString());
+            await processModuleClasses(url);
         }
     }
 }
@@ -31,8 +32,8 @@ async function watchModules(): Promise<void> {
             const url = new URL("file://" + event.paths[0] + "?version=" + Date.now());
             
             try {
-                await import(url.toString());
                 console.log("[%s] %s", event.kind, event.paths[0]);
+                await processModuleClasses(url);
             } catch (e) {
                 console.error(`Error loading module: ${event.paths[0]}`);
                 console.error(e);
@@ -45,4 +46,15 @@ async function watchModules(): Promise<void> {
     for await (const event of watcher) {
         ingest(event);
     }
+}
+
+async function processModuleClasses(url: URL): Promise<void> {
+    try {
+        await import(url.toString());
+    } catch (error) {
+        throw error;
+    }
+
+    ModuleWriter.process();
+    ModuleWriter.flush();
 }

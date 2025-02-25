@@ -8,7 +8,7 @@ export async function buildStaticFiles(watch?: boolean): Promise<void> {
     const behaviorPackPath = path.join(Deno.cwd(), "src/behavior_pack");
     const behaviorPackDest = path.join(Deno.cwd(), Config.Paths.bp.root);
     Deno.mkdirSync(behaviorPackDest, {recursive: true});
-    sendToDist(behaviorPackPath, behaviorPackDest, ["*.ts", "manifest.json"]);
+    sendToDist(behaviorPackPath, behaviorPackDest, ["**/*.ts", "**/manifest.json"]);
 
     // Handles RP Root Files
     const resourcePackPath = path.join(Deno.cwd(), "src/resource_pack");
