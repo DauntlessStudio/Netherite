@@ -62,12 +62,12 @@ interface Events {
         [key: string]: string|number|boolean;
     };
     filters?: ServerFilters|ServerFilters[];
-    queue_command: {
+    queue_command?: {
         command: string|string[];
     }
 }
 
-export interface ServerEntity {
+export interface ServerEntityStrict {
     format_version: string;
     "minecraft:entity": {
         description: Description;
@@ -76,6 +76,20 @@ export interface ServerEntity {
         };
         components: Components;
         events: {
+            [key: string]: Events;
+        }
+    }
+}
+
+export interface ServerEntityLoose {
+    format_version?: string;
+    "minecraft:entity": {
+        description?: Partial<Description>;
+        component_groups?: {
+            [key: string]: Components;
+        };
+        components?: Components;
+        events?: {
             [key: string]: Events;
         }
     }

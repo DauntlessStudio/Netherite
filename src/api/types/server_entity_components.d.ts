@@ -3404,17 +3404,17 @@ export interface DamageSensor {
         /**
          * The type of damage that triggers the events
          */
-        cause: DamageType;
+        cause?: DamageType;
         /**
          * A modifier that adds/removes the base damage received. It does not cause negative damage.
          * @default 0.0
          */
-        damage_modifier: number;
+        damage_modifier?: number;
         /**
          * A multiplier that modifies the base damage received.
          * @default 1.0
          */
-        damage_multiplier: number;
+        damage_multiplier?: number;
         /**
          * Defines how the entity receives damage.
          * - `yes` - The entity receives damage
@@ -3422,15 +3422,15 @@ export interface DamageSensor {
          * - `no_but_side_effects_apply` - The entity does not receive damage, but side effects apply (e.g. weapon durability loss, enchantment effects, etc.)
          * @default "yes"
          */
-        deals_damage: "yes"|"no"|"no_but_side_effects_apply";
+        deals_damage?: "yes"|"no"|"no_but_side_effects_apply";
         /**
          * Defines event triggers and damage filters. All filters must pass for the event to trigger
          */
-        on_damage: Trigger;
+        on_damage?: Trigger;
         /**
          * Defines what sound to playe when the `on_damage` filters are met
          */
-        on_damage_sound_event: string;
+        on_damage_sound_event?: string;
     }[];
 }
 
