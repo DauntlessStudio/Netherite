@@ -1,4 +1,5 @@
 import type { ServerFilters } from "./filters.d.ts";
+import type { Components } from "./server_entity_components.d.ts";
 
 interface Property {
     client_sync?: boolean;
@@ -71,9 +72,9 @@ export interface ServerEntity {
     "minecraft:entity": {
         description: Description;
         component_groups: {
-            [key: string]: unknown;
+            [key: string]: Components;
         };
-        components: unknown;
+        components: Components;
         events: {
             [key: string]: Events;
         }

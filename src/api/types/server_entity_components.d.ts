@@ -4,9 +4,359 @@ import type { ServerFilters } from "./filters.d.ts";
 import type { MobEffects } from "./mob_effects.d.ts";
 import type { Molang } from "./molang.d.ts";
 
+type PartialWithAdditionalProperties<T> = Partial<T> & {[key: string]: unknown};
+
+export interface Components {
+    "minecraft:behavior.admire_item"?: PartialWithAdditionalProperties<BehaviorAdmireItem>
+    "minecraft:behavior.avoid_block"?: PartialWithAdditionalProperties<BehaviorAvoidBlock>
+    "minecraft:behavior.avoid_mob_type"?: PartialWithAdditionalProperties<BehaviorAvoidMobType>
+    "minecraft:behavior.barter"?: PartialWithAdditionalProperties<BehaviorBarter>
+    "minecraft:behavior.beg"?: PartialWithAdditionalProperties<BehaviorBeg>
+    "minecraft:behavior.break_door"?: PartialWithAdditionalProperties<BehaviorBreakDoor>
+    "minecraft:behavior.breed"?: PartialWithAdditionalProperties<BehaviorBreed>
+    "minecraft:behavior.celebrate"?: PartialWithAdditionalProperties<BehaviorCelebrate>
+    "minecraft:behavior.celebrate_survive"?: PartialWithAdditionalProperties<BehaviorCelebrateSurvive>
+    "minecraft:behavior.charge_attack"?: PartialWithAdditionalProperties<BehaviorChargeAttack>
+    "minecraft:behavior.charge_held_item"?: PartialWithAdditionalProperties<BehaviorChargeHeldItem>
+    "minecraft:behavior.circle_around_anchor"?: PartialWithAdditionalProperties<BehaviorCircleAroundAnchor>
+    "minecraft:behavior.controlled_by_player"?: PartialWithAdditionalProperties<BehaviorControlledByPlayer>
+    "minecraft:behavior.croak"?: PartialWithAdditionalProperties<BehaviorCroak>
+    "minecraft:behavior.defend_trusted_target"?: PartialWithAdditionalProperties<BehaviorDefendTrustedTarget>
+    "minecraft:behavior.defend_village_target"?: PartialWithAdditionalProperties<BehaviorDefendVillageTarget>
+    "minecraft:behavior.delayed_attack"?: PartialWithAdditionalProperties<BehaviorDelayedAttack>
+    "minecraft:behavior.dig"?: PartialWithAdditionalProperties<BehaviorDig>
+    "minecraft:behavior.door_interact"?: PartialWithAdditionalProperties<BehaviorDoorInteract>
+    "minecraft:behavior.dragonchargeplayer"?: PartialWithAdditionalProperties<BehaviorDragonChargePlayer>
+    "minecraft:behavior.dragondeath"?: PartialWithAdditionalProperties<BehaviorDragonDeath>
+    "minecraft:behavior.dragonflaming"?: PartialWithAdditionalProperties<BehaviorDragonFlaming>
+    "minecraft:behavior.dragonholdingpattern"?: PartialWithAdditionalProperties<BehaviorDragonHoldingPattern>
+    "minecraft:behavior.dragonlanding"?: PartialWithAdditionalProperties<BehaviorDragonLanding>
+    "minecraft:behavior.dragonscanning"?: PartialWithAdditionalProperties<BehaviorDragonScanning>
+    "minecraft:behavior.dragonstrafeplayer"?: PartialWithAdditionalProperties<BehaviorDragonStrafePlayer>
+    "minecraft:behavior.dragontakeoff"?: PartialWithAdditionalProperties<BehaviorDragonTakeOff>
+    "minecraft:behavior.drink_milk"?: PartialWithAdditionalProperties<BehaviorDrinkMilk>
+    "minecraft:behavior.drink_potion"?: PartialWithAdditionalProperties<BehaviorDrinkPotion>
+    "minecraft:behavior.drop_item_for"?: PartialWithAdditionalProperties<BehaviorDropItemFor>
+    "minecraft:behavior.eat_block"?: PartialWithAdditionalProperties<BehaviorEatBlock>
+    "minecraft:behavior.eat_carried_item"?: PartialWithAdditionalProperties<BehaviorEatCarriedItem>
+    "minecraft:behavior.eat_mob"?: PartialWithAdditionalProperties<BehaviorEatMob>
+    "minecraft:behavior.emerge"?: PartialWithAdditionalProperties<BehaviorEmerge>
+    "minecraft:behavior.enderman_leave_block"?: PartialWithAdditionalProperties<BehaviorEndermanLeaveBlock>
+    "minecraft:behavior.enderman_take_block"?: PartialWithAdditionalProperties<BehaviorEndermanTakeBlock>
+    "minecraft:behavior.equip_item"?: PartialWithAdditionalProperties<BehaviorEquipItem>
+    "minecraft:behavior.explore_outskirts"?: PartialWithAdditionalProperties<BehaviorExploreOutskirts>
+    "minecraft:behavior.fertilize_farm_block"?: PartialWithAdditionalProperties<BehaviorFertilizeFarmBlock>
+    "minecraft:behavior.find_cover"?: PartialWithAdditionalProperties<BehaviorFindCover>
+    "minecraft:behavior.find_mount"?: PartialWithAdditionalProperties<BehaviorFindMount>
+    "minecraft:behavior.find_underwater_treasure"?: PartialWithAdditionalProperties<BehaviorFindUnderwaterTreasure>
+    "minecraft:behavior.fire_at_target"?: PartialWithAdditionalProperties<BehaviorFireAtTarget>
+    "minecraft:behavior.flee_sun"?: PartialWithAdditionalProperties<BehaviorFleeSun>
+    "minecraft:behavior.float"?: PartialWithAdditionalProperties<BehaviorFloat>
+    "minecraft:behavior.float_wander"?: PartialWithAdditionalProperties<BehaviorFloatWander>
+    "minecraft:behavior.follow_caravan"?: PartialWithAdditionalProperties<BehaviorFollowCaravan>
+    "minecraft:behavior.follow_mob"?: PartialWithAdditionalProperties<BehaviorFollowMob>
+    "minecraft:behavior.follow_owner"?: PartialWithAdditionalProperties<BehaviorFollowOwner>
+    "minecraft:behavior.follow_parent"?: PartialWithAdditionalProperties<BehaviorFollowParent>
+    "minecraft:behavior.follow_target_captain"?: PartialWithAdditionalProperties<BehaviorFollowTargetCaptain>
+    "minecraft:behavior.go_and_give_items_to_noteblock"?: PartialWithAdditionalProperties<BehaviorGoAndGiveItemsToNoteblock>
+    "minecraft:behavior.go_and_give_items_to_owner"?: PartialWithAdditionalProperties<BehaviorGoAndGiveItemsToOwner>
+    "minecraft:behavior.go_home"?: PartialWithAdditionalProperties<BehaviorGoHome>
+    "minecraft:behavior.guardian_attack"?: PartialWithAdditionalProperties<BehaviorGuardianAttack>
+    "minecraft:behavior.harvest_farm_block"?: PartialWithAdditionalProperties<BehaviorHarvestFarmBlock>
+    "minecraft:behavior.hide"?: PartialWithAdditionalProperties<BehaviorHide>
+    "minecraft:behavior.hold_ground"?: PartialWithAdditionalProperties<BehaviorHoldGround>
+    "minecraft:behavior.hurt_by_target"?: PartialWithAdditionalProperties<BehaviorHurtByTarget>
+    "minecraft:behavior.inspect_bookshelf"?: PartialWithAdditionalProperties<BehaviorInspectBookshelf>
+    "minecraft:behavior.investigate_suspicious_location"?: PartialWithAdditionalProperties<BehaviorInvestigateSuspiciousLocation>
+    "minecraft:behavior.jump_around_target"?: PartialWithAdditionalProperties<BehaviorJumpAroundTarget>
+    "minecraft:behavior.jump_to_block"?: PartialWithAdditionalProperties<BehaviorJumpToBlock>
+    "minecraft:behavior.knockback_roar"?: PartialWithAdditionalProperties<BehaviorKnockbackRoar>
+    "minecraft:behavior.lay_down"?: PartialWithAdditionalProperties<BehaviorLayDown>
+    "minecraft:behavior.lay_egg"?: PartialWithAdditionalProperties<BehaviorLayEgg>
+    "minecraft:behavior.leap_at_target"?: PartialWithAdditionalProperties<BehaviorLeapAtTarget>
+    "minecraft:behavior.look_at_entity"?: PartialWithAdditionalProperties<BehaviorLookAtEntity>
+    "minecraft:behavior.look_at_player"?: PartialWithAdditionalProperties<BehaviorLookAtPlayer>
+    "minecraft:behavior.look_at_target"?: PartialWithAdditionalProperties<BehaviorLookAtTarget>
+    "minecraft:behavior.look_at_trading_player"?: PartialWithAdditionalProperties<BehaviorLookAtTradingPlayer>
+    "minecraft:behavior.make_love"?: PartialWithAdditionalProperties<BehaviorMakeLove>
+    "minecraft:behavior.melee_attack"?: PartialWithAdditionalProperties<BehaviorMeleeAttack>
+    "minecraft:behavior.melee_box_attack"?: PartialWithAdditionalProperties<BehaviorMeleeBoxAttack>
+    "minecraft:behavior.mingle"?: PartialWithAdditionalProperties<BehaviorMingle>
+    "minecraft:behavior.mount_pathing"?: PartialWithAdditionalProperties<BehaviorMountPathing>
+    "minecraft:behavior.move_around_target"?: PartialWithAdditionalProperties<BehaviorMoveAroundTarget>
+    "minecraft:behavior.move_indoors"?: PartialWithAdditionalProperties<BehaviorMoveIndoors>
+    "minecraft:behavior.move_outdoors"?: PartialWithAdditionalProperties<BehaviorMoveOutdoors>
+    "minecraft:behavior.move_through_village"?: PartialWithAdditionalProperties<BehaviorMoveThroughVillage>
+    "minecraft:behavior.move_to_block"?: PartialWithAdditionalProperties<BehaviorMoveToBlock>
+    "minecraft:behavior.move_to_land"?: PartialWithAdditionalProperties<BehaviorMoveToLand>
+    "minecraft:behavior.move_to_lava"?: PartialWithAdditionalProperties<BehaviorMoveToLava>
+    "minecraft:behavior.move_to_liquid"?: PartialWithAdditionalProperties<BehaviorMoveToLiquid>
+    "minecraft:behavior.move_to_poi"?: PartialWithAdditionalProperties<BehaviorMoveToPOI>
+    "minecraft:behavior.move_to_random_block"?: PartialWithAdditionalProperties<BehaviorMoveToRandomBlock>
+    "minecraft:behavior.move_to_village"?: PartialWithAdditionalProperties<BehaviorMoveThroughVillage>
+    "minecraft:behavior.move_to_water"?: PartialWithAdditionalProperties<BehaviorMoveToWater>
+    "minecraft:behavior.move_towards_dwelling_restriction"?: PartialWithAdditionalProperties<BehaviorMoveTowardsDwellingRestriction>
+    "minecraft:behavior.move_towards_home_restriction"?: PartialWithAdditionalProperties<BehaviorMoveTowardsHomeRestriction>
+    "minecraft:behavior.move_towards_target"?: PartialWithAdditionalProperties<BehaviorMoveTowardsTarget>
+    "minecraft:behavior.nap"?: PartialWithAdditionalProperties<BehaviorNap>
+    "minecraft:behavior.nearest_attackable_target"?: PartialWithAdditionalProperties<BehaviorNearestAttackableTarget>
+    "minecraft:behavior.nearest_prioritized_attackable_target"?: PartialWithAdditionalProperties<BehaviorNearestPrioritizedAttackableTarget>
+    "minecraft:behavior.ocelot_sit_on_block"?: PartialWithAdditionalProperties<BehaviorOcelotSitOnBlock>
+    "minecraft:behavior.ocelotattack"?: PartialWithAdditionalProperties<BehaviorOcelotAttack>
+    "minecraft:behavior.offer_flower"?: PartialWithAdditionalProperties<BehaviorOfferFlower>
+    "minecraft:behavior.open_door"?: PartialWithAdditionalProperties<BehaviorOpenDoor>
+    "minecraft:behavior.owner_hurt_by_target"?: PartialWithAdditionalProperties<BehaviorOwnerHurtByTarget>
+    "minecraft:behavior.owner_hurt_target"?: PartialWithAdditionalProperties<BehaviorOwnerHurtTarget>
+    "minecraft:behavior.panic"?: PartialWithAdditionalProperties<BehaviorPanic>
+    "minecraft:behavior.pet_sleep_with_owner"?: PartialWithAdditionalProperties<BehaviorPetSleepWithOwner>
+    "minecraft:behavior.pickup_items"?: PartialWithAdditionalProperties<BehaviorPickupItems>
+    "minecraft:behavior.play"?: PartialWithAdditionalProperties<BehaviorPlay>
+    "minecraft:behavior.play_dead"?: PartialWithAdditionalProperties<BehaviorPlayDead>
+    "minecraft:behavior.player_ride_tamed"?: PartialWithAdditionalProperties<BehaviorPlayerRideTamed>
+    "minecraft:behavior.raid_garden"?: PartialWithAdditionalProperties<BehaviorRaidGarden>
+    "minecraft:behavior.ram_attack"?: PartialWithAdditionalProperties<BehaviorRamAttack>
+    "minecraft:behavior.random_breach"?: PartialWithAdditionalProperties<BehaviorRandomBreach>
+    "minecraft:behavior.random_fly"?: PartialWithAdditionalProperties<BehaviorRandomFly>
+    "minecraft:behavior.random_hover"?: PartialWithAdditionalProperties<BehaviorRandomHover>
+    "minecraft:behavior.random_look_around"?: PartialWithAdditionalProperties<BehaviorRandomLookAround>
+    "minecraft:behavior.random_look_around_and_sit"?: PartialWithAdditionalProperties<BehaviorRandomLookAroundAndSit>
+    "minecraft:behavior.random_search_and_dig"?: PartialWithAdditionalProperties<BehaviorRandomSearchAndDig>
+    "minecraft:behavior.random_sitting"?: PartialWithAdditionalProperties<BehaviorRandomSitting>
+    "minecraft:behavior.random_stroll"?: PartialWithAdditionalProperties<BehaviorRandomStroll>
+    "minecraft:behavior.random_swim"?: PartialWithAdditionalProperties<BehaviorRandomSwim>
+    "minecraft:behavior.ranged_attack"?: PartialWithAdditionalProperties<BehaviorRangedAttack>
+    "minecraft:behavior.receive_love"?: PartialWithAdditionalProperties<BehaviorReceiveLove>
+    "minecraft:behavior.restrict_open_door"?: PartialWithAdditionalProperties<BehaviorRestrictOpenDoor>
+    "minecraft:behavior.restrict_sun"?: PartialWithAdditionalProperties<BehaviorRestrictSun>
+    "minecraft:behavior.rise_to_liquid_level"?: PartialWithAdditionalProperties<BehaviorRiseToLiquidLevel>
+    "minecraft:behavior.roar"?: PartialWithAdditionalProperties<BehaviorRoar>
+    "minecraft:behavior.roll"?: PartialWithAdditionalProperties<BehaviorRoll>
+    "minecraft:behavior.run_around_like_crazy"?: PartialWithAdditionalProperties<BehaviorRunAroundLikeCrazy>
+    "minecraft:behavior.scared"?: PartialWithAdditionalProperties<BehaviorScared>
+    "minecraft:behavior.send_event"?: PartialWithAdditionalProperties<BehaviorSendEvent>
+    "minecraft:behavior.share_items"?: PartialWithAdditionalProperties<BehaviorShareItems>
+    "minecraft:behavior.silverfish_merge_with_stone"?: PartialWithAdditionalProperties<BehaviorSilverfishMergeWithStone>
+    "minecraft:behavior.silverfish_wake_up_friends"?: PartialWithAdditionalProperties<BehaviorSilverfishWakeUpFriends>
+    "minecraft:behavior.skeleton_horse_trap"?: PartialWithAdditionalProperties<BehaviorSkeletonHorseTrap>
+    "minecraft:behavior.sleep"?: PartialWithAdditionalProperties<BehaviorSleep>
+    "minecraft:behavior.slime_attack"?: PartialWithAdditionalProperties<BehaviorSlimeAttack>
+    "minecraft:behavior.slime_float"?: PartialWithAdditionalProperties<BehaviorSlimeFloat>
+    "minecraft:behavior.slime_keep_on_jumping"?: PartialWithAdditionalProperties<BehaviorSlimeKeepOnJumping>
+    "minecraft:behavior.slime_random_direction"?: PartialWithAdditionalProperties<BehaviorSlimeRandomDirection>
+    "minecraft:behavior.snacking"?: PartialWithAdditionalProperties<BehaviorSnacking>
+    "minecraft:behavior.sneeze"?: PartialWithAdditionalProperties<BehaviorSneeze>
+    "minecraft:behavior.sniff"?: PartialWithAdditionalProperties<BehaviorSniff>
+    "minecraft:behavior.sonic_boom"?: PartialWithAdditionalProperties<BehaviorSonicBoom>
+    "minecraft:behavior.squid_dive"?: PartialWithAdditionalProperties<BehaviorSquidDive>
+    "minecraft:behavior.squid_flee"?: PartialWithAdditionalProperties<BehaviorSquidFlee>
+    "minecraft:behavior.squid_idle"?: PartialWithAdditionalProperties<BehaviorSquidIdle>
+    "minecraft:behavior.squid_move_away_from_ground"?: PartialWithAdditionalProperties<BehaviorSquidMoveAwayFromGround>
+    "minecraft:behavior.squid_out_of_water"?: PartialWithAdditionalProperties<BehaviorSquidOutOfWater>
+    "minecraft:behavior.stalk_and_pounce_on_target"?: PartialWithAdditionalProperties<BehaviorStalkAndPounceOnTarget>
+    "minecraft:behavior.stay_near_noteblock"?: PartialWithAdditionalProperties<BehaviorStayNearNoteblock>
+    "minecraft:behavior.stay_while_sitting"?: PartialWithAdditionalProperties<BehaviorStayWhileSitting>
+    "minecraft:behavior.stomp_attack"?: PartialWithAdditionalProperties<BehaviorStompAttack>
+    "minecraft:behavior.stomp_turtle_egg"?: PartialWithAdditionalProperties<BehaviorStompTurtleEgg>
+    "minecraft:behavior.stroll_towards_village"?: PartialWithAdditionalProperties<BehaviorStrollTowardsVillage>
+    "minecraft:behavior.summon_entity"?: PartialWithAdditionalProperties<BehaviorSummonEntity>
+    "minecraft:behavior.swell"?: PartialWithAdditionalProperties<BehaviorSwell>
+    "minecraft:behavior.swim_idle"?: PartialWithAdditionalProperties<BehaviorSwimIdle>
+    "minecraft:behavior.swim_up_for_breath"?: PartialWithAdditionalProperties<BehaviorSwimUpForBreath>
+    "minecraft:behavior.swim_wander"?: PartialWithAdditionalProperties<BehaviorSwimWander>
+    "minecraft:behavior.swim_with_entity"?: PartialWithAdditionalProperties<BehaviorSwimWithEntity>
+    "minecraft:behavior.swoop_attack"?: PartialWithAdditionalProperties<BehaviorSwoopAttack>
+    "minecraft:behavior.take_flower"?: PartialWithAdditionalProperties<BehaviorTakeFlower>
+    "minecraft:behavior.teleport_to_owner"?: PartialWithAdditionalProperties<BehaviorTeleportToOwner>
+    "minecraft:behavior.tempt"?: PartialWithAdditionalProperties<BehaviorTempt>
+    "minecraft:behavior.timer_flag_1"?: PartialWithAdditionalProperties<BehaviorTimerFlag1>
+    "minecraft:behavior.timer_flag_2"?: PartialWithAdditionalProperties<BehaviorTimerFlag2>
+    "minecraft:behavior.timer_flag_3"?: PartialWithAdditionalProperties<BehaviorTimerFlag3>
+    "minecraft:behavior.trade_interest"?: PartialWithAdditionalProperties<BehaviorTradeInterest>
+    "minecraft:behavior.trade_with_player"?: PartialWithAdditionalProperties<BehaviorTradeWithPlayer>
+    "minecraft:behavior.vex_copy_owner_target"?: PartialWithAdditionalProperties<BehaviorVexCopyOwnerTarget>
+    "minecraft:behavior.vex_random_move"?: PartialWithAdditionalProperties<BehaviorVexRandomMove>
+    "minecraft:behavior.wither_random_attack_pos_goal"?: PartialWithAdditionalProperties<BehaviorWitherRandomAttackPosGoal>
+    "minecraft:behavior.wither_target_highest_damage"?: PartialWithAdditionalProperties<BehaviorWitherTargetHighestDamage>
+    "minecraft:behavior.work"?: PartialWithAdditionalProperties<BehaviorWork>
+    "minecraft:behavior.work_composter"?: PartialWithAdditionalProperties<BehaviorWorkComposter>
+    "minecraft:attack"?: PartialWithAdditionalProperties<Attack>
+    "minecraft:spell_effects"?: PartialWithAdditionalProperties<SpellEffects>
+    "minecraft:strength"?: PartialWithAdditionalProperties<Strength>
+    "minecraft:addrider"?: PartialWithAdditionalProperties<AddRider>
+    "minecraft:admire_item"?: PartialWithAdditionalProperties<AdmireItem>
+    "minecraft:ageable"?: PartialWithAdditionalProperties<Ageable>
+    "minecraft:anger_level"?: PartialWithAdditionalProperties<AngerLevel>
+    "minecraft:angry"?: PartialWithAdditionalProperties<Angry>
+    "minecraft:annotation.break_door"?: PartialWithAdditionalProperties<AnnotationBreakDoor>
+    "minecraft:annotation.open_door"?: PartialWithAdditionalProperties<AnnotationOpenDoor>
+    "minecraft:area_attack"?: PartialWithAdditionalProperties<AreaAttack>
+    "minecraft:attack_cooldown"?: PartialWithAdditionalProperties<AttackCooldown>
+    "minecraft:barter"?: PartialWithAdditionalProperties<Barter>
+    "minecraft:block_climber"?: PartialWithAdditionalProperties<BlockClimber>
+    "minecraft:block_sensor"?: PartialWithAdditionalProperties<BlockSensor>
+    "minecraft:boostable"?: PartialWithAdditionalProperties<Boostable>
+    "minecraft:boss"?: PartialWithAdditionalProperties<Boss>
+    "minecraft:break_blocks"?: PartialWithAdditionalProperties<BreakBlocks>
+    "minecraft:breathable"?: PartialWithAdditionalProperties<Breathable>
+    "minecraft:breedable"?: PartialWithAdditionalProperties<Breedable>
+    "minecraft:bribeable"?: PartialWithAdditionalProperties<Bribeable>
+    "minecraft:buoyant"?: PartialWithAdditionalProperties<Buoyant>
+    "minecraft:burns_in_daylight"?: PartialWithAdditionalProperties<BurnsInDaylight>
+    "minecraft:can_join_raid"?: PartialWithAdditionalProperties<CanJoinRaid>
+    "minecraft:celebrate_hunt"?: PartialWithAdditionalProperties<CelebrateHunt>
+    "minecraft:collision_box"?: PartialWithAdditionalProperties<CollisionBox>
+    "minecraft:combat_regeneration"?: PartialWithAdditionalProperties<CombatRegeneration>
+    "minecraft:conditional_bandwidth_optimization"?: PartialWithAdditionalProperties<ConditionalBandwidthOptimization>
+    "minecraft:custom_hit_test"?: PartialWithAdditionalProperties<CustomHitTest>
+    "minecraft:damage_over_time"?: PartialWithAdditionalProperties<DamageOverTime>
+    "minecraft:damage_sensor"?: PartialWithAdditionalProperties<DamageSensor>
+    "minecraft:dash"?: PartialWithAdditionalProperties<Dash>
+    "minecraft:despawn"?: PartialWithAdditionalProperties<Despawn>
+    "minecraft:dimension_bound"?: PartialWithAdditionalProperties<DimensionBound>
+    "minecraft:drying_out_timer"?: PartialWithAdditionalProperties<DryingOutTimer>
+    "minecraft:economy_trade_table"?: PartialWithAdditionalProperties<EconomyTradeTable>
+    "minecraft:entity_armor_equipment_slot_mapping"?: PartialWithAdditionalProperties<EntityArmorEquipmentSlotMapping>
+    "minecraft:entity_sensor"?: PartialWithAdditionalProperties<EntitySensor>
+    "minecraft:environment_sensor"?: PartialWithAdditionalProperties<EnvironmentSensor>
+    "minecraft:equip_item"?: PartialWithAdditionalProperties<EquipItem>
+    "minecraft:equippable"?: PartialWithAdditionalProperties<Equippable>
+    "minecraft:exhaustion_values"?: PartialWithAdditionalProperties<ExhaustionValues>
+    "minecraft:experience_reward"?: PartialWithAdditionalProperties<ExperienceReward>
+    "minecraft:explode"?: PartialWithAdditionalProperties<Explode>
+    "minecraft:flocking"?: PartialWithAdditionalProperties<Flocking>
+    "minecraft:game_event_movement_tracking"?: PartialWithAdditionalProperties<GameEventMovementTracking>
+    "minecraft:genetics"?: PartialWithAdditionalProperties<Genetics>
+    "minecraft:giveable"?: PartialWithAdditionalProperties<Giveable>
+    "minecraft:group_size"?: PartialWithAdditionalProperties<GroupSize>
+    "minecraft:grows_crop"?: PartialWithAdditionalProperties<GrowsCrop>
+    "minecraft:healable"?: PartialWithAdditionalProperties<Healable>
+    "minecraft:heartbeat"?: PartialWithAdditionalProperties<Heartbeat>
+    "minecraft:home"?: PartialWithAdditionalProperties<Home>
+    "minecraft:hurt_on_condition"?: PartialWithAdditionalProperties<HurtOnCondition>
+    "minecraft:inside_block_notifier"?: PartialWithAdditionalProperties<InsideBlockNotifier>
+    "minecraft:insomnia"?: PartialWithAdditionalProperties<Insomnia>
+    "minecraft:instant_despawn"?: PartialWithAdditionalProperties<InstantDespawn>
+    "minecraft:interact"?: PartialWithAdditionalProperties<Interact>
+    "minecraft:inventory"?: PartialWithAdditionalProperties<Inventory>
+    "minecraft:item_hopper"?: PartialWithAdditionalProperties<ItemHopper>
+    "minecraft:jump.dynamic"?: PartialWithAdditionalProperties<JumpDynamic>
+    "minecraft:jump.static"?: PartialWithAdditionalProperties<JumpStatic>
+    "minecraft:leashable"?: PartialWithAdditionalProperties<Leashable>
+    "minecraft:looked_at"?: PartialWithAdditionalProperties<LookedAt>
+    "minecraft:managed_wandering_trader"?: PartialWithAdditionalProperties<ManagedWanderingTrader>
+    "minecraft:mob_effect"?: PartialWithAdditionalProperties<MobEffect>
+    "minecraft:mob_effect_immunity"?: PartialWithAdditionalProperties<MobEffectImmunity>
+    "minecraft:movement.amphibious"?: PartialWithAdditionalProperties<MovementAmphibious>
+    "minecraft:movement.basic"?: PartialWithAdditionalProperties<MovementBasic>
+    "minecraft:movement.fly"?: PartialWithAdditionalProperties<MovementFly>
+    "minecraft:movement.generic"?: PartialWithAdditionalProperties<MovementGeneric>
+    "minecraft:movement.hover"?: PartialWithAdditionalProperties<MovementHover>
+    "minecraft:movement.jump"?: PartialWithAdditionalProperties<MovementJump>
+    "minecraft:movement.skip"?: PartialWithAdditionalProperties<MovementSkip>
+    "minecraft:movement.sway"?: PartialWithAdditionalProperties<MovementSway>
+    "minecraft:nameable"?: PartialWithAdditionalProperties<Nameable>
+    "minecraft:navigation.climb"?: PartialWithAdditionalProperties<NavigationClimb>
+    "minecraft:navigation.float"?: PartialWithAdditionalProperties<NavigationFloat>
+    "minecraft:navigation.fly"?: PartialWithAdditionalProperties<NavigationFly>
+    "minecraft:navigation.generic"?: PartialWithAdditionalProperties<NavigationGeneric>
+    "minecraft:navigation.hover"?: PartialWithAdditionalProperties<NavigationHover>
+    "minecraft:navigation.swim"?: PartialWithAdditionalProperties<NavigationSwim>
+    "minecraft:navigation.walk"?: PartialWithAdditionalProperties<NavigationWalk>
+    "minecraft:npc"?: PartialWithAdditionalProperties<NPC>
+    "minecraft:out_of_control"?: PartialWithAdditionalProperties<OutOfControl>
+    "minecraft:peek"?: PartialWithAdditionalProperties<Peek>
+    "minecraft:persistent"?: PartialWithAdditionalProperties<Persistent>
+    "minecraft:physics"?: PartialWithAdditionalProperties<Physics>
+    "minecraft:preferred_path"?: PartialWithAdditionalProperties<PreferredPath>
+    "minecraft:projectile"?: PartialWithAdditionalProperties<Projectile>
+    "minecraft:pushable"?: PartialWithAdditionalProperties<Pushable>
+    "minecraft:raid_trigger"?: PartialWithAdditionalProperties<RaidTrigger>
+    "minecraft:rail_movement"?: PartialWithAdditionalProperties<RailMovement>
+    "minecraft:rail_sensor"?: PartialWithAdditionalProperties<RailSensor>
+    "minecraft:ravager_blocked"?: PartialWithAdditionalProperties<RavagerBlocked>
+    "minecraft:reflect_projectiles"?: PartialWithAdditionalProperties<ReflectProjectiles>
+    "minecraft:rideable"?: PartialWithAdditionalProperties<Rideable>
+    "minecraft:scale_by_age"?: PartialWithAdditionalProperties<ScaleByAge>
+    "minecraft:scheduler"?: PartialWithAdditionalProperties<Scheduler>
+    "minecraft:shareables"?: PartialWithAdditionalProperties<Shareables>
+    "minecraft:shooter"?: PartialWithAdditionalProperties<Shooter>
+    "minecraft:sittable"?: PartialWithAdditionalProperties<Sittable>
+    "minecraft:spawn_entity"?: PartialWithAdditionalProperties<SpawnEntity>
+    "minecraft:suspect_tracking"?: PartialWithAdditionalProperties<SuspectTracking>
+    "minecraft:tameable"?: PartialWithAdditionalProperties<Tameable>
+    "minecraft:tamemount"?: PartialWithAdditionalProperties<TameMount>
+    "minecraft:target_nearby_sensor"?: PartialWithAdditionalProperties<TargetNearbySensor>
+    "minecraft:teleport"?: PartialWithAdditionalProperties<Teleport>
+    "minecraft:tick_world"?: PartialWithAdditionalProperties<TickWorld>
+    "minecraft:timer"?: PartialWithAdditionalProperties<Timer>
+    "minecraft:trade_table"?: PartialWithAdditionalProperties<TradeTable>
+    "minecraft:trail"?: PartialWithAdditionalProperties<Trail>
+    "minecraft:transformation"?: PartialWithAdditionalProperties<Transformation>
+    "minecraft:transient"?: PartialWithAdditionalProperties<Transient>
+    "minecraft:trusting"?: PartialWithAdditionalProperties<Trusting>
+    "minecraft:variable_max_auto_step"?: PartialWithAdditionalProperties<VariableMaxAutoStep>
+    "minecraft:vibration_damper"?: PartialWithAdditionalProperties<VibrationDamper>
+    "minecraft:vibration_listener"?: PartialWithAdditionalProperties<VibrationListener>
+    "minecraft:water_movement"?: PartialWithAdditionalProperties<WaterMovement>
+    "minecraft:ambient_sound_interval"?: PartialWithAdditionalProperties<AmbientSoundInterval>
+    "minecraft:body_rotation_blocked"?: PartialWithAdditionalProperties<BodyRotationBlocked>
+    "minecraft:can_climb"?: PartialWithAdditionalProperties<CanClimb>
+    "minecraft:can_fly"?: PartialWithAdditionalProperties<CanFly>
+    "minecraft:can_power_jump"?: PartialWithAdditionalProperties<CanPowerJump>
+    "minecraft:cannot_be_attacked"?: PartialWithAdditionalProperties<CannotBeAttacked>
+    "minecraft:color"?: PartialWithAdditionalProperties<Color>
+    "minecraft:color2"?: PartialWithAdditionalProperties<Color2>
+    "minecraft:default_look_angle"?: PartialWithAdditionalProperties<DefaultLookAngle>
+    "minecraft:equipment"?: PartialWithAdditionalProperties<Equipment>
+    "minecraft:fire_immune"?: PartialWithAdditionalProperties<FireImmune>
+    "minecraft:floats_in_liquid"?: PartialWithAdditionalProperties<FloatsInLiquid>
+    "minecraft:flying_speed"?: PartialWithAdditionalProperties<FlyingSpeed>
+    "minecraft:friction_modifier"?: PartialWithAdditionalProperties<FrictionModifier>
+    "minecraft:ground_offset"?: PartialWithAdditionalProperties<GroundOffset>
+    "minecraft:ignore_cannot_be_attacked"?: PartialWithAdditionalProperties<IgnoreCannotBeAttacked>
+    "minecraft:input_ground_controlled"?: PartialWithAdditionalProperties<InputGroundControlled>
+    "minecraft:is_baby"?: PartialWithAdditionalProperties<IsBaby>
+    "minecraft:is_charged"?: PartialWithAdditionalProperties<IsCharged>
+    "minecraft:is_chested"?: PartialWithAdditionalProperties<IsChested>
+    "minecraft:is_dyeable"?: PartialWithAdditionalProperties<IsDyeable>
+    "minecraft:is_hidden_when_invisible"?: PartialWithAdditionalProperties<IsHiddenWhenInvisible>
+    "minecraft:is_ignited"?: PartialWithAdditionalProperties<IsIgnited>
+    "minecraft:is_illager_captain"?: PartialWithAdditionalProperties<IsIllagerCaptain>
+    "minecraft:is_pregnant"?: PartialWithAdditionalProperties<IsPregnant>
+    "minecraft:is_saddled"?: PartialWithAdditionalProperties<IsSaddled>
+    "minecraft:is_shaking"?: PartialWithAdditionalProperties<IsShaking>
+    "minecraft:is_sheared"?: PartialWithAdditionalProperties<IsSheared>
+    "minecraft:is_stackable"?: PartialWithAdditionalProperties<IsStackable>
+    "minecraft:is_stunned"?: PartialWithAdditionalProperties<IsStunned>
+    "minecraft:is_tamed"?: PartialWithAdditionalProperties<IsTamed>
+    "minecraft:item_controllable"?: PartialWithAdditionalProperties<ItemControllable>
+    "minecraft:loot"?: PartialWithAdditionalProperties<Loot>
+    "minecraft:mark_variant"?: PartialWithAdditionalProperties<MarkVariant>
+    "minecraft:movement_sound_distance_offset"?: PartialWithAdditionalProperties<MovementSoundDistanceOffset>
+    "minecraft:push_through"?: PartialWithAdditionalProperties<PushThrough>
+    "minecraft:renders_when_invisible"?: PartialWithAdditionalProperties<RendersWhenInvisible>
+    "minecraft:scale"?: PartialWithAdditionalProperties<Scale>
+    "minecraft:skin_id"?: PartialWithAdditionalProperties<SkinID>
+    "minecraft:sound_volume"?: PartialWithAdditionalProperties<SoundVolume>
+    "minecraft:type_family"?: PartialWithAdditionalProperties<TypeFamily>
+    "minecraft:variant"?: PartialWithAdditionalProperties<Variant>
+    "minecraft:walk_animation_speed"?: PartialWithAdditionalProperties<WalkAnimationSpeed>
+    "minecraft:wants_jockey"?: PartialWithAdditionalProperties<WantsJockey>
+    "minecraft:on_death"?: PartialWithAdditionalProperties<OnDeath>
+    "minecraft:on_friendly_anger"?: PartialWithAdditionalProperties<OnFriendlyAnger>
+    "minecraft:on_hurt"?: PartialWithAdditionalProperties<OnHurt>
+    "minecraft:on_hurt_by_player"?: PartialWithAdditionalProperties<OnHurtByPlayer>
+    "minecraft:on_ignite"?: PartialWithAdditionalProperties<OnIgnite>
+    "minecraft:on_start_landing"?: PartialWithAdditionalProperties<OnStartLanding>
+    "minecraft:on_start_takeoff"?: PartialWithAdditionalProperties<OnStartTakeoff>
+    "minecraft:on_target_acquired"?: PartialWithAdditionalProperties<OnTargetAcquired>
+    "minecraft:on_target_escape"?: PartialWithAdditionalProperties<OnTargetEscape>
+    "minecraft:on_wake_with_owner"?: PartialWithAdditionalProperties<OnWakeWithOwner>
+}
+
 type EventTarget = "block"|"damager"|"self"|"other"|"player"|"parent"|"target";
 
-interface Trigger {
+export interface Trigger {
     /**
      * The list of conditions for this trigger to fire
      */
@@ -22,7 +372,7 @@ interface Trigger {
     event?: string;
 }
 
-interface EntityType {
+export interface EntityType {
     /**
      * The amount of time in seconds to wait before selecting a target of the same type again
      * @default 0
@@ -69,7 +419,7 @@ interface EntityType {
 /**
  * Defines the entity's melee attack and any additional effects
  */
-interface Attack {
+export interface Attack {
     /**
      * Range of random damage to deal, negative values can heal the target
      */
@@ -87,7 +437,7 @@ interface Attack {
 /**
  * Defines what mob effects to add/remove when this component is added
  */
-interface SpellEffects {
+export interface SpellEffects {
     /**
      * List of effects to add
      */
@@ -118,7 +468,7 @@ interface SpellEffects {
 /**
  * Defines the entity's strength to carry items
  */
-interface Strength {
+export interface Strength {
     /**
      * The max strength of the entity
      */
@@ -136,7 +486,7 @@ interface Strength {
 /**
  * Can cause entity to admire items configured as admireable, requires {@link AdmireItem}
  */
-interface BehaviorAdmireItem {
+export interface BehaviorAdmireItem {
     /**
      * The sound event to play when admiring the item
      */
@@ -150,7 +500,7 @@ interface BehaviorAdmireItem {
 /**
  * Can cause this entity to avoid certain blocks
  */
-interface BehaviorAvoidBlock {
+export interface BehaviorAvoidBlock {
     /**
      * The sound event to play when avoiding the block
      */
@@ -203,7 +553,7 @@ interface BehaviorAvoidBlock {
 /**
  * Can cause the entity to run away from other entities that match the criteria
  */
-interface BehaviorAvoidMobType {
+export interface BehaviorAvoidMobType {
     /**
      * The sound event to play when avoiding the mob
      */
@@ -276,12 +626,12 @@ interface BehaviorAvoidMobType {
 /**
  * Can cause the entity to barter. Requires {@link Barter}
  */
-interface BehaviorBarter {}
+export interface BehaviorBarter {}
 
 /**
  * Can cause the entity to look at and follow a player holding certain items
  */
-interface BehaviorBeg {
+export interface BehaviorBeg {
     /**
      * List of items the mob likes
      */
@@ -301,12 +651,12 @@ interface BehaviorBeg {
 /**
  * Can cause the entity to break doors
  */
-interface BehaviorBreakDoor {}
+export interface BehaviorBreakDoor {}
 
 /**
  * Can cause the entity to breed. Requires {@link Breedable}
  */
-interface BehaviorBreed {
+export interface BehaviorBreed {
     /**
      * Multiplier for movement speed
      * @default 1.0
@@ -317,7 +667,7 @@ interface BehaviorBreed {
 /**
  * Can cause the entity to celebrate surviving a raid with sounds and jumping
  */
-interface BehaviorCelebrate {
+export interface BehaviorCelebrate {
     /**
      * The sound event to play when celebrating
      */
@@ -346,7 +696,7 @@ interface BehaviorCelebrate {
 /**
  * Can cause the entity to celebrate surviving a raid by shooting fireworks
  */
-interface BehaviorCelebrateSurvive {
+export interface BehaviorCelebrateSurvive {
     /**
      * Duration in seconds that the celebration lasts
      * @default 30.0
@@ -366,7 +716,7 @@ interface BehaviorCelebrateSurvive {
 /**
  * Can cause the entity to damage a target by using a charging attack
  */
-interface BehaviorChargeAttack {
+export interface BehaviorChargeAttack {
     /**
      * The max distance the entity can be from its target to start this behavior
      * @default 3.0
@@ -392,14 +742,14 @@ interface BehaviorChargeAttack {
 /**
  * Can cause the entity to charge and use their held item
  */
-interface BehaviorChargeHeldItem {
+export interface BehaviorChargeHeldItem {
     items: string[];
 }
 
 /**
  * Causes an entity to circle around an anchor point placed near a point or target
  */
-interface BehaviorCircleAroundAnchor {
+export interface BehaviorCircleAroundAnchor {
     /**
      * Number of degrees to change this entity's facing by when it selects its next anchor point
      * @default 15
@@ -453,7 +803,7 @@ interface BehaviorCircleAroundAnchor {
 /**
  * Can cause the entity to be controlled by the player using an item. Requires {@link Rideable} and {@link ItemControllable}
  */
-interface BehaviorControlledByPlayer {
+export interface BehaviorControlledByPlayer {
     /**
      * The entity will attempt to rate to face where the player is facing each tick, a normalized range where 1 matches the player's facing exactly
      * @default 0.5
@@ -474,7 +824,7 @@ interface BehaviorControlledByPlayer {
 /**
  * Can cause the entity to croak at a random inverval
  */
-interface BehaviorCroak {
+export interface BehaviorCroak {
     /**
      * Random duration in seconds after which croaking stops
      * @default 4.5
@@ -494,7 +844,7 @@ interface BehaviorCroak {
 /**
  * Can cause the entity to target another entity that hurts an entity it trusts
  */
-interface BehaviorDefendTrustedTarget {
+export interface BehaviorDefendTrustedTarget {
     /**
      * Sound event to play while defending
      */
@@ -532,7 +882,7 @@ interface BehaviorDefendTrustedTarget {
 /**
  * Can cause the entity to stay in a village and defend it from aggressors
  */
-interface BehaviorDefendVillageTarget {
+export interface BehaviorDefendVillageTarget {
     /**
      * Percent chance of attacking aggressors, where 0 is 0% and 1 is 100%
      * @default 0.05
@@ -543,7 +893,7 @@ interface BehaviorDefendVillageTarget {
 /**
  * Can cause the entity to attack while delaying the damage dealing in order to sync it with an animation
  */
-interface BehaviorDelayedAttack {
+export interface BehaviorDelayedAttack {
     attack_duration: number;
     attack_once: boolean;
     attack_types: string[];
@@ -573,7 +923,7 @@ interface BehaviorDelayedAttack {
 /**
  * Can cause the entity to dig into the ground before despawning
  */
-interface BehaviorDig {
+export interface BehaviorDig {
     allow_dig_when_named: boolean;
     digs_in_daylight: boolean;
     duration: number;
@@ -586,12 +936,12 @@ interface BehaviorDig {
 /**
  * Can cause the enity to open and close doors
  */
-interface BehaviorDoorInteract {}
+export interface BehaviorDoorInteract {}
 
 /**
  * Can cause the entity to attack by charging. Can only be used by `minecraft:ender_dragon`
  */
-interface BehaviorDragonChargePlayer {
+export interface BehaviorDragonChargePlayer {
     active_speed: number;
     continue_charge_threshold_time: number;
     flight_speed: number;
@@ -602,32 +952,32 @@ interface BehaviorDragonChargePlayer {
 /**
  * Can cause the entity to use a special death animation. Can only be used by `minecraft:ender_dragon`
  */
-interface BehaviorDragonDeath {}
+export interface BehaviorDragonDeath {}
 
 /**
  * Can cause the entity to shoot flame-breath. Can only be used by `minecraft:ender_dragon`
  */
-interface BehaviorDragonFlaming {}
+export interface BehaviorDragonFlaming {}
 
 /**
  * Can cause the entity to circle in a holding platform. Can only be used by `minecraft:ender_dragon`
  */
-interface BehaviorDragonHoldingPattern {}
+export interface BehaviorDragonHoldingPattern {}
 
 /**
  * Can cause the entity to transition into perch. Can only be used by `minecraft:ender_dragon`
  */
-interface BehaviorDragonLanding {}
+export interface BehaviorDragonLanding {}
 
 /**
  * Can cause the entity to look for a player while perched. Can only be used by `minecraft:ender_dragon`
  */
-interface BehaviorDragonScanning {}
+export interface BehaviorDragonScanning {}
 
 /**
  * Can cause the entity to look for player while flying. Can only be used by `minecraft:ender_dragon`
  */
-interface BehaviorDragonStrafePlayer {
+export interface BehaviorDragonStrafePlayer {
     active_speed: number;
     fireball_range: number;
     flight_speed: number;
@@ -641,12 +991,12 @@ interface BehaviorDragonStrafePlayer {
 /**
  * Can cause the entity to transition out of perch. Can only be used by `minecraft:ender_dragon`
  */
-interface BehaviorDragonTakeOff {}
+export interface BehaviorDragonTakeOff {}
 
 /**
  * Can cause the entity to drink milk under certain conditions
  */
-interface BehaviorDrinkMilk {
+export interface BehaviorDrinkMilk {
     cooldown_seconds: number;
     filters: ServerFilters|ServerFilters[];
 }
@@ -654,7 +1004,7 @@ interface BehaviorDrinkMilk {
 /**
  * Can cause the entity to drink potions under certain conditions
  */
-interface BehaviorDrinkPotion {
+export interface BehaviorDrinkPotion {
     potions: {
         chance: number;
         filters: ServerFilters|ServerFilters[];
@@ -666,7 +1016,7 @@ interface BehaviorDrinkPotion {
 /**
  * Can cause the entity to move towards a target and drop an item near them
  */
-interface BehaviorDropItemFor {
+export interface BehaviorDropItemFor {
     cooldown: number;
     drop_item_chance: number;
     entity_types: ServerFilters|ServerFilters[];
@@ -689,7 +1039,7 @@ interface BehaviorDropItemFor {
 /**
  * Can cause the entity to consume a block, replacing it with another block
  */
-interface BehaviorEatBlock {
+export interface BehaviorEatBlock {
     eat_and_replace_block_pairs: {
         eat_block: string;
         replace_block: string;
@@ -702,14 +1052,14 @@ interface BehaviorEatBlock {
 /**
  * Can cause the entity to eat food it is carrying
  */
-interface BehaviorEatCarriedItem {
+export interface BehaviorEatCarriedItem {
     delay_before_eating: number;
 }
 
 /**
  * Can cause the entity to eat another entity
  */
-interface BehaviorEatMob {
+export interface BehaviorEatMob {
     eat_animation_time: number;
     eat_mob_sound: string;
     loot_table: string;
@@ -721,7 +1071,7 @@ interface BehaviorEatMob {
 /**
  * Can cause the entity to emerge from the ground
  */
-interface BehaviorEmerge {
+export interface BehaviorEmerge {
     cooldown_time: number;
     duration: number;
     on_done: Trigger;
@@ -730,22 +1080,22 @@ interface BehaviorEmerge {
 /**
  * Can cause the entity to leave blocks. Can only be used by `minecraft:enderman`
  */
-interface BehaviorEndermanLeaveBlock {}
+export interface BehaviorEndermanLeaveBlock {}
 
 /**
  * Can cause the entity to take blocks. Can only be used by `minecraft:enderman`
  */
-interface BehaviorEndermanTakeBlock {}
+export interface BehaviorEndermanTakeBlock {}
 
 /**
  * Can cause the entity to put on desired equipment
  */
-interface BehaviorEquipItem {}
+export interface BehaviorEquipItem {}
 
 /**
  * Can cause the entity to first travel to a random point on the village outskirts. Requires {@link Dweller} and {@link SharedNavigation}
  */
-interface BehaviorExploreOutskirts {
+export interface BehaviorExploreOutskirts {
     dist_from_boundary: [number, number, number];
     explore_dist: number;
     max_travel_time: number;
@@ -762,7 +1112,7 @@ interface BehaviorExploreOutskirts {
 /**
  * Can cause the entity to search wiehin an area for growable crops that they will fertilize
  */
-interface BehaviorFertalizeFarmBlock {
+export interface BehaviorFertilizeFarmBlock {
     goal_radius: number;
     max_fertilizer_usage: number;
     search_cooldown_max_seconds: number;
@@ -775,7 +1125,7 @@ interface BehaviorFertalizeFarmBlock {
 /**
  * Can cause the entity to seek shade
  */
-interface BehaviorFindCover {
+export interface BehaviorFindCover {
     cooldown_time: number;
     speed_multiplier: number;
 }
@@ -783,7 +1133,7 @@ interface BehaviorFindCover {
 /**
  * Can cause the entity to look for a mount
  */
-interface BehaviorFindMount {
+export interface BehaviorFindMount {
     avoid_water: boolean;
     mount_distance: number;
     start_delay: number;
@@ -794,7 +1144,7 @@ interface BehaviorFindMount {
 /**
  * Can cause the entity to move towards the nearest underwater ruin or shipwreck
  */
-interface BehaviorFindUnderwaterTreasure {
+export interface BehaviorFindUnderwaterTreasure {
     search_range: number;
     speed_multiplier: number;
     stop_distance: number;
@@ -803,7 +1153,7 @@ interface BehaviorFindUnderwaterTreasure {
 /**
  * Can cause the entity to attack by firing a shot with a delay
  */
-interface BehaviorFireAtTarget {
+export interface BehaviorFireAtTarget {
     attack_cooldown: number;
     attack_range: [number, number];
     filters: ServerFilters|ServerFilters[];
@@ -822,21 +1172,21 @@ interface BehaviorFireAtTarget {
 /**
  * Can cause the entity to run from direct sunlight and seek shade
  */
-interface BehaviorFleeSun {
+export interface BehaviorFleeSun {
     speed_multiplier: number;
 }
 
 /**
  * Can cause the mob to stay afloat while swimming
  */
-interface BehaviorFloat {
+export interface BehaviorFloat {
     sink_with_passengers: boolean;
 }
 
 /**
  * Can cause the mob to float like a Ghast
  */
-interface BehaviorFloatWander {
+export interface BehaviorFloatWander {
     float_duration: [number, number];
     must_reach: boolean;
     random_reselect: boolean;
@@ -848,7 +1198,7 @@ interface BehaviorFloatWander {
 /**
  * Can cause the entity to follow a caravan
  */
-interface BehaviorFollowCaravan {
+export interface BehaviorFollowCaravan {
     entity_count: number;
     entity_types: EntityType[];
     speed_multiplier: number;
@@ -857,7 +1207,7 @@ interface BehaviorFollowCaravan {
 /**
  * Can cause the entity to follow other mobs
  */
-interface BehaviorFollowMob {
+export interface BehaviorFollowMob {
     search_range: number;
     speed_multiplier: number;
     stop_distance: number;
@@ -866,7 +1216,20 @@ interface BehaviorFollowMob {
 /**
  * Can cause the entity to follow the owning player
  */
-interface BehaviorFollowOwner {
+export interface BehaviorFollowOwner {
+    can_teleport: boolean;
+    ignore_vibration: boolean;
+    max_distance: number;
+    post_teleport_distance: number;
+    speed_multiplier: number;
+    start_distance: number;
+    stop_distance: number;
+}
+
+/**
+ * Can cause the entity to follow its parent
+ */
+export interface BehaviorFollowParent {
     can_teleport: boolean;
     ignore_vibration: boolean;
     max_distance: number;
@@ -879,7 +1242,7 @@ interface BehaviorFollowOwner {
 /**
  * Can cause the entity to follow its current target captain
  */
-interface BehaviorFollowTargetCaptain {
+export interface BehaviorFollowTargetCaptain {
     follow_distance: number;
     within_radius: number;
 }
@@ -887,7 +1250,7 @@ interface BehaviorFollowTargetCaptain {
 /**
  * Can cause the entity to toss the items from its inventory to a recently played Noteblock
  */
-interface BehaviorGoAndGiveItemsToNoteblock {
+export interface BehaviorGoAndGiveItemsToNoteblock {
     listen_time: number;
     on_item_throw: Trigger;
     reach_block_distance: number;
@@ -900,7 +1263,7 @@ interface BehaviorGoAndGiveItemsToNoteblock {
 /**
  * Can cause the entity to toss items from its inventory to its owner
  */
-interface BehaviorGoAndGiveItemsToOwner {
+export interface BehaviorGoAndGiveItemsToOwner {
     on_item_throw: Trigger;
     reach_block_distance: number;
     run_speed: number;
@@ -912,7 +1275,7 @@ interface BehaviorGoAndGiveItemsToOwner {
 /**
  * Can cause the entity to go to the location where they were spawned. Requires {@link Home}
  */
-interface BehaviorGoHome {
+export interface BehaviorGoHome {
     calculate_new_path_radius: number;
     goal_radius: number;
     interval: number;
@@ -924,7 +1287,7 @@ interface BehaviorGoHome {
 /**
  * Can cause the entity to use a laser beam attack. Can only be used by `minecraft:guardian` and `minecraft:elder_guardian`
  */
-interface BehaviorGuardianAttack {
+export interface BehaviorGuardianAttack {
     elder_extra_magic_damage: number;
     hard_mode_extra_magic_damage: number;
     magic_damage: number;
@@ -937,7 +1300,7 @@ interface BehaviorGuardianAttack {
 /**
  * Can cause the entity to search within an area for valid farmland to till. Requires {@link Inventory} and {@link SharedNavigation}
  */
-interface BehaviorHarvestFarmBlock {
+export interface BehaviorHarvestFarmBlock {
     goal_radius: number;
     max_seconds_before_search: number;
     search_cooldown_max_seconds: number;
@@ -951,7 +1314,7 @@ interface BehaviorHarvestFarmBlock {
 /**
  * Can cause the entity to attempt to move to and hide at a POI
  */
-interface BehaviorHide {
+export interface BehaviorHide {
     duration: number;
     poi_type: string;
     speed_multiplier: number;
@@ -961,7 +1324,7 @@ interface BehaviorHide {
 /**
  * Can cause the entity to freeze and look at their target
  */
-interface BehaviorHoldGround {
+export interface BehaviorHoldGround {
     broadcast: boolean;
     broadcast_range: number;
     min_radius: number;
@@ -971,7 +1334,7 @@ interface BehaviorHoldGround {
 /**
  * Can cause the entity to target a mob that hurt them
  */
-interface BehaviorHurtByTarget {
+export interface BehaviorHurtByTarget {
     alert_same_type: boolean;
     entity_types: EntityType[];
     hurt_owner: boolean
@@ -980,7 +1343,7 @@ interface BehaviorHurtByTarget {
 /**
  * Can cause the entity to inspect bookshelves
  */
-interface BehaviorInspectBookshelf {
+export interface BehaviorInspectBookshelf {
     goal_radius: number;
     search_count: number;
     search_height: number;
@@ -991,7 +1354,7 @@ interface BehaviorInspectBookshelf {
 /**
  * Can cause the entity to move towards a suspicious position. Requires {@link SuspectTracking}
  */
-interface BehaviorInvestigateSuspiciousLocation {
+export interface BehaviorInvestigateSuspiciousLocation {
     goal_radius: number;
     speed_multiplier: number;
 }
@@ -999,7 +1362,7 @@ interface BehaviorInvestigateSuspiciousLocation {
 /**
  * Can cause the entity to jump around a target
  */
-interface BehaviorJumpAroundTarget {
+export interface BehaviorJumpAroundTarget {
     check_collision: boolean;
     entity_bounding_box_scale: number;
     filters: ServerFilters|ServerFilters[];
@@ -1019,7 +1382,7 @@ interface BehaviorJumpAroundTarget {
 /**
  * Can cause the entity to jump to another random block
  */
-interface BehaviorJumpToBlock {
+export interface BehaviorJumpToBlock {
     cooldown_range: [number, number];
     forbidden_blocks: string[];
     max_velocity: number;
@@ -1035,7 +1398,7 @@ interface BehaviorJumpToBlock {
 /**
  * Can cause the entity to perform a damaging knockback attack
  */
-interface BehaviorKnockbackRoar {
+export interface BehaviorKnockbackRoar {
     attack_time: number;
     cooldown_time: number;
     damage_filters: ServerFilters|ServerFilters[];
@@ -1052,7 +1415,7 @@ interface BehaviorKnockbackRoar {
 /**
  * Can cause the entity to lay down
  */
-interface BehaviorLayDown {
+export interface BehaviorLayDown {
     interval: number;
     random_stop_interval: number;
 }
@@ -1060,7 +1423,7 @@ interface BehaviorLayDown {
 /**
  * Can cause the entity to lay egg blocks if pregnant
  */
-interface BehaviorLayEgg {
+export interface BehaviorLayEgg {
     allow_laying_from_below: boolean;
     egg_type: string;
     goal_radius: number;
@@ -1078,7 +1441,7 @@ interface BehaviorLayEgg {
 /**
  * Can cause the entity to jump at and attack their target
  */
-interface BehaviorLeapAtTarget {
+export interface BehaviorLeapAtTarget {
     must_be_on_ground: boolean;
     set_persistent: boolean;
     yd: number;
@@ -1087,7 +1450,7 @@ interface BehaviorLeapAtTarget {
 /**
  * Can cause the entity to look at a nearby entity
  */
-interface BehaviorLookAtEntity {
+export interface BehaviorLookAtEntity {
     angle_of_view_horizontal: number;
     angle_of_view_vertical: number;
     filters: ServerFilters|ServerFilters[];
@@ -1099,7 +1462,18 @@ interface BehaviorLookAtEntity {
 /**
  * Can cause the entity to look at a nearby player
  */
-interface BehaviorLookAtPlayer {
+export interface BehaviorLookAtPlayer {
+    angle_of_view_horizontal: number;
+    angle_of_view_vertical: number;
+    look_distance: number;
+    look_time: [number, number];
+    probability: number;
+}
+
+/**
+ * Can cause the entity to look at a nearby target
+ */
+export interface BehaviorLookAtTarget {
     angle_of_view_horizontal: number;
     angle_of_view_vertical: number;
     look_distance: number;
@@ -1110,7 +1484,7 @@ interface BehaviorLookAtPlayer {
 /**
  * Can cause the entity to look at a the player they are trading with
  */
-interface BehaviorLookAtTradingPlayer {
+export interface BehaviorLookAtTradingPlayer {
     angle_of_view_horizontal: number;
     angle_of_view_vertical: number;
     look_distance: number;
@@ -1121,12 +1495,12 @@ interface BehaviorLookAtTradingPlayer {
 /**
  * Allows the entity to look for a mate. Can only be used by `minecraft:villager`
  */
-interface BehaviorMakeLove {}
+export interface BehaviorMakeLove {}
 
 /**
  * Can cause the entity to perform a melee attack
  */
-interface BehaviorMeleeAttack {
+export interface BehaviorMeleeAttack {
     attack_once: boolean;
     attack_types: string[];
     can_spread_on_fire: boolean;
@@ -1155,7 +1529,7 @@ interface BehaviorMeleeAttack {
 /**
  * Can cause the entity to perform a melee attack based on bounding box calculations
  */
-interface BehaviorMeleeBoxAttack {
+export interface BehaviorMeleeBoxAttack {
     attack_once: boolean;
     attack_types: string[];
     can_spread_on_fire: boolean;
@@ -1184,7 +1558,7 @@ interface BehaviorMeleeBoxAttack {
 /**
  * Can cause the entity to go to the village bell and mingle
  */
-interface BehaviorMingle {
+export interface BehaviorMingle {
     cooldown_time: number;
     duration: number;
     mingle_distance: number;
@@ -1195,7 +1569,7 @@ interface BehaviorMingle {
 /**
  * Can cause the entity to move around on its own while mounted seeking a target to attack
  */
-interface BehaviorMountPathing {
+export interface BehaviorMountPathing {
     speed_multiplier: number;
     target_dist: number;
     track_target: boolean;
@@ -1204,7 +1578,7 @@ interface BehaviorMountPathing {
 /**
  * Can cause the entity to move around a target
  */
-interface BehaviorMoveAroundTarget {
+export interface BehaviorMoveAroundTarget {
     destination_pos_search_spread_degrees: number;
     destination_position_range: [number, number];
     filters: ServerFilters|ServerFilters[];
@@ -1217,7 +1591,7 @@ interface BehaviorMoveAroundTarget {
 /**
  * Can cause the entity to move indoors
  */
-interface BehaviorMoveIndoors {
+export interface BehaviorMoveIndoors {
     speed_multiplier: number;
     timeout_cooldown: number;
 }
@@ -1225,7 +1599,7 @@ interface BehaviorMoveIndoors {
 /**
  * Can cause the entity to move outdoors
  */
-interface BehaviorMoveOutoors {
+export interface BehaviorMoveOutdoors {
     goal_radius: number;
     search_count: number;
     search_height: number;
@@ -1237,7 +1611,7 @@ interface BehaviorMoveOutoors {
 /**
  * Can cause the entity to move to a block
  */
-interface BehaviorMoveToBlock {
+export interface BehaviorMoveToBlock {
     goal_radius: number;
     on_reach: Trigger;
     on_stay_completed: Trigger;
@@ -1254,9 +1628,20 @@ interface BehaviorMoveToBlock {
 }
 
 /**
+ * Can cause the entity to move to ground
+ */
+export interface BehaviorMoveToLand {
+    goal_radius: number;
+    search_count: number;
+    search_height: number;
+    search_range: number;
+    speed_multiplier: number;
+}
+
+/**
  * Can cause the entity to move into lava
  */
-interface BehaviorMoveToLava {
+export interface BehaviorMoveToLava {
     goal_radius: number;
     search_count: number;
     search_height: number;
@@ -1267,7 +1652,7 @@ interface BehaviorMoveToLava {
 /**
  * Can cause the entity to move into a liquid
  */
-interface BehaviorMoveToLiquid {
+export interface BehaviorMoveToLiquid {
     goal_radius: number;
     material_type: "Any"|"Water"|"Lava";
     search_count: number;
@@ -1280,7 +1665,7 @@ interface BehaviorMoveToLiquid {
 /**
  * Can cause the entity to move to a POI
  */
-interface BehaviorMoveToPOI {
+export interface BehaviorMoveToPOI {
     poi_type: string;
     speed_multiplier: number;
 }
@@ -1288,7 +1673,7 @@ interface BehaviorMoveToPOI {
 /**
  * Can cause the entity to move towards a random block
  */
-interface BehaviorMoveToRandomBlock {
+export interface BehaviorMoveToRandomBlock {
     block_distance: number;
     within_radius: number;
 }
@@ -1296,7 +1681,7 @@ interface BehaviorMoveToRandomBlock {
 /**
  * Can cause the entity to move to a random location within a village
  */
-interface BehaviorMoveToVillage {
+export interface BehaviorMoveThroughVillage {
     goal_radius: number;
     search_count: number;
     search_height: number;
@@ -1308,7 +1693,7 @@ interface BehaviorMoveToVillage {
 /**
  * Can cause the entity to move to water
  */
-interface BehaviorMoveToWater {
+export interface BehaviorMoveToWater {
     goal_radius: number;
     search_count: number;
     search_height: number;
@@ -1320,21 +1705,29 @@ interface BehaviorMoveToWater {
 /**
  * Can cause the entity to move towards their dwelling. Requires {@link Dweller} and {@link SharedNavigation}
  */
-interface BehaviorMoveTowardsDwellingRestriction {
+export interface BehaviorMoveTowardsDwellingRestriction {
     speed_multiplier: number;
 }
 
 /**
  * Can cause the entity to move towards their home. Requires {@link Home} and {@link SharedNavigation}
  */
-interface BehaviorMoveTowardsHomeRestriction {
+export interface BehaviorMoveTowardsHomeRestriction {
     speed_multiplier: number;
 }
 
 /**
  * Can cause the entity to move towards its target
  */
-interface BehaviorMoveTowardsDwellingRestriction {
+export interface BehaviorMoveTowardsTarget {
+    within_radius: number;
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to move towards home bed
+ */
+export interface BehaviorMoveTowardsDwellingRestriction {
     within_radius: number;
     speed_multiplier: number;
 }
@@ -1342,7 +1735,7 @@ interface BehaviorMoveTowardsDwellingRestriction {
 /**
  * Can cause the entity to take naps
  */
-interface BehaviorNap {
+export interface BehaviorNap {
     cooldown_max: number;
     cooldown_min: number;
     mob_detect_dist: number;
@@ -1352,7 +1745,7 @@ interface BehaviorNap {
 /**
  * Can cause the entity to attack the closest target that matches the conditions
  */
-interface BehaviorNearestAttackableTarget {
+export interface BehaviorNearestAttackableTarget {
     attack_interval: number;
     attack_interval_min: number;
     attack_owner: boolean;
@@ -1373,7 +1766,7 @@ interface BehaviorNearestAttackableTarget {
 /**
  * Can cause the entity to attack the highest priority target that matches the conditions
  */
-interface BehaviorNearestPrioritizedAttackableTarget {
+export interface BehaviorNearestPrioritizedAttackableTarget {
     attack_interval: number;
     attack_interval_min: number;
     attack_owner: boolean;
@@ -1394,14 +1787,14 @@ interface BehaviorNearestPrioritizedAttackableTarget {
 /**
  * Can cause the entity to sit in place like the Ocelot
  */
-interface BehaviorOcelotSitOnBlock {
+export interface BehaviorOcelotSitOnBlock {
     speed_multiplier: number;
 }
 
 /**
  * Can cause the entity to attack by sneaking and pouncing
  */
-interface BehaviorOcelotAttack {
+export interface BehaviorOcelotAttack {
     cooldown_time: number;
     max_distance: number;
     max_sneak_range: number;
@@ -1417,7 +1810,7 @@ interface BehaviorOcelotAttack {
 /**
  * Can cause the entity to offer a flower to a mob with {@link BehaviorTakeFlower}
  */
-interface BehaviorOfferFlower {
+export interface BehaviorOfferFlower {
     chance_to_start: number;
     filters: ServerFilters|ServerFilters[];
     max_head_rotation_y: number;
@@ -1429,28 +1822,28 @@ interface BehaviorOfferFlower {
 /**
  * Can cause the entity to open doors if allowed by their navigation
  */
-interface BehaviorOpenDoor {
+export interface BehaviorOpenDoor {
     close_door_after: boolean;
 }
 
 /**
  * Can cause the entity to target entities that hurt their owner
  */
-interface BehaviorOwnerHurtByTarget {
+export interface BehaviorOwnerHurtByTarget {
     entity_types: EntityType[];
 }
 
 /**
  * Can cause the entity to target entities that is hurt by their owner
  */
-interface BehaviorOwnerHurtTarget {
+export interface BehaviorOwnerHurtTarget {
     entity_types: EntityType[];
 }
 
 /**
  * Can cause the entity to enter a panic state, running form the damage source that made it enter the state
  */
-interface BehaviorPanic {
+export interface BehaviorPanic {
     damage_sources: MobEffect[];
     force: boolean;
     ignore_mob_damage: boolean;
@@ -1461,7 +1854,7 @@ interface BehaviorPanic {
 /**
  * Can cause the entity as a pet to sleep in the bed with the owner
  */
-interface BehaviorPetSleepWithOwner {
+export interface BehaviorPetSleepWithOwner {
     goal_radius: number;
     search_height: number;
     search_range: number;
@@ -1471,7 +1864,7 @@ interface BehaviorPetSleepWithOwner {
 /**
  * Can cause the entity to pick up items on the ground
  */
-interface BehaviorPickupItems {
+export interface BehaviorPickupItems {
     can_pickup_any_item: boolean;
     can_pickup_to_hand_or_equipment: boolean;
     excluded_items: string[];
@@ -1485,7 +1878,7 @@ interface BehaviorPickupItems {
 /**
  * Can cause the entity to play with other entities by chasing them and moving randomly
  */
-interface BehaviorPlay {
+export interface BehaviorPlay {
     chance_to_start: number;
     follow_distance: number;
     friend_search_area: [number, number, number];
@@ -1497,7 +1890,7 @@ interface BehaviorPlay {
 /**
  * Can cause the entity to pretend to be dead to avoid being attacked
  */
-interface BehaviorPlayDead {
+export interface BehaviorPlayDead {
     apply_regeneration: boolean;
     damage_sources: DamageType[];
     duration: number;
@@ -1510,12 +1903,12 @@ interface BehaviorPlayDead {
 /**
  * Can cause the entity to be ridden by the player after being tamed
  */
-interface BehaviorPlayerRideTamed {}
+export interface BehaviorPlayerRideTamed {}
 
 /**
  * Can cause the entity to raid crops out of farms while hungry
  */
-interface BehaviorRaidGarden {
+export interface BehaviorRaidGarden {
     blocks: string[];
     eat_delay: number;
     full_delay: number;
@@ -1529,7 +1922,7 @@ interface BehaviorRaidGarden {
 /**
  * Can cause the entity to attack by ramming
  */
-interface BehaviorRamAttack {
+export interface BehaviorRamAttack {
     baby_knockback_modifier: number;
     cooldown_range: [number, number];
     knockback_force: number;
@@ -1546,7 +1939,7 @@ interface BehaviorRamAttack {
 /**
  * Can cause the entity to randomly breach the surface of water
  */
-interface BehaviorRandomBreach {
+export interface BehaviorRandomBreach {
     cooldown_time: number;
     interval: number;
     speed_multiplier: number;
@@ -1557,7 +1950,7 @@ interface BehaviorRandomBreach {
 /**
  * Can cause the entity to randomly fly around
  */
-interface BehaviorRandomFly {
+export interface BehaviorRandomFly {
     can_land_on_trees: boolean;
     cooldown_time: number;
     interval: number;
@@ -1569,7 +1962,19 @@ interface BehaviorRandomFly {
 /**
  * Can cause the entity to randomly hover around
  */
-interface BehaviorRandomBreach {
+export interface BehaviorRandomHover {
+    can_land_on_trees: boolean;
+    cooldown_time: number;
+    interval: number;
+    speed_multiplier: number;
+    xz_dist: number;
+    y_dist: number;
+}
+
+/**
+ * Can cause the entity to randomly hover around
+ */
+export interface BehaviorRandomBreach {
     cooldown_time: number;
     hover_height: [number, number];
     interval: number;
@@ -1582,7 +1987,7 @@ interface BehaviorRandomBreach {
 /**
  * Can cause the entity to randomly look around
  */
-interface BehaviorRandomLookAround {
+export interface BehaviorRandomLookAround {
     look_time: [number, number];
     max_angle_of_view_horizontal: number;
     max_angle_of_view_vertical: number;
@@ -1591,7 +1996,7 @@ interface BehaviorRandomLookAround {
 /**
  * Can cause the entity to randomly sit and look around
  */
-interface BehaviorRandomLookAroundAndSit {
+export interface BehaviorRandomLookAroundAndSit {
     continue_if_leashed: boolean;
     continue_sitting_on_reload: boolean;
     max_angle_of_view_horizontal: number;
@@ -1607,7 +2012,7 @@ interface BehaviorRandomLookAroundAndSit {
 /**
  * Can cause the entity to randomly move to a block and dig up an item
  */
-interface BehaviorRandomSearchAndDig {
+export interface BehaviorRandomSearchAndDig {
     cooldown_range: [number, number];
     digging_duration_range: [number, number];
     find_valid_position_retries: number;
@@ -1631,7 +2036,7 @@ interface BehaviorRandomSearchAndDig {
 /**
  * Can cause the entity to randomly sit for a duration
  */
-interface BehaviorRandomSitting {
+export interface BehaviorRandomSitting {
     cooldown_time: number;
     min_sit_time: number;
     start_chance: number;
@@ -1641,7 +2046,7 @@ interface BehaviorRandomSitting {
 /**
  * Can cause the entity to randomly stroll around
  */
-interface BehaviorRandomStroll {
+export interface BehaviorRandomStroll {
     cooldown_time: number;
     interval: number;
     speed_multiplier: number;
@@ -1652,7 +2057,7 @@ interface BehaviorRandomStroll {
 /**
  * Can cause the entity to randomly swim through water
  */
-interface BehaviorRandomSwim {
+export interface BehaviorRandomSwim {
     cooldown_time: number;
     interval: number;
     speed_multiplier: number;
@@ -1663,7 +2068,7 @@ interface BehaviorRandomSwim {
 /**
  * Can cause the entity to attack using ranged shots
  */
-interface BehaviorRangedAttack {
+export interface BehaviorRangedAttack {
     attack_interval: number;
     attack_interval_max: number;
     attack_interval_min: number;
@@ -1685,22 +2090,22 @@ interface BehaviorRangedAttack {
 /**
  * Can cause the entity to stop and mate with another entity. Can only be used by `minecraft:villager`
  */
-interface BehaviorRecieveLove {}
+export interface BehaviorReceiveLove {}
 
 /**
  * Can cause the entity to stay indoors during night time
  */
-interface BehaviorRestrictOpenDoor {}
+export interface BehaviorRestrictOpenDoor {}
 
 /**
  * Can cause the entity to avoid the direct sunlight
  */
-interface BehaviorRestrictSun {}
+export interface BehaviorRestrictSun {}
 
 /**
  * Can cause the entity to stay at a certain level in liquid
  */
-interface BehaviorRiseToLiquidLevel {
+export interface BehaviorRiseToLiquidLevel {
     liquid_y_offset: number;
     rise_delta: number;
     sink_delta: number;
@@ -1709,35 +2114,35 @@ interface BehaviorRiseToLiquidLevel {
 /**
  * Can cause the entity to roar based on {@link AngerLevel}
  */
-interface BehaviorRoar {
+export interface BehaviorRoar {
     duration: number;
 }
 
 /**
  * Can cause the entity to roll forward
  */
-interface BehaviorRoll {
+export interface BehaviorRoll {
     probability: number;
 }
 
 /**
  * Can cause the entity to run around aimlessly
  */
-interface BehaviorRunAroundLikeCrazy {
+export interface BehaviorRunAroundLikeCrazy {
     speed_multiplier: number;
 }
 
 /**
  * Can cause the entity to become scared when the weather is thundering
  */
-interface BehaviorScared {
+export interface BehaviorScared {
     sound_interval: number;
 }
 
 /**
  * Can cause the entity to send an event to another mob
  */
-interface BehaviorSendEvent {
+export interface BehaviorSendEvent {
     cast_duration: number;
     look_at_target: boolean;
     sequence: {
@@ -1750,7 +2155,7 @@ interface BehaviorSendEvent {
 /**
  * Can cause the entity to give its items to others
  */
-interface BehaviorShareItems {
+export interface BehaviorShareItems {
     entity_types: EntityType[];
     goal_radius: number;
     max_dist: number;
@@ -1760,17 +2165,17 @@ interface BehaviorShareItems {
 /**
  * Can cause the entity to merge into stone. Can only be used by `minecraft:silverfish`
  */
-interface BehaviorSilverfishMergeWithStone {}
+export interface BehaviorSilverfishMergeWithStone {}
 
 /**
  * Can cause the entity to alert nearby entities in blocks. Can only be used by `minecraft:silverfish`
  */
-interface BehaviorSilverfishWakeUpFriends {}
+export interface BehaviorSilverfishWakeUpFriends {}
 
 /**
  * Can cause the entity to be horse traps
  */
-interface BehaviorSkeletonHorseTrap {
+export interface BehaviorSkeletonHorseTrap {
     duration: number;
     within_radius: number;
 }
@@ -1778,7 +2183,7 @@ interface BehaviorSkeletonHorseTrap {
 /**
  * Can cause the entity to move to and sleep in its village bed
  */
-interface BehaviorSleep {
+export interface BehaviorSleep {
     can_sleep_while_riding: boolean;
     cooldown_time: number;
     sleep_collider_height: number;
@@ -1791,7 +2196,7 @@ interface BehaviorSleep {
 /**
  * Can cause the entity to perfom a slime attack
  */
-interface BehaviorSlimeAttack {
+export interface BehaviorSlimeAttack {
     set_persistent: boolean;
     speed_multiplier: number;
     x_max_rotation: number;
@@ -1801,7 +2206,7 @@ interface BehaviorSlimeAttack {
 /**
  * Can cause the entity to float in water or lava. Can only be used by `minecraft:slime`
  */
-interface BehaviorSlimeFloat {
+export interface BehaviorSlimeFloat {
     jump_chance_percentage: number;
     speed_multiplier: number;
 }
@@ -1809,14 +2214,14 @@ interface BehaviorSlimeFloat {
 /**
  * Can cause the entity to jump around. Can only be used by `minecraft:slime`
  */
-interface BehaviorSlimeKeepOnJumping {
+export interface BehaviorSlimeKeepOnJumping {
     speed_multiplier: number;
 }
 
 /**
  * Can cause the entity to move in random directions. Can only be used by `minecraft:slime`
  */
-interface BehaviorSlimeRandomDirection {
+export interface BehaviorSlimeRandomDirection {
     add_random_time_range: number;
     min_change_direction_time: number;
     turn_range: number;
@@ -1825,7 +2230,7 @@ interface BehaviorSlimeRandomDirection {
 /**
  * Can cause the entity to take a load off and snack on food that it fond nearby
  */
-interface BehaviorSnacking {
+export interface BehaviorSnacking {
     items: string[];
     snacking_cooldown: number;
     snacking_cooldown_min: number;
@@ -1835,7 +2240,7 @@ interface BehaviorSnacking {
 /**
  * Can cause the entity to stop and sneeze
  */
-interface BehaviorSneeze {
+export interface BehaviorSneeze {
     cooldown_time: number;
     drop_item_chance: number;
     entity_types: EntityType[];
@@ -1850,7 +2255,7 @@ interface BehaviorSneeze {
 /**
  * Can cause the entity to sniff around
  */
-interface BehaviorSniff {
+export interface BehaviorSniff {
     cooldown_range: [number, number];
     duration: number;
     sniffing_radius: number;
@@ -1861,7 +2266,7 @@ interface BehaviorSniff {
 /**
  * Can cause the entity to perform a sonic boom
  */
-interface BehaviorSonicBoom {
+export interface BehaviorSonicBoom {
     attack_cooldown: number;
     attack_damage: number;
     attack_range_horizontal: number;
@@ -1879,32 +2284,32 @@ interface BehaviorSonicBoom {
 /**
  * Can cause the entity to dive. Can only be used by `minecraft:squid`
  */
-interface BehaviorSquidDive {}
+export interface BehaviorSquidDive {}
 
 /**
  * Allows the entity to swim away. Can only be used by `minecraft:squid`
  */
-interface BehaviorSquidFlee {}
+export interface BehaviorSquidFlee {}
 
 /**
  * Can cause the entity to swim in place. Can only be used by `minecraft:squid`
  */
-interface BehaviorSquidIdle {}
+export interface BehaviorSquidIdle {}
 
 /**
  * Can cause the entity to move back to water. Can only be used by `minecraft:squid`
  */
-interface BehaviorSquidMoveAwayFromGround {}
+export interface BehaviorSquidMoveAwayFromGround {}
 
 /**
  * Can cause the entity to stick to the ground outside water. Can only be used by `minecraft:squid`
  */
-interface BehaviorSquidOutOfWater {}
+export interface BehaviorSquidOutOfWater {}
 
 /**
  * Can cause the entity to stalk, then pounce on a target
  */
-interface BehaviorStalkAndPounceOnTarget {
+export interface BehaviorStalkAndPounceOnTarget {
     interest_time: number;
     leap_distance: number;
     leap_height: number;
@@ -1919,7 +2324,7 @@ interface BehaviorStalkAndPounceOnTarget {
 /**
  * Can cause the entity to attempt to toss the items from its inventory to a recently played Noteblock
  */
-interface BehaviorStayNearNoteblock {
+export interface BehaviorStayNearNoteblock {
     listen_time: number;
     speed: number;
     start_distance: number;
@@ -1929,12 +2334,12 @@ interface BehaviorStayNearNoteblock {
 /**
  * Can cause the entity to stay put while sitting
  */
-interface BehaviorStayWhileSitting {}
+export interface BehaviorStayWhileSitting {}
 
 /**
  * Can cause the entity to attack using stop AoE damage
  */
-interface BehaviorStompAttack {
+export interface BehaviorStompAttack {
     attack_once: boolean;
     attack_types: string[];
     can_spread_on_fire: boolean;
@@ -1964,7 +2369,7 @@ interface BehaviorStompAttack {
 /**
  * Can cause the entity to stomp turtle eggs
  */
-interface BehaviorStompTurtleEgg {
+export interface BehaviorStompTurtleEgg {
     goal_radius: number;
     interval: number;
     search_height: number;
@@ -1975,7 +2380,7 @@ interface BehaviorStompTurtleEgg {
 /**
  * Can cause the entity to move to a random location within a village
  */
-interface BehaviorStrollTowardsVillage {
+export interface BehaviorStrollTowardsVillage {
     cooldown_time: number;
     goal_radius: number;
     search_range: number;
@@ -1986,7 +2391,7 @@ interface BehaviorStrollTowardsVillage {
 /**
  * Can cause the entity to summon other entities
  */
-interface BehaviorSummonEntity {
+export interface BehaviorSummonEntity {
     summon_choices: {
         cast_duration: number;
         cooldown_time: number;
@@ -2017,7 +2422,7 @@ interface BehaviorSummonEntity {
 /**
  * Can cause the entity to swell when a player is nearby. Can only be used by `minecraft:creeper`
  */
-interface BehaviorSwell {
+export interface BehaviorSwell {
     start_distance: number;
     stop_distance: number;
 }
@@ -2025,7 +2430,7 @@ interface BehaviorSwell {
 /**
  * Can cause the entity to go idle while swimming
  */
-interface BehaviorSwimIdle {
+export interface BehaviorSwimIdle {
     idle: number;
     success_rate: number;
 }
@@ -2033,7 +2438,7 @@ interface BehaviorSwimIdle {
 /**
  * Can cause the entity to move to the surface when out of breath. Requires {@link Breathable}
  */
-interface BehaviorSwimUpForBreath {
+export interface BehaviorSwimUpForBreath {
     material_type: "any"|"water"|"lava";
     search_height: number;
     search_radius: number;
@@ -2043,7 +2448,7 @@ interface BehaviorSwimUpForBreath {
 /**
  * Can cause the entity to wander while swimming
  */
-interface BehaviorSwimWander {
+export interface BehaviorSwimWander {
     interval: number;
     look_ahead: number;
     speed_multiplier: number;
@@ -2053,7 +2458,7 @@ interface BehaviorSwimWander {
 /**
  * Can cause the entity to follow another swimming entity
  */
-interface BehaviorSwimWithEntity {
+export interface BehaviorSwimWithEntity {
     catch_up_multiplier: number;
     catch_up_threshold: number;
     chance_to_stop: number;
@@ -2069,7 +2474,7 @@ interface BehaviorSwimWithEntity {
 /**
  * Can cause the entity to perform a swoop attack
  */
-interface BehaviorSwoopAttack {
+export interface BehaviorSwoopAttack {
     damage_reach: number;
     delay_range: [number, number];
     speed_multiplier: number;
@@ -2078,7 +2483,7 @@ interface BehaviorSwoopAttack {
 /**
  * Can cause the entity to accept flowers from another mob with the {@link BehaviorOfferFlower}
  */
-interface BehaviorTakeFlower {
+export interface BehaviorTakeFlower {
     filters: ServerFilters|ServerFilters[];
     max_head_rotation_y: number;
     max_rotation_x: number;
@@ -2092,7 +2497,7 @@ interface BehaviorTakeFlower {
 /**
  * Can cause the entity to teleport to its owner
  */
-interface BehaviorTeleportToOwner {
+export interface BehaviorTeleportToOwner {
     cooldown: number;
     filters: ServerFilters|ServerFilters[];
 }
@@ -2100,7 +2505,7 @@ interface BehaviorTeleportToOwner {
 /**
  * Can cause the entity to be tempted by certain items
  */
-interface BehaviorTempt {
+export interface BehaviorTempt {
     can_get_scared: boolean;
     can_tempt_vertically: boolean;
     can_tempt_while_ridden: boolean;
@@ -2114,23 +2519,23 @@ interface BehaviorTempt {
 /**
  * Timer based event
  */
-interface SharedBehaviorTimer {
+export interface SharedBehaviorTimer {
     cooldown_range: [number, number];
     duration_range: [number, number];
     on_end: Trigger;
     on_start: Trigger;
 }
 
-interface BehaviorTimerFlag1 extends SharedBehaviorTimer {}
+export interface BehaviorTimerFlag1 extends SharedBehaviorTimer {}
 
-interface BehaviorTimerFlag2 extends SharedBehaviorTimer {}
+export interface BehaviorTimerFlag2 extends SharedBehaviorTimer {}
 
-interface BehaviorTimerFlag3 extends SharedBehaviorTimer {}
+export interface BehaviorTimerFlag3 extends SharedBehaviorTimer {}
 
 /**
  * Can cause the entity to look at a player holding a tradeable item
  */
-interface BehaviorTradeInterest {
+export interface BehaviorTradeInterest {
     carried_item_switch_time: number;
     cooldown: number;
     interest_time: number;
@@ -2141,7 +2546,7 @@ interface BehaviorTradeInterest {
 /**
  * Can cause the entity to trade with a player
  */
-interface BehaviorTradeWithPlayer {
+export interface BehaviorTradeWithPlayer {
     filters: ServerFilters|ServerFilters[];
     max_distance_from_player: number;
 }
@@ -2149,31 +2554,31 @@ interface BehaviorTradeWithPlayer {
 /**
  * Can cause the entity to target the same entity its owner is targeting
  */
-interface BehaviorVexCopyOwnerTarget {
+export interface BehaviorVexCopyOwnerTarget {
     entity_types: EntityType[];
 }
 
 /**
  * Can cause the entity to move around randomly like a Vex
  */
-interface BehaviorVexRandomMove {}
+export interface BehaviorVexRandomMove {}
 
 /**
  * Can cause the entity to launch random attacks. Only used by `minecraft:wither`
  */
-interface BehaviorWitherRandomAttackPosGoal {}
+export interface BehaviorWitherRandomAttackPosGoal {}
 
 /**
  * Can cause the entity to focus its attack on the entity that's done the most damage to it. Only used by `minecraft:wither`
  */
-interface BehaviorWitherTargetHighestDamage {
+export interface BehaviorWitherTargetHighestDamage {
     entity_types: EntityType[];
 }
 
 /**
  * Can cause the entity to work at a POI
  */
-interface BehaviorWork {
+export interface BehaviorWork {
     active_time: number;
     can_work_in_rain: boolean;
     goal_cooldown: number;
@@ -2187,7 +2592,7 @@ interface BehaviorWork {
 /**
  * Can cause the entity use a Composter POI to convert seeds into bone meal
  */
-interface BehaviorWorkComposter {
+export interface BehaviorWorkComposter {
     active_time: number;
     block_interaction_max: number;
     can_empty_composter: boolean;
@@ -2210,7 +2615,7 @@ interface BehaviorWorkComposter {
 /**
  * Adds a rider to the entity. Requires `minecraft:rideable`
  */
-interface AddRider {
+export interface AddRider {
     /**
      * The entity type that will be riding this entity
      */
@@ -2224,7 +2629,7 @@ interface AddRider {
 /**
  * Causes the mob to ignore attackable targets for a given duration
  */
-interface AdmireItem {
+export interface AdmireItem {
     /**
      * Duration, in seconds, for shich the mob won't admire items if it was hurt
      * @default 0
@@ -2240,7 +2645,7 @@ interface AdmireItem {
 /**
  * Adds a timer for the entity to grow up. It can be accelerated by giving the entity the items it likes as defined by `feed_items`
  */
-interface Ageable {
+export interface Ageable {
     /**
      * List of items that the entity drops when it grows up
      */
@@ -2280,7 +2685,7 @@ interface Ageable {
 /**
  * Allows this entity to track anger towards a set of nuisances
  */
-interface AngerLevel {
+export interface AngerLevel {
     /**
      * Anger level will decay over time. Defines how often anger will be decreased by one
      * @default 1.0
@@ -2333,7 +2738,7 @@ interface AngerLevel {
 /**
  * Defines the entity's angry state using a timer
  */
-interface Angry {
+export interface Angry {
     /**
      * The sound event to play when the mob is angry
      */
@@ -2399,7 +2804,7 @@ interface Angry {
 /**
  * Allows the actor to break doors assuming that the flags are set up for the component to use in navigation
  */
-interface Annotation_BreakDoor {
+export interface AnnotationBreakDoor {
     /**
      * The time in seconds required to break through doors
      * @default 12.0
@@ -2415,12 +2820,12 @@ interface Annotation_BreakDoor {
 /**
  * Allows the actor to open doors assuming that the flags are set up for the component to use in navigation
  */
-interface Annotation_OpenDoor {}
+export interface AnnotationOpenDoor {}
 
 /**
  * Allows the entity to deal damage to other entities within range
  */
-interface AreaAttack {
+export interface AreaAttack {
     /**
      * The type of damage that is applied to entities matching `entity_filter` within `damage_range`
      */
@@ -2454,7 +2859,7 @@ interface AreaAttack {
 /**
  * Adds an attack cooldown to a mob to prevent it from attempting to aquire new targets
  */
-interface AttackCooldown {
+export interface AttackCooldown {
     attack_cooldown_complete_event: string;
     attack_cooldown_time: [number, number];
 }
@@ -2462,7 +2867,7 @@ interface AttackCooldown {
 /**
  * Enables the entity to drop an item as a barter exchange
  */
-interface Barter {
+export interface Barter {
     /**
      * A loot table used to drop a random item
      */
@@ -2477,12 +2882,12 @@ interface Barter {
 /**
  * Allows the player to detect and maneuver on the scaffold block
  */
-interface BlockClimber {}
+export interface BlockClimber {}
 
 /**
  * Fires an event when a block is broken in range
  */
-interface BlockSensor {
+export interface BlockSensor {
     /**
      * A list of blocks and events to fire when a block is broken. If a block is in multiple lists, multiple events will be fired
      */
@@ -2510,7 +2915,7 @@ interface BlockSensor {
 /**
  * A rideable entity's boost
  */
-interface Boostable {
+export interface Boostable {
     /** 
      * List of items that can be used to boost while riding this entity.
     */
@@ -2543,7 +2948,7 @@ interface Boostable {
 /**
  * Defines the effects for boss entities
  */
-interface Boss {
+export interface Boss {
     /**
      * The max distance in blocks that the boss can be from the player for the health bar to be displayed
      * @default 55
@@ -2562,7 +2967,7 @@ interface Boss {
 /**
  * Specifies the blocks this entity can break as it moves around
  */
-interface BreakBlocks {
+export interface BreakBlocks {
     /**
      * A list of the blocks that can be broken when the entity moves
      */
@@ -2572,7 +2977,7 @@ interface BreakBlocks {
 /**
  * Defines what blocks the entity can breathe in and gives them the ability to suffocate
  */
-interface Breathable {
+export interface Breathable {
     /**
      * List of blocks this entity can breathe in, in addition to the other parameters
      */
@@ -2627,7 +3032,7 @@ interface Breathable {
 /**
  * Defines the way the entity can get into the "love" state
  */
-interface Breedable {
+export interface Breedable {
     /**
      * If true, the entity can breed while sitting
      * @default false
@@ -2780,7 +3185,7 @@ interface Breedable {
 /**
  * Defines the way an entity can be bribed
  */
-interface Bribeable {
+export interface Bribeable {
     /**
      * Time in seconds before the entity can be bribed again
      * @default 2.0
@@ -2795,7 +3200,7 @@ interface Bribeable {
 /**
  * Enables an entity to float on the specified liquid blocks
  */
-interface Buoyant {
+export interface Buoyant {
     /**
      * Applies gravity each tick. Causes more of a wave simulation but will cause more gravity to be applied outside liquids. Will override `gravity: false` on the `minecraft:physics` component
      * @default true
@@ -2835,17 +3240,17 @@ interface Buoyant {
 /**
  * Specifies if a mob burns in daylight
  */
-interface BurnsInDaylight {}
+export interface BurnsInDaylight {}
 
 /**
  * Determines if this entity can join an existing raid
  */
-interface CanJoinRaid {}
+export interface CanJoinRaid {}
 
 /**
  * Specifies hunt celebration behavior
  */
-interface CelebrateHunt {
+export interface CelebrateHunt {
     /**
      * If true, celebration will be broadcast to other entities in radius
      * @default true
@@ -2879,7 +3284,7 @@ interface CelebrateHunt {
 /**
  * Sets the width and height of the entity's collision box
  */
-interface CollisionBox {
+export interface CollisionBox {
     /**
      * Height of the collision box in blocks
      */
@@ -2893,7 +3298,7 @@ interface CollisionBox {
 /**
  * Gives Regeneration and removes Mining Fatigue from the mob that kills the entity's attack target
  */
-interface CombatRegeneration {
+export interface CombatRegeneration {
     /**
      * Determines if the entity will grant entities of the same type effects if they kill the target
      * @default false
@@ -2914,7 +3319,7 @@ interface CombatRegeneration {
 /**
  * Defines the conditional spatial bandwidth optimizations for this entity
  */
-interface ConditionalBandwidthOptimization {
+export interface ConditionalBandwidthOptimization {
     conditional_values: {
         /**
          * Conditions that must be met for these optimization values to be used
@@ -2952,7 +3357,7 @@ interface ConditionalBandwidthOptimization {
 /**
  * List of hitboxes for damage or interactions
  */
-interface CustomHitTest {
+export interface CustomHitTest {
     /**
      * List of AABB hitboxes that do not rotate with the entity
      */
@@ -2975,7 +3380,7 @@ interface CustomHitTest {
 /**
  * Applies damage at specified intervals to the entity
  */
-interface DamageOverTime {
+export interface DamageOverTime {
     /**
      * Amount of damage applied per interval
      * @default 1
@@ -2991,7 +3396,7 @@ interface DamageOverTime {
 /**
  * Handles and responds to damage
  */
-interface DamageSensor {
+export interface DamageSensor {
     /**
      * List of triggers with events to call when taking specific types of damage. Iterates top to bottom until a trigger matches all `on_damage` filters then stops evaluating
      */
@@ -3032,7 +3437,7 @@ interface DamageSensor {
 /**
  * Ability for a rideable entity to dash
  */
-interface Dash {
+export interface Dash {
     /**
      * The dash cooldown in seconds.
      * @default 1.0
@@ -3053,7 +3458,7 @@ interface Dash {
 /**
  * Despawns the entity when the despawn rules or filters evaluate to true. Does not apply to entities created via the `/summon` command
  */
-interface Despawn {
+export interface Despawn {
     /**
      * Determines if `min_range_random_chance` is used in the standard despawn rules
      * @default true
@@ -3108,12 +3513,12 @@ interface Despawn {
 /**
  * Prevents the entity from changing dimension through portals
  */
-interface DimensionBound {}
+export interface DimensionBound {}
 
 /**
  * Adds a timer for drying out that will count down and fire `dried_out_event`, or stop counting down and fire `stopped_drying_out_event` if in rain or water
  */
-interface DryingOutTimer {
+export interface DryingOutTimer {
     /**
      * Event to fire when the drying out time runs out
      */
@@ -3141,7 +3546,7 @@ interface DryingOutTimer {
 /**
  * Defines the entity's dwelling
  */
-interface Dweller {
+export interface Dweller {
     dwelling_type: "village";
     dweller_role: "hostile"|"inhabitant"|"defender"
     update_interval_base: number;
@@ -3154,7 +3559,7 @@ interface Dweller {
 /**
  * Defines the entity's ability to trade with players
  */
-interface EconomyTradeTable {
+export interface EconomyTradeTable {
     /**
      * Determines if trades should be coverted when the mob transforms
      * @default false
@@ -3219,14 +3624,14 @@ interface EconomyTradeTable {
  * Defines to which armor slot an item equiped to `minecraft:equippable`'s second slot should be equiped to.
  * @deprecated
  */
-interface EntityArmorEquipmentSlotMapping {
+export interface EntityArmorEquipmentSlotMapping {
     armor_slot: string;
 }
 
 /**
  * Defines events fired when a set of conditions are met by entities within range
  */
-interface EntitySensor {
+export interface EntitySensor {
     /**
      * If true, the subsensors' range is additive to the entity's size
      */
@@ -3274,7 +3679,7 @@ interface EntitySensor {
 /**
  * Defines events to fire when the environment matches certain conditions
  */
-interface EnvironmentSensor {
+export interface EnvironmentSensor {
     /**
      * A list of triggers that fire when the conditions match the given filter criteria
      */
@@ -3284,7 +3689,7 @@ interface EnvironmentSensor {
 /**
  * Defines the items the entity can equip
  */
-interface EquipItem {
+export interface EquipItem {
     /**
      * List of items the entity should not equip
      */
@@ -3294,7 +3699,7 @@ interface EquipItem {
 /**
  * Defines how the entity equips items
  */
-interface Equippable {
+export interface Equippable {
     /**
      * List of slots and the items that can be equipped to them
      */
@@ -3330,7 +3735,7 @@ interface Equippable {
 /**
  * Defines how much exhaustion each player action should take
  */
-interface ExhaustionValues {
+export interface ExhaustionValues {
     /**
      * Amount of exhaustion applied when attacking
      * @default 0.1
@@ -3381,7 +3786,7 @@ interface ExhaustionValues {
 /**
  * Defines the experience rewarded to players
  */
-interface ExperienceReward {
+export interface ExperienceReward {
     /**
      * The amount of experience rewarded to the player when the entity is bred
      * @default "0"
@@ -3397,7 +3802,7 @@ interface ExperienceReward {
 /**
  * Defines how the entity explodes
  */
-interface Explode {
+export interface Explode {
     /**
      * If true, the explosion will affect blocks and entities underwater
      * @default false
@@ -3479,7 +3884,7 @@ interface Explode {
 /**
  * Defines how the entity flocks in groups in water
  */
-interface Flocking {
+export interface Flocking {
     /**
      * The amount of blocks away the entity will look at to push away from
      * @default 0
@@ -3575,7 +3980,7 @@ interface Flocking {
 /**
  * Allows an entity to emit move, swim, and flap game events depending on the block the entity is moving through. It by default exists on all entities and can be overriden
  */
-interface GameEventMovementTracking {
+export interface GameEventMovementTracking {
     /**
      * If true, the `flap` game event will be emitted when the entity moves through the air
      * @default false
@@ -3596,7 +4001,7 @@ interface GameEventMovementTracking {
 /**
  * Defines the way the entity's genes and alleles are passed on to the offspring
  */
-interface Genetics {
+export interface Genetics {
     /**
      * The list of genes this entity has and will cross with a partner during breeding
      */
@@ -3665,7 +4070,7 @@ interface Genetics {
 /**
  * Defines sets of items that can be used to trigger events when used on this entity. The item will be taken and added to the entity's inventory
  */
-interface Giveable {
+export interface Giveable {
     /**
      * An optional cooldown in seconds to prevent spamming interactions
      * @default 0
@@ -3684,7 +4089,7 @@ interface Giveable {
 /**
  * Keeps track of entity group size in the given radius
  */
-interface GroupSize {
+export interface GroupSize {
     /**
      * The list of conditions that must be satisfied for othe entities to be counted towards group size
      */
@@ -3699,7 +4104,7 @@ interface GroupSize {
 /**
  * Defines how the entity can grow crops when walking over them
  */
-interface GrowsCrop {
+export interface GrowsCrop {
     /**
      * Value between 0-1 defining change of success per tick
      * @default 0
@@ -3715,7 +4120,7 @@ interface GrowsCrop {
 /**
  * Defines the interactions with this entity for healig it
  */
-interface Healable {
+export interface Healable {
     /**
      * The filter group that defines the conditions for using this item to heal the entity
      */
@@ -3744,7 +4149,7 @@ interface Healable {
 /**
  * Defines the entity's heartbeat
  */
-interface Heartbeat {
+export interface Heartbeat {
     /**
      * A Molang expression defining the inter-beat interval in seconds
      * @default "1.0"
@@ -3760,7 +4165,7 @@ interface Heartbeat {
 /**
  * Saves a home position when the entity is spawned
  */
-interface Home {
+export interface Home {
     /**
      * Optional list of blocks that can be considered a valid home
      */
@@ -3783,7 +4188,7 @@ interface Home {
 /**
  * Defines a set of conditions under which an entity should take damage
  */
-interface HurtOnCondition {
+export interface HurtOnCondition {
     /**
      * The list of conditions that must be met for the entity to take damage
      */
@@ -3807,7 +4212,7 @@ interface HurtOnCondition {
  * Verifies whether the entity is inside any of the listed blocks
  * TODO: Find out what this component is for, what is being notified?
  */
-interface InsideBlockNotifier {
+export interface InsideBlockNotifier {
     /**
      * List of blocks monitored to see if the entity is inside
      */
@@ -3817,7 +4222,7 @@ interface InsideBlockNotifier {
 /**
  * Adds a timer since last rested to see if phantoms should spawn
  */
-interface Insomnia {
+export interface Insomnia {
     /**
      * Number of days the mob has to stay up for the insomnia effect to begin
      * @default 3.0
@@ -3828,7 +4233,7 @@ interface Insomnia {
 /**
  * Despawns the entity immediately
  */
-interface InstantDespawn {
+export interface InstantDespawn {
     /**
      * If true, linked entities (i.e. leashed) will also be despawned
      * @default false
@@ -3839,7 +4244,7 @@ interface InstantDespawn {
 /**
  * Defines interactions with this entity
  */
-interface Interact {
+export interface Interact {
     /**
      * Loot tables with items to add to the player's inventory upon successful interaction
      */
@@ -3956,7 +4361,7 @@ interface Interact {
 /**
  * Defines this entity's inventory properties
  */
-interface Inventory {
+export interface Inventory {
     /**
      * Number of slots that this entity can gain per extra strength
      * @default 0
@@ -3991,17 +4396,17 @@ interface Inventory {
 /**
  * Defines that this entity is an item hopper
  */
-interface ItemHopper {}
+export interface ItemHopper {}
 
 /**
  * Defines a dynamic jump type based on the entity's movement speed
  */
-interface JumpDynamic {}
+export interface JumpDynamic {}
 
 /**
  * Defines the entity's ability to jump
  */
-interface JumpStatic {
+export interface JumpStatic {
     /**
      * The initial vertical velocity for the jump
      * @default 0.42
@@ -4012,7 +4417,7 @@ interface JumpStatic {
 /**
  * Defines this entity's leashing properties
  */
-interface Leashable {
+export interface Leashable {
     /**
      * If true, players can leash this entity even if already leashed to another mob
      * @default false
@@ -4046,7 +4451,7 @@ interface Leashable {
 /**
  * Defines the behavior when the entity is looked at
  */
-interface LookedAt {
+export interface LookedAt {
     /**
      * The FOV in degrees that the entity can be looked at
      * @default 26
@@ -4112,12 +4517,12 @@ interface LookedAt {
 /**
  * Defines that the entity should use wandering trader behavior
  */
-interface ManagedWanderingTrader {}
+export interface ManagedWanderingTrader {}
 
 /**
  * Defines how mob effects might be applied to nearby entities
  */
-interface MobEffect {
+export interface MobEffect {
     /**
      * Time in seconds between effect applications
      * @default 0.0
@@ -4146,14 +4551,14 @@ interface MobEffect {
 /**
  * Defines the entity's mob effect immunities
  */
-interface MobEffectImmunity {
+export interface MobEffectImmunity {
     /**
      * List of mob effects that the entity is immune to
      */
     mob_effects: MobEffects[];
 }
 
-interface SharedMovement {
+export interface SharedMovement {
     /**
      * The maximum number in degrees the entity can turn per tick
      * @default 30.0
@@ -4164,42 +4569,47 @@ interface SharedMovement {
 /**
  * Allows the entity to swim in water and on land
  */
-interface MovementAmphibious extends SharedMovement {}
+export interface MovementAmphibious extends SharedMovement {}
 
 /**
  * Accentsthe movement of an entity
  */
-interface MovementBasic extends SharedMovement {}
+export interface MovementBasic extends SharedMovement {}
 
 /**
  * Allows the entity to fly
  */
-interface MovementFly extends SharedMovement {}
+export interface MovementFly extends SharedMovement {}
 
 /**
  * Allows the entity to fly, swim, climb, etc.
  */
-interface MovementGeneric extends SharedMovement {}
+export interface MovementGeneric extends SharedMovement {}
 
 /**
  * Allows the entity to hover
  */
-interface MovementHover extends SharedMovement {}
+export interface MovementHover extends SharedMovement {}
 
 /**
  * Allows the entity to hop as it moves (i.e. Slimes)
  */
-interface MovementJump extends SharedMovement {}
+export interface MovementJump extends SharedMovement {}
+
+/**
+ * UNDOCUMENTED
+ */
+export interface MovementSkip extends SharedMovement {}
 
 /**
  * Allows the entity to sway side to side giving the impression of swimming
  */
-interface MovementSway extends SharedMovement {}
+export interface MovementSway extends SharedMovement {}
 
 /**
  * Allows the entity to be named
  */
-interface Nameable {
+export interface Nameable {
     /**
      * If true, the entity can be renamed with a name tag
      * @default true
@@ -4229,7 +4639,7 @@ interface Nameable {
     }
 }
 
-interface SharedNavigation {
+export interface SharedNavigation {
     /**
      * Tells the pathfinder to avoid blocks that cause damage
      * @default false
@@ -4329,47 +4739,66 @@ interface SharedNavigation {
 /**
  * Allows this entity to generate paths that include vertical walls like a Spider
  */
-interface NavigationClimb extends SharedNavigation {}
+export interface NavigationClimb extends SharedNavigation {}
 
 /**
  * Allows this entity to generate paths while floating through the air like a Ghast
  */
-interface NavigationFloat extends SharedNavigation {}
+export interface NavigationFloat extends SharedNavigation {}
 
 /**
  * Allows this entity to generate paths while floating through the air like a Parrot
  */
-interface NavigationFly extends SharedNavigation {}
+export interface NavigationFly extends SharedNavigation {}
 
 /**
  * Allows this entity to generate paths by walking, swimming, flying, climbing, and jumping
  */
-interface NavigationGeneric extends SharedNavigation {}
+export interface NavigationGeneric extends SharedNavigation {}
 
 /**
  * Allows this entity to generate paths while in the air like a Bee
  */
-interface NavigationHover extends SharedNavigation {}
+export interface NavigationHover extends SharedNavigation {}
 
 /**
  * Allows this entity to generate paths in water
  */
-interface NavigationSwim extends SharedNavigation {}
+export interface NavigationSwim extends SharedNavigation {}
 
 /**
  * Allows this entity to generate paths by walking around
  */
-interface NavigationWalk extends SharedNavigation {}
+export interface NavigationWalk extends SharedNavigation {}
+
+/**
+ * Allows the entity to be interacted with as an NPC with a dialogue window
+ */
+export interface NPC {
+    npc_data: {
+        portait_offsets: {
+            translate: [number, number, number];
+            scale: [number, number, number];
+        };
+        picker_offsets: {
+            translate: [number, number, number];
+            scale: [number, number, number];
+        };
+        skin_list: {
+            variant: number;
+        }[];
+    };
+}
 
 /**
  * Defines the entity's "out of control" state
  */
-interface OutOfControl {}
+export interface OutOfControl {}
 
 /**
  * Defines the entity's peek behavior
  */
-interface Peek {
+export interface Peek {
     /**
      * Event to call when the entity is done peeking
      */
@@ -4387,12 +4816,12 @@ interface Peek {
 /**
  * Defines that an entity should be persistent in the game world
  */
-interface Persistent {}
+export interface Persistent {}
 
 /**
  * Defines physics properties of an entity
  */
-interface Physics {
+export interface Physics {
     /**
      * If true, the entity will collide with things
      * @default true
@@ -4413,7 +4842,7 @@ interface Physics {
 /**
  * Defines the cost information for the entity to walk on preferred blocks
  */
-interface PreferredPath {
+export interface PreferredPath {
     /**
      * The cost of non-preferred blocks
      * @default 0
@@ -4447,7 +4876,7 @@ interface PreferredPath {
 /**
  * Defines the entity as a fireable projectile
  */
-interface Projectile {
+export interface Projectile {
     /**
      * Determines the angel at which the projectile is fired
      * @default 0
@@ -4609,7 +5038,7 @@ interface Projectile {
 /**
  * Defines the entity's ability to be pushed
  */
-interface Pushable {
+export interface Pushable {
     /**
      * If true, this entity can be pushed by other entities
      * @default true
@@ -4625,7 +5054,7 @@ interface Pushable {
 /**
  * Attempts to trigger a raid at the entity's location
  */
-interface RaidTrigger {
+export interface RaidTrigger {
     /**
      * Event to fire when a raid is triggered on a village
      */
@@ -4635,7 +5064,7 @@ interface RaidTrigger {
 /**
  * Defines the entity's moveent on rails. An entity with this component is **only** allowed to move on rails
  */
-interface RailMovement {
+export interface RailMovement {
     /**
      * Maximum speed this entity will move when on rails
      * @default 0.4
@@ -4646,7 +5075,7 @@ interface RailMovement {
 /**
  * TODO: Find out what this component is for, assuming something to do with minecarts and sensor rails
  */
-interface RailSensor {
+export interface RailSensor {
     /**
      * If true, this entity will trigger its `on_deactivate` behavior
      * @default false
@@ -4684,9 +5113,27 @@ interface RailSensor {
 }
 
 /**
+ * Defines the Ravager's response to their melee attack being blocked
+ */
+export interface RavagerBlocked {
+    /**
+     * The strength with which blocking entities should be knocked back
+     * @default 3.0
+     */
+    knockback_strength: number;
+    /**
+     * A list of weighted responses to the block
+     */
+    reaction_choices: {
+        weight: number;
+        value: Trigger;
+    }[];
+}
+
+/**
  * [EXPERIMENTAL] Allows an entity to reflect projectiles
  */
-interface ReflectProjectiles {
+export interface ReflectProjectiles {
     /**
      * [EXPERIMENTAL] A Molang expression defining the angle in degreees to add to the projectile's y axis rotation
      * @default "0"
@@ -4716,7 +5163,7 @@ interface ReflectProjectiles {
 /**
  * Defines the entity's ability to be ridden
  */
-interface Rideable {
+export interface Rideable {
     /**
      * The seat index designating the driver
      * @default 0
@@ -4794,7 +5241,7 @@ interface Rideable {
 /**
  * Defines the entity's size interpolation based on the entity's age
  */
-interface ScaleByAge {
+export interface ScaleByAge {
     /**
      * Ending scale of the entity when it's fully grown
      * @default 1
@@ -4810,7 +5257,7 @@ interface ScaleByAge {
 /**
  * Fires of events at scheduled times
  */
-interface Scheduler {
+export interface Scheduler {
     /**
      * UNKNOWN
      */
@@ -4828,7 +5275,7 @@ interface Scheduler {
 /**
  * Defines a list of items the mob wants to share or pick up
  */
-interface Shareables {
+export interface Shareables {
     /**
      * If true, all items not specified in `items` will also be shareable, but with lower priority than those in `items`
      * @default false
@@ -4912,7 +5359,7 @@ interface Shareables {
 /**
  * Defines the entity's abiltity to shoot projectiles. Required by the {@link BehaviorRangedAttack} component
  */
-interface Shooter {
+export interface Shooter {
     /**
      * ID of the Potion effect for the default projectile to be applied on hit
      * @default -1
@@ -4946,7 +5393,7 @@ interface Shooter {
 /**
  * Defines the entity's "sit" state
  */
-interface Sittable {
+export interface Sittable {
     /**
      * Event to fire when the entity enters the "sit" state
      */
@@ -4960,7 +5407,7 @@ interface Sittable {
 /**
  * Defines the ability for the entity to spawn another entity or item on a timer
  */
-interface SpawnEntity {
+export interface SpawnEntity {
     /**
      * Filters determining of the entity can perform a spawn
      */
@@ -5023,12 +5470,12 @@ interface SpawnEntity {
 /**
  * Allows the entity to remember suspicious locations
  */
-interface SuspectTracking {}
+export interface SuspectTracking {}
 
 /**
  * Defines the entity's ability to be tamed
  */
-interface Tameable {
+export interface Tameable {
     /**
      * The chance of taming the entity with each item use, 0.0 is 0% and 1.0 is 100%
      * @default 1.0
@@ -5047,7 +5494,7 @@ interface Tameable {
 /**
  * Allows the entity to be tamed by mounting it
  */
-interface TameMount {
+export interface TameMount {
     /**
      * The amount the entity's temper will be modified by when a player attempts to tame it
      * @default 5
@@ -5103,7 +5550,7 @@ interface TameMount {
 /**
  * Defines the entity's range within which it can sense other entities to target
  */
-interface TargetNearbySensor {
+export interface TargetNearbySensor {
     /**
      * Max distance in blocks that another entity will be considered `inside` the range
      * @default 1
@@ -5136,7 +5583,7 @@ interface TargetNearbySensor {
 /**
  * Defines an entity's teleporting behavior
  */
-interface Teleport {
+export interface Teleport {
     /**
      * The percentage chance that the entity will teleport while in darkness
      * @default 0.01
@@ -5182,7 +5629,7 @@ interface Teleport {
 /**
  * Defines if the entity ticks the world around it
  */
-interface TickWorld {
+export interface TickWorld {
     /**
      * The distance at whih the closest player has to be before this entity dispawns, ignored if `never_despawn` is true. Minimum is 128
      * @default 128
@@ -5204,7 +5651,7 @@ interface TickWorld {
 /**
  * Defines a timer which fires an event after counting down
  */
-interface Timer {
+export interface Timer {
     /**
      * If true, the timer will restart every time it fires
      * @default true
@@ -5234,7 +5681,7 @@ interface Timer {
 /**
  * Defines the entity's ability to trade with players
  */
-interface TradeTable {
+export interface TradeTable {
     /**
      * If true, the trades are converted when the entity transforms into one that has an {@link EconomyTradeTable} component
      * @default false
@@ -5263,7 +5710,7 @@ interface TradeTable {
 /**
  * Causes an entity to leave a trail of blocks as it moves around the world
  */
-interface Trail {
+export interface Trail {
     /**
      * The type of block left by the entity as a trail. Solid blocks may not be spawned at an offset of `[0,0,0]`
      * @default "minecraft:air"
@@ -5283,7 +5730,7 @@ interface Trail {
 /**
  * Defines an entity's transformation into another
  */
-interface Transformation {
+export interface Transformation {
     /**
      * List of component groups to add to the entity after transform
      */
@@ -5379,12 +5826,12 @@ interface Transformation {
 /**
  * Defines that the entity will not be saved, despawning when unloaded
  */
-interface Transient {}
+export interface Transient {}
 
 /**
  * Defines the entity's ability to trust players
  */
-interface Trusting {
+export interface Trusting {
     /**
      * The chance of the entity trusting with each item use, 0.0 is 0% and 1.0 is 100%
      * @default 1.0
@@ -5403,7 +5850,7 @@ interface Trusting {
 /**
  * Entities with this component wil have a max auto step height depending on if the block they stand on prevents jumping
  */
-interface VariableMaxAutoStep {
+export interface VariableMaxAutoStep {
     /**
      * The max auto step height when on any block that does not prevent jumping
      * @default 0.5625
@@ -5424,12 +5871,17 @@ interface VariableMaxAutoStep {
 /**
  * Vibrations emitted by the entity will be ignored
  */
-interface VibrationDamper {}
+export interface VibrationDamper {}
+
+/**
+ * Vibrations will be detected by the entity
+ */
+export interface VibrationListener {}
 
 /**
  * Defines water movement properties for the entity
  */
-interface WaterMovement {
+export interface WaterMovement {
     /**
      * Drag factor to determine movement speed when in water
      * @default 0.8
@@ -5444,7 +5896,7 @@ interface WaterMovement {
 /**
  * Defines the entity's ambient sound and its intervals
  */
-interface AmbientSoundInterval {
+export interface AmbientSoundInterval {
     /**
      * Random max time in seconds between ambient sound events
      * @default 16.0
@@ -5478,32 +5930,32 @@ interface AmbientSoundInterval {
 /**
  * When set, the entity will no longer visually rotate their body to match their facing direction
  */
-interface BodyRotationBlocked {}
+export interface BodyRotationBlocked {}
 
 /**
  * Allows this entity to climb ladders
  */
-interface CanClimb {}
+export interface CanClimb {}
 
 /**
  * Marks the entity as being able to fly for the pathfinder
  */
-interface CanFly {}
+export interface CanFly {}
 
 /**
  * Allows the entity to power jump like Horses
  */
-interface CanPowerJump {}
+export interface CanPowerJump {}
 
 /**
  * When set, blocks entities from attacking the owner unless they have the {@link IgnoreCannotBeAttacked} component
  */
-interface CannotBeAttacked {}
+export interface CannotBeAttacked {}
 
 /**
  * Defines the entity's color. Requires specific materials on the client entity
  */
-interface Color {
+export interface Color {
     /**
      * The palette color index
      * @default 0
@@ -5514,7 +5966,7 @@ interface Color {
 /**
  * Defines the entity's secondary color. Only works with `runtime_identifier: "tropicalfish"`
  */
-interface Color2 {
+export interface Color2 {
     /**
      * The palette color index
      * @default 0
@@ -5525,7 +5977,7 @@ interface Color2 {
 /**
  * Sets the entity's default head rotation angle
  */
-interface DefaultLookAngle {
+export interface DefaultLookAngle {
     /**
      * Angle, in degrees
      * @default 0
@@ -5536,7 +5988,7 @@ interface DefaultLookAngle {
 /**
  * Sets the equipment table to use for the entity
  */
-interface Equipment {
+export interface Equipment {
     /**
      * A list of slots with the chance to drop an equipped item from that slot
      */
@@ -5550,17 +6002,17 @@ interface Equipment {
 /**
  * Marks the entity as not being able to set on fire or taking fire damage
  */
-interface FireImmune {}
+export interface FireImmune {}
 
 /**
  * Sets that this entity can float in liquid blocks
  */
-interface FloatsInLiquid {}
+export interface FloatsInLiquid {}
 
 /**
  * Speed in blocks the mob flies at
  */
-interface FlyingSpeed {
+export interface FlyingSpeed {
     /**
      * Speed in blocks per tick
      * @default 0.02
@@ -5571,7 +6023,7 @@ interface FlyingSpeed {
 /**
  * Defines how much friction affects this entity
  */
-interface FrictionModifier {
+export interface FrictionModifier {
     /**
      * The amount of friction to apply to the entity
      * @default 1.0
@@ -5582,7 +6034,7 @@ interface FrictionModifier {
 /**
  * Sets the offset from the ground that the entity is actually at
  */
-interface GroundOffset {
+export interface GroundOffset {
     /**
      * The value of the entity's offset from the ground, in blocks
      * @default 0
@@ -5593,7 +6045,7 @@ interface GroundOffset {
 /**
  * Defines exceptions to the {@link CannotBeAttacked} component
  */
-interface IgnoreCannotBeAttacked {
+export interface IgnoreCannotBeAttacked {
     /**
      * Defines which entities are exceptions and are allowed to be attacked by the owner entity, potentially attacked entity is `subject: "other"`
      */
@@ -5603,27 +6055,27 @@ interface IgnoreCannotBeAttacked {
 /**
  * Allows the entity to be controlled by the rider's input if the have the {@link Rideable} component
  */
-interface InputGroundControlled {}
+export interface InputGroundControlled {}
 
 /**
  * Defines the entity as a baby
  */
-interface IsBaby {}
+export interface IsBaby {}
 
 /**
  * Defines the entity as charged
  */
-interface IsCharged {}
+export interface IsCharged {}
 
 /**
  * Defines the entity as carrying a chest
  */
-interface IsChested {}
+export interface IsChested {}
 
 /**
  * Defines the entity as able to change color with dyes
  */
-interface IsDyeable {
+export interface IsDyeable {
     /**
      * The text displayed when interacting with Touch controls
      */
@@ -5633,57 +6085,57 @@ interface IsDyeable {
 /**
  * Defines the entity as can hide from hostile mobs while invisible
  */
-interface IsHiddenWhenInvisible {}
+export interface IsHiddenWhenInvisible {}
 
 /**
  * Defines the entity as currently on fire
  */
-interface IsIgnited {}
+export interface IsIgnited {}
 
 /**
  * Defines the entity as an Illager Captain
  */
-interface IsIllagerCaptain {}
+export interface IsIllagerCaptain {}
 
 /**
  * Defines the entity as pregnant
  */
-interface IsPregnant {}
+export interface IsPregnant {}
 
 /**
  * Defines the entity as wearing a saddle
  */
-interface IsSaddled {}
+export interface IsSaddled {}
 
 /**
  * Defines the entity as currently shaking
  */
-interface IsShaking {}
+export interface IsShaking {}
 
 /**
  * Defines the entity as sheared
  */
-interface IsSheared {}
+export interface IsSheared {}
 
 /**
  * Defines the entity as stackable
  */
-interface IsStackable {}
+export interface IsStackable {}
 
 /**
  * Defines the entity as stunned
  */
-interface IsStunned {}
+export interface IsStunned {}
 
 /**
  * Defines the entity as tamed
  */
-interface IsTamed {}
+export interface IsTamed {}
 
 /**
  * Defines what items can be used to control this entity while ridden
  */
-interface ItemControllable {
+export interface ItemControllable {
     /**
      * The list of items that can be used to control the entity
      */
@@ -5693,7 +6145,7 @@ interface ItemControllable {
 /**
  * Defines the entity's loot table dropped on death
  */
-interface Loot {
+export interface Loot {
     /**
      * The file path to the loot table, relative to the behavior pack root
      */
@@ -5703,7 +6155,7 @@ interface Loot {
 /**
  * Defines the entity's auxiliary variant
  */
-interface MarkVariant {
+export interface MarkVariant {
     /**
      * The value of the entity's mark variant
      * @default 0
@@ -5714,7 +6166,7 @@ interface MarkVariant {
 /**
  * Defines the offset used to determine the next step distance to play a movement sound
  */
-interface MovementSoundDistanceOffset {
+export interface MovementSoundDistanceOffset {
     /**
      * The higher the number, the less often the sound will play
      * @default 1.0
@@ -5725,7 +6177,7 @@ interface MovementSoundDistanceOffset {
 /**
  * Defines the distance through which the entity can push through
  */
-interface PushTrough {
+export interface PushThrough {
     /**
      * Value of the entity's push-through, in blocks
      * @default 0
@@ -5736,12 +6188,12 @@ interface PushTrough {
 /**
  * Defines the entity as rendering even when invisible, allowing it to be handled by the client entity
  */
-interface RendersWhenInvisible {}
+export interface RendersWhenInvisible {}
 
 /**
  * Defines the entity's scale, both for rendering and hitbox
  */
-interface Scale {
+export interface Scale {
     /**
      * The scale of the entity
      * @default 1.0
@@ -5752,7 +6204,7 @@ interface Scale {
 /**
  * Defines the entity's skin id
  */
-interface SkinID {
+export interface SkinID {
     /**
      * The value of the entity's skin id
      * @default 0
@@ -5763,7 +6215,7 @@ interface SkinID {
 /**
  * Defines the entity's base volume for sound effects
  */
-interface SoundVolume {
+export interface SoundVolume {
     /**
      * The value of the entity's sound volume
      * @default 1.0
@@ -5774,7 +6226,7 @@ interface SoundVolume {
 /**
  * Defines the families this entity belongs to
  */
-interface TypeFamily {
+export interface TypeFamily {
     /**
      * The family types of the entity
      */
@@ -5784,7 +6236,7 @@ interface TypeFamily {
 /**
  * Defines the entity's variant
  */
-interface Variant {
+export interface Variant {
     /**
      * The value of the entity's variant
      * @default 0
@@ -5795,7 +6247,7 @@ interface Variant {
 /**
  * Sets the speed multiplier for this entity's walk animation
  */
-interface WalkAnimationSpeed {
+export interface WalkAnimationSpeed {
     /**
      * The speed multiplier for the entity's walk animation
      * @default 1.0
@@ -5806,7 +6258,7 @@ interface WalkAnimationSpeed {
 /**
  * Defines the entity as wanting to become a jockey
  */
-interface WantsJocky {}
+export interface WantsJockey {}
 
 // #endregion
 
@@ -5815,51 +6267,51 @@ interface WantsJocky {}
 /**
  * Only usable by `minecraft:ender_dragon`. Adds a trigger to fire on the entity's death
  */
-interface OnDeath extends Trigger {}
+export interface OnDeath extends Trigger {}
 
 /**
  * Adds a trigger that will fire when a nearby entity of the same type becomes angry
  */
-interface OnFriendlyAnger extends Trigger {}
+export interface OnFriendlyAnger extends Trigger {}
 
 /**
  * Adds a trigger that will fire when the entity takes damage
  */
-interface OnHurt extends Trigger {}
+export interface OnHurt extends Trigger {}
 
 /**
  * Adds a trigger that will fire when the entity is attacked by a player
  */
-interface OnHurtByPlayer extends Trigger {}
+export interface OnHurtByPlayer extends Trigger {}
 
 /**
  * Adds a trigger that will fire when the entity is set on fire
  */
-interface OnIgnite extends Trigger {}
+export interface OnIgnite extends Trigger {}
 
 /**
  * Only usable by `minecraft:ender_dragon`. Adds a trigger to fire when the entity lands
  */
-interface OnStartLanding extends Trigger {}
+export interface OnStartLanding extends Trigger {}
 
 /**
  * Only usable by `minecraft:ender_dragon`. Adds a trigger to fire when the entity starts flying
  */
-interface OnStartTakeoff extends Trigger {}
+export interface OnStartTakeoff extends Trigger {}
 
 /**
  * Adds a trigger that will fire when the entity finds a target
  */
-interface OnTargetAcquired extends Trigger {}
+export interface OnTargetAcquired extends Trigger {}
 
 /**
  * Adds a trigger that will fire when the entity loses its target
  */
-interface OnTargetEscape extends Trigger {}
+export interface OnTargetEscape extends Trigger {}
 
 /**
  * Adds a trigger that will fire when this pet's owner wakes after sleeping with the pet
  */
-interface OnWakeWithOwner extends Trigger {}
+export interface OnWakeWithOwner extends Trigger {}
 
 // #endregion
