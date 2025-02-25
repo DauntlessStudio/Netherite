@@ -2014,6 +2014,195 @@ interface BehaviorSummonEntity {
     }[];
 }
 
+/**
+ * Can cause the entity to swell when a player is nearby. Can only be used by `minecraft:creeper`
+ */
+interface BehaviorSwell {
+    start_distance: number;
+    stop_distance: number;
+}
+
+/**
+ * Can cause the entity to go idle while swimming
+ */
+interface BehaviorSwimIdle {
+    idle: number;
+    success_rate: number;
+}
+
+/**
+ * Can cause the entity to move to the surface when out of breath. Requires {@link Breathable}
+ */
+interface BehaviorSwimUpForBreath {
+    material_type: "any"|"water"|"lava";
+    search_height: number;
+    search_radius: number;
+    speed_mod: number;
+}
+
+/**
+ * Can cause the entity to wander while swimming
+ */
+interface BehaviorSwimWander {
+    interval: number;
+    look_ahead: number;
+    speed_multiplier: number;
+    wander_time: number;
+}
+
+/**
+ * Can cause the entity to follow another swimming entity
+ */
+interface BehaviorSwimWithEntity {
+    catch_up_multiplier: number;
+    catch_up_threshold: number;
+    chance_to_stop: number;
+    entity_types: EntityType[];
+    match_direction_threshold: number;
+    search_range: number;
+    speed_multiplier: number;
+    state_check_interval: number;
+    stop_distance: number;
+    success_rate: number;
+}
+
+/**
+ * Can cause the entity to perform a swoop attack
+ */
+interface BehaviorSwoopAttack {
+    damage_reach: number;
+    delay_range: [number, number];
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to accept flowers from another mob with the {@link BehaviorOfferFlower}
+ */
+interface BehaviorTakeFlower {
+    filters: ServerFilters|ServerFilters[];
+    max_head_rotation_y: number;
+    max_rotation_x: number;
+    max_wait_time: number;
+    min_distance_to_target: number;
+    min_wait_time: number;
+    search_area: [number, number, number];
+    speed_multiplier: number;
+}
+
+/**
+ * Can cause the entity to teleport to its owner
+ */
+interface BehaviorTeleportToOwner {
+    cooldown: number;
+    filters: ServerFilters|ServerFilters[];
+}
+
+/**
+ * Can cause the entity to be tempted by certain items
+ */
+interface BehaviorTempt {
+    can_get_scared: boolean;
+    can_tempt_vertically: boolean;
+    can_tempt_while_ridden: boolean;
+    items: string[];
+    sound_interval: [number, number];
+    speed_multiplier: number;
+    tempt_sound: string;
+    within_radius: number;
+}
+
+/**
+ * Timer based event
+ */
+interface SharedBehaviorTimer {
+    cooldown_range: [number, number];
+    duration_range: [number, number];
+    on_end: Trigger;
+    on_start: Trigger;
+}
+
+interface BehaviorTimerFlag1 extends SharedBehaviorTimer {}
+
+interface BehaviorTimerFlag2 extends SharedBehaviorTimer {}
+
+interface BehaviorTimerFlag3 extends SharedBehaviorTimer {}
+
+/**
+ * Can cause the entity to look at a player holding a tradeable item
+ */
+interface BehaviorTradeInterest {
+    carried_item_switch_time: number;
+    cooldown: number;
+    interest_time: number;
+    remove_item_time: number;
+    within_radius: number;
+}
+
+/**
+ * Can cause the entity to trade with a player
+ */
+interface BehaviorTradeWithPlayer {
+    filters: ServerFilters|ServerFilters[];
+    max_distance_from_player: number;
+}
+
+/**
+ * Can cause the entity to target the same entity its owner is targeting
+ */
+interface BehaviorVexCopyOwnerTarget {
+    entity_types: EntityType[];
+}
+
+/**
+ * Can cause the entity to move around randomly like a Vex
+ */
+interface BehaviorVexRandomMove {}
+
+/**
+ * Can cause the entity to launch random attacks. Only used by `minecraft:wither`
+ */
+interface BehaviorWitherRandomAttackPosGoal {}
+
+/**
+ * Can cause the entity to focus its attack on the entity that's done the most damage to it. Only used by `minecraft:wither`
+ */
+interface BehaviorWitherTargetHighestDamage {
+    entity_types: EntityType[];
+}
+
+/**
+ * Can cause the entity to work at a POI
+ */
+interface BehaviorWork {
+    active_time: number;
+    can_work_in_rain: boolean;
+    goal_cooldown: number;
+    on_arrival: Trigger;
+    sound_delay_max: number;
+    sound_delay_min: number;
+    speed_multiplier: number;
+    work_in_rain_tolerance: number;
+}
+
+/**
+ * Can cause the entity use a Composter POI to convert seeds into bone meal
+ */
+interface BehaviorWorkComposter {
+    active_time: number;
+    block_interaction_max: number;
+    can_empty_composter: boolean;
+    can_fill_composter: boolean;
+    can_work_in_rain: boolean;
+    goal_cooldown: number;
+    items_per_use_max: number;
+    min_item_count: number;
+    on_arrival: Trigger;
+    speed_multiplier: number;
+    use_block_max: number;
+    use_block_min: number;
+    work_in_rain_tolerance: number;
+}
+
 // #endregion
 
 // #region Components
