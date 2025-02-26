@@ -1,8 +1,8 @@
 import * as path from "jsr:@std/path";
 import { Config, Language, Manifest, Module, Script } from "../../core/classes/index.ts";
-import { buildStaticFiles } from "../../core/static_builder.ts";
 import { Command, type CommandData } from "../command.ts";
 import { emptyDirectorySync } from "../../core/utils/index.ts";
+import { Static } from "../../core/classes/static.ts";
 
 interface BuildCommandData extends CommandData {
     options: {
@@ -38,7 +38,7 @@ export default new Command<BuildCommandData>({
         emptyDirectorySync(path.join(Deno.cwd(), Config.Paths.bp.root));
         emptyDirectorySync(path.join(Deno.cwd(), Config.Paths.rp.root));
         // Copy static src files to dist
-        buildStaticFiles(_args.options.watch);
+        Static.build(_args.options.watch);
         // Build dynamic src files
         await Module.build(_args.options.watch);
         Language.outputLangFiles();

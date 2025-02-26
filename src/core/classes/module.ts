@@ -6,6 +6,8 @@ export interface ModuleWriteable {
     generate(): {outputPath: string, content: Uint8Array};
 }
 
+type ModuleSubdirectory = "bp"|"rp"|"root";
+
 export class Module {
     private static queue: ModuleWriteable[] = [];
     private static moduleDir: string = path.join(Deno.cwd(), "src/modules");
@@ -42,6 +44,19 @@ export class Module {
         }
 
         await iterator(this.moduleDir);
+    }
+
+    public static isInModuleDirectory(directory: string, subdirectory: ModuleSubdirectory): boolean {
+        const absoluteModuleDir = path.isAbsolute(this.moduleDir) ? this.moduleDir : path.resolve(Deno.cwd(), this.moduleDir);
+        const absoluteDirectory = path.isAbsolute(directory) ? directory : path.resolve(Deno.cwd(), directory);
+    
+        if (!absoluteDirectory.startsWith(absoluteModuleDir)) {
+            return false;
+        }
+    
+        const directorySegments = absoluteDirectory.replace(absoluteModuleDir, "").split(path.SEPARATOR_PATTERN).filter(Boolean);
+    
+        return RegExp(subdirectory, "i").test(directorySegments.at(1) ?? "") || absoluteDirectory === absoluteModuleDir;
     }
 
     private static async watch(): Promise<void> {
