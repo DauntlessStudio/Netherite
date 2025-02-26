@@ -1,7 +1,7 @@
 import * as path from "jsr:@std/path";
 import * as esbuild from "npm:esbuild";
 import {denoPlugins} from "jsr:@luca/esbuild-deno-loader";
-import { Config } from "./config.ts";
+import { Config } from "./classes/config.ts";
 
 export async function buildScripts(watch?: boolean): Promise<void> {
     try {

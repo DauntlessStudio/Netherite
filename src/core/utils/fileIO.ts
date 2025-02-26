@@ -1,5 +1,5 @@
 import * as path from "jsr:@std/path";
-import { Config } from "../config.ts";
+import { Config } from "../classes/config.ts";
 
 export function emptyDirectorySync(dir: string): void {
     for (const entry of Deno.readDirSync(dir)) {

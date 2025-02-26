@@ -1,5 +1,5 @@
 import * as path from "jsr:@std/path";
-import { Config } from "./config.ts";
+import { Config } from "./classes/config.ts";
 
 export function buildManifests(): void {
     if (Config.Options.projectType !== "skin-pack") {

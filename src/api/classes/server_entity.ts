@@ -1,5 +1,5 @@
 import { Language } from "../../core/classes/language.ts";
-import { Config } from "../../core/config.ts";
+import { Config } from "../../core/classes/config.ts";
 import { ModuleWriter, type ModuleWriteable } from "../../core/module_writer.ts";
 import { deepMerge } from "../../core/utils/object.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.d.ts";

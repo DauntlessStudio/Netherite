@@ -1,6 +1,6 @@
 import "jsr:@std/dotenv/load";
 import * as path from "jsr:@std/path";
-import { Config } from "./config.ts";
+import { Config } from "./classes/config.ts";
 
 export interface ProjectBuilderOptions {
     projectName: string;

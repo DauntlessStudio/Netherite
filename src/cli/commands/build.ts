@@ -1,5 +1,5 @@
 import * as path from "jsr:@std/path";
-import { Config } from "../../core/config.ts";
+import { Config } from "../../core/classes/config.ts";
 import { buildManifests } from "../../core/manifest_builder.ts";
 import { buildScripts } from "../../core/scripts_builder.ts";
 import { buildStaticFiles } from "../../core/static_builder.ts";

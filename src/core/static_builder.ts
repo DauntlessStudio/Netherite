@@ -1,5 +1,5 @@
 import * as path from "jsr:@std/path";
-import { Config } from "./config.ts";
+import { Config } from "./classes/config.ts";
 import { sendToDist } from "./utils/fileIO.ts";
 import { sleep } from "./utils/time.ts";
 import { Language } from "./classes/language.ts";
