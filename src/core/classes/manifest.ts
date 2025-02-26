@@ -1,6 +1,7 @@
 import * as path from "jsr:@std/path";
-import * as types from "../../api/types/index.d.ts";
+import type * as types from "../../api/types/index.d.ts";
 import { Config } from "./config.ts";
+import { writeTextToDist } from "../utils/fileIO.ts";
 
 export class Manifest {
     public static get BehaviorManifest() : Promise<types.Manifest> {
@@ -108,8 +109,8 @@ export class Manifest {
 
     public static async outputManifestFiles(): Promise<void> {
         if (Config.Options.projectType !== "skin-pack") {
-            Deno.writeTextFileSync(path.join(Config.Paths.bp.root, "manifest.json"), JSON.stringify(await this.BehaviorManifest, null, "\t"));
-            Deno.writeTextFileSync(path.join(Config.Paths.rp.root, "manifest.json"), JSON.stringify(await this.ResourceManifest, null, "\t"));
+            writeTextToDist(path.join(Config.Paths.bp.root, "manifest.json"), JSON.stringify(await this.BehaviorManifest, null, "\t"));
+            writeTextToDist(path.join(Config.Paths.rp.root, "manifest.json"), JSON.stringify(await this.ResourceManifest, null, "\t"));
         }
     }
 }

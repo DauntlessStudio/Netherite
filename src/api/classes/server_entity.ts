@@ -1,7 +1,5 @@
-import { Language } from "../../core/classes/language.ts";
-import { Config } from "../../core/classes/config.ts";
-import { ModuleWriter, type ModuleWriteable } from "../../core/module_writer.ts";
-import { deepMerge } from "../../core/utils/object.ts";
+import { Language, Config, Module, type ModuleWriteable } from "../../core/classes/index.ts";
+import { deepMerge } from "../../core/utils/index.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.d.ts";
 
 export class MinecraftServerEntity implements ModuleWriteable {
@@ -114,7 +112,7 @@ export class MinecraftServerEntity implements ModuleWriteable {
     
     constructor(entity: ServerEntityLoose) {
         this.entity = MinecraftServerEntity.validate(entity);
-        ModuleWriter.register(this);
+        Module.register(this);
     }
 
     public updateEntity(entity: ServerEntityLoose): MinecraftServerEntity {

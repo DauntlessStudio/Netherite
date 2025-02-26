@@ -3,10 +3,10 @@ import { Config } from "../../core/classes/config.ts";
 import { buildScripts } from "../../core/scripts_builder.ts";
 import { buildStaticFiles } from "../../core/static_builder.ts";
 import { Command, type CommandData } from "../command.ts";
-import { buildModules } from "../../core/modules_builder.ts";
 import { emptyDirectorySync } from "../../core/utils/fileIO.ts";
 import { Language } from "../../core/classes/language.ts";
 import { Manifest } from "../../core/classes/manifest.ts";
+import { Module } from "../../core/classes/module.ts";
 
 interface BuildCommandData extends CommandData {
     options: {
@@ -44,7 +44,7 @@ export default new Command<BuildCommandData>({
         // Copy static src files to dist
         buildStaticFiles(_args.options.watch);
         // Build dynamic src files
-        await buildModules(_args.options.watch);
+        await Module.build(_args.options.watch);
         Language.outputLangFiles();
         Manifest.outputManifestFiles();
         // Build scripts

@@ -30,6 +30,16 @@ export function sendToDist(src: string, dest: string, excludeGlob: string[] = []
     }
 }
 
+export function writeBufferToDist(dest: string, content: Uint8Array): void {
+    Deno.mkdirSync(path.dirname(dest), {recursive: true});
+
+    if (isTextFile(dest)) {
+        writeTextToDist(dest, new TextDecoder().decode(content));
+    } else {
+        Deno.writeFileSync(dest, content);
+    }
+}
+
 export function writeTextToDist(dest: string, content: string): void {
     Deno.mkdirSync(path.dirname(dest), {recursive: true});
     
