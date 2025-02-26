@@ -1,12 +1,12 @@
 import * as path from "jsr:@std/path";
 import { Config } from "../../core/classes/config.ts";
-import { buildManifests } from "../../core/manifest_builder.ts";
 import { buildScripts } from "../../core/scripts_builder.ts";
 import { buildStaticFiles } from "../../core/static_builder.ts";
 import { Command, type CommandData } from "../command.ts";
 import { buildModules } from "../../core/modules_builder.ts";
 import { emptyDirectorySync } from "../../core/utils/fileIO.ts";
 import { Language } from "../../core/classes/language.ts";
+import { Manifest } from "../../core/classes/manifest.ts";
 
 interface BuildCommandData extends CommandData {
     options: {
@@ -46,7 +46,7 @@ export default new Command<BuildCommandData>({
         // Build dynamic src files
         await buildModules(_args.options.watch);
         Language.outputLangFiles();
-        buildManifests();
+        Manifest.outputManifestFiles();
         // Build scripts
         buildScripts(_args.options.watch);
     },
