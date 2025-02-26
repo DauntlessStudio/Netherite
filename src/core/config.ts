@@ -5,6 +5,7 @@ import * as path from "jsr:@std/path";
 import type { ProjectBuilderOptions } from "./project_initializer.ts";
 import { Buffer } from "node:buffer";
 
+// TODO: Expand this to include a versions option for semantic versioning of the project
 export interface ConfigOptions extends ProjectBuilderOptions {
     uuid: string;
 }

@@ -10,6 +10,7 @@ export interface ProjectBuilderOptions {
     projectType: "world"|"add-on"|"skin-pack";
 };
 
+// TODO: Update this to generate an `en_US.lang` file for the project in both the BP and the RP that uses the dynamic string replacements for the output
 export async function initProject(options: ProjectBuilderOptions): Promise<void> {
     console.log(`Building project ${options.projectName}...`);
     

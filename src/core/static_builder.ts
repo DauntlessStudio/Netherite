@@ -2,19 +2,21 @@ import * as path from "jsr:@std/path";
 import { Config } from "./config.ts";
 import { sendToDist } from "./utils/fileIO.ts";
 import { sleep } from "./utils/time.ts";
+import { Language } from "./classes/language.ts";
 
 export async function buildStaticFiles(watch?: boolean): Promise<void> {
     // Handles BP Root Files
     const behaviorPackPath = path.join(Deno.cwd(), "src/behavior_pack");
     const behaviorPackDest = path.join(Deno.cwd(), Config.Paths.bp.root);
     Deno.mkdirSync(behaviorPackDest, {recursive: true});
-    sendToDist(behaviorPackPath, behaviorPackDest, ["*.ts", "manifest.json"]);
+    sendToDist(behaviorPackPath, behaviorPackDest, ["**/*.ts", "**/manifest.json"]);
 
     // Handles RP Root Files
     const resourcePackPath = path.join(Deno.cwd(), "src/resource_pack");
     const resourcePackDest = path.join(Deno.cwd(), Config.Paths.rp.root);
     Deno.mkdirSync(resourcePackDest, {recursive: true});
-    sendToDist(resourcePackPath, resourcePackDest, ["manifest.json"]);
+    Language.ingestLangFiles(path.join(resourcePackPath, "texts"));
+    sendToDist(resourcePackPath, resourcePackDest, ["**/.lang", "**/manifest.json"]);
 
     // Handles Module Files
     const modulePath = path.join(Deno.cwd(), "src/modules");
@@ -26,11 +28,12 @@ export async function buildStaticFiles(watch?: boolean): Promise<void> {
                 const subPath = path.join(modulePath, entry.name, subEntry.name);
 
                 if (subEntry.isDirectory && /.+([bp]|[BP])/.test(subPath)) {
-                    sendToDist(subPath, behaviorPackDest, ["*.ts", "manifest.json"]);
+                    sendToDist(subPath, behaviorPackDest, ["**/*.ts", "**/manifest.json"]);
                 }
                 
                 if (subEntry.isDirectory && /.+([rp]|[RP])/.test(subPath)) {
-                    sendToDist(subPath, resourcePackDest, ["manifest.json"]);
+                    Language.ingestLangFiles(path.join(subPath, "texts"));
+                    sendToDist(subPath, resourcePackDest, ["**/.lang", "**/manifest.json"]);
                 }
             }
         }

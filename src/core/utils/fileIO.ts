@@ -18,20 +18,26 @@ export function sendToDist(src: string, dest: string, excludeGlob: string[] = []
     if (stat.isDirectory) {
         Deno.mkdirSync(dest, {recursive: true});
         for (const entry of Deno.readDirSync(src)) {
-            sendToDist(path.join(src, entry.name), path.join(dest, entry.name));
+            sendToDist(path.join(src, entry.name), path.join(dest, entry.name), excludeGlob);
         }
     } else {
         if (isTextFile(src)) {
             const content = Deno.readTextFileSync(src);
-            const modifiedContent = content
-                .replace(/NAMESPACE/g, Config.Options.projectNamespace)
-                .replace(/FORMATVERSION/g, Config.Options.projectFormatVersion);
-                
-            Deno.writeTextFileSync(dest, modifiedContent);
+            writeTextToDist(dest, content);
         } else {
             Deno.copyFileSync(src, dest);
         }
     }
+}
+
+export function writeTextToDist(dest: string, content: string): void {
+    Deno.mkdirSync(path.dirname(dest), {recursive: true});
+    
+    const modifiedContent = content
+    .replace(/NAMESPACE/g, Config.Options.projectNamespace)
+    .replace(/FORMATVERSION/g, Config.Options.projectFormatVersion);
+    
+    Deno.writeTextFileSync(dest, modifiedContent);
 }
 
 export function isTextFile(filename: string): boolean {
