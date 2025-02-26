@@ -6,6 +6,7 @@ import { buildStaticFiles } from "../../core/static_builder.ts";
 import { Command, type CommandData } from "../command.ts";
 import { buildModules } from "../../core/modules_builder.ts";
 import { emptyDirectorySync } from "../../core/utils/fileIO.ts";
+import { Language } from "../../core/classes/language.ts";
 
 interface BuildCommandData extends CommandData {
     options: {
@@ -44,6 +45,7 @@ export default new Command<BuildCommandData>({
         buildStaticFiles(_args.options.watch);
         // Build dynamic src files
         await buildModules(_args.options.watch);
+        Language.outputLangFiles();
         buildManifests();
         // Build scripts
         buildScripts(_args.options.watch);

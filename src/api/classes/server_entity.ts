@@ -1,3 +1,4 @@
+import { Language } from "../../core/classes/language.ts";
 import { Config } from "../../core/config.ts";
 import { ModuleWriter, type ModuleWriteable } from "../../core/module_writer.ts";
 import { deepMerge } from "../../core/utils/object.ts";
@@ -122,6 +123,12 @@ export class MinecraftServerEntity implements ModuleWriteable {
     }
 
     generate(): { outputPath: string; content: Uint8Array; } {
+        Language.addPlaceholderEntry("entity names", `entity.${this.Identifier}.name`, this.Shortname);
+
+        if (this.entity["minecraft:entity"].description.is_spawnable) {
+            Language.addPlaceholderEntry("spawn eggs", `item.spawn_egg.entity.${this.Identifier}.spawn`, `Spawn ${this.Shortname}`);
+        }
+
         return {
             outputPath: `${Config.Paths.bp.root}entities/${this.Shortname}.json`,
             content: new TextEncoder().encode(JSON.stringify(this.entity, null, "\t"))
