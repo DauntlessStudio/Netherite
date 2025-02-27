@@ -12,6 +12,12 @@ export class Static {
 
     private static readonly pendingChanges: Map<string, boolean> = new Map();
 
+    private static readonly specialFiles: Map<string, (file: string) => void> = new Map([
+        ["**/*.lang", Language.watch.bind(Language)],
+        ["**/sound/sound_definitions.json", Sound.watch.bind(Sound)],
+        ["**/textures/*.json", Texture.watch.bind(Texture)],
+    ]);
+
     public static build(watch?: boolean) {
         Language.ingestLangFiles(path.join(this.resourcePath, "texts"));
         Sound.ingestSoundFiles(path.join(this.resourcePath, "sounds"));
@@ -83,6 +89,15 @@ export class Static {
 
             if (src.endsWith(".ts") || !this.canWrite(src)) return;
 
+            console.log("[%s] %s", event.kind, event.paths[0]);
+
+            for (const [file, callback] of this.specialFiles.entries()) {
+                if (path.globToRegExp(file).test(src)) {
+                    callback(src);
+                    return;
+                }
+            }
+
             const dest = this.getDistFromPath(src);
 
             switch (event.kind) {
@@ -107,8 +122,6 @@ export class Static {
                 default:
                     break;
             }
-
-            console.log("[%s] %s", event.kind, event.paths[0]);
         };
 
         const watcher = Deno.watchFs(path.join(Deno.cwd(), "src"), {recursive: true});

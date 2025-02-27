@@ -40,4 +40,16 @@ export class Texture {
         writeTextToDist(path.join(path.join(Config.Paths.rp.root, "textures"), "terrain_texture.json"), JSON.stringify(this.terrainTexture, null, "\t"));
         writeTextToDist(path.join(path.join(Config.Paths.rp.root, "textures"), "item_texture.json"), JSON.stringify(this.itemTexture, null, "\t"));
     }
+
+    public static watch(filePath: string): void {
+        if (filePath.endsWith("terrain_texture.json")) {
+            const fileContent: ClientTerrainTexture = JSON.parse(Deno.readTextFileSync(filePath));
+            this.terrainTexture = deepMerge(this.terrainTexture, fileContent);
+        } else if (filePath.endsWith("item_texture.json")) {
+            const fileContent: ClientItemTexture = JSON.parse(Deno.readTextFileSync(filePath));
+            this.itemTexture = deepMerge(this.itemTexture, fileContent);
+        }
+
+        this.build();
+    }
 }

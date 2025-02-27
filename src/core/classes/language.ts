@@ -46,24 +46,28 @@ export class Language {
         }
 
         for (const entry of Deno.readDirSync(dirPath)) {
-            if (!entry.name.endsWith(".lang")) continue;
+            this.ingestFile(path.join(dirPath, entry.name));
+        }
+    }
 
-            const langKey = entry.name.replace(".lang", "") as LangType;
+    private static ingestFile(filePath: string): void {
+        if (!filePath.endsWith(".lang")) return;
 
-            const fileContent = Deno.readTextFileSync(path.join(dirPath, entry.name));
-    
-            const categoryGroups = fileContent.split(/(?=(#+ .+ =+))/g);
-    
-            for (const category of categoryGroups) {
-                const lines = category.split("\n").map(line => line.trim()).filter(line => line.length > 0);
-                if (lines.length === 0) continue;
+        const langKey = path.basename(filePath).replace(".lang", "") as LangType;
 
-                const categoryName = lines.shift()!.replace(/#+ | =+/g, "").toLowerCase().trim();
-    
-                for (const line of lines) {
-                    const [key, value] = line.split("=");
-                    this.addLangEntry(langKey, categoryName, key, value);
-                }
+        const fileContent = Deno.readTextFileSync(filePath);
+
+        const categoryGroups = fileContent.split(/(?=(#+ .+ =+))/g);
+
+        for (const category of categoryGroups) {
+            const lines = category.split("\n").map(line => line.trim()).filter(line => line.length > 0);
+            if (lines.length === 0) continue;
+
+            const categoryName = lines.shift()!.replace(/#+ | =+/g, "").toLowerCase().trim();
+
+            for (const line of lines) {
+                const [key, value] = line.split("=");
+                this.addLangEntry(langKey, categoryName, key, value);
             }
         }
     }
@@ -102,5 +106,13 @@ export class Language {
         }
 
         writeTextToDist(path.join(path.join(Config.Paths.bp.root, "texts"), "languages.json"), JSON.stringify(langEntries, null, "\t"));
+    }
+    
+    public static watch(filePath: string): void {
+        if (filePath.endsWith(".lang")) {
+            this.ingestFile(filePath);
+        }
+
+        this.build();
     }
 }

@@ -28,4 +28,13 @@ export class Sound {
     public static build(): void {
         writeTextToDist(path.join(path.join(Config.Paths.rp.root, "sounds"), "sound_definitions.json"), JSON.stringify(this.soundDefinitions, null, "\t"));
     }
+
+    public static watch(filePath: string): void {
+        if (filePath.endsWith("sound_definitions.json")) {
+            const fileContent: ClientSoundDefinitions = JSON.parse(Deno.readTextFileSync(filePath));
+            this.soundDefinitions = deepMerge(this.soundDefinitions, fileContent);
+        }
+
+        this.build();
+    }
 }
