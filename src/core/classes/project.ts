@@ -1,7 +1,7 @@
 import "jsr:@std/dotenv/load";
 import * as path from "jsr:@std/path";
 import { Config } from "./config.ts";
-import { templateFileMap } from "../../templates/index.ts";
+import { TemplateFile } from "../../templates/index.ts";
 import { replaceTextInFile } from "../utils/index.ts";
 import { emptyDirectorySync } from "../utils/fileIO.ts";
 import { Module } from "./module.ts";
@@ -63,7 +63,7 @@ export class Project {
         Deno.chdir(projectDir);
 
         this.createDirectories();
-        this.createFiles();
+        await this.createFiles();
         await this.installDependencies();
 
         await new Deno.Command("netherite", {args: ["build"]}).output();
@@ -104,41 +104,13 @@ export class Project {
         }
     }
 
-    private static createFiles(): void {
+    private static async createFiles(): Promise<void> {
         if (Config.Options.type === "skin-pack") {
-            // Add skin pack files
+            // TODO: Add skin pack files
             return;
         }
 
-        Object.entries(templateFileMap).forEach(([src, {out, useBuffer, transforms}]) => {
-            if (useBuffer) {
-                const filePath = Config.getTemplateFile(src);
-                const buffer = Deno.readFileSync(filePath);
-                out.forEach(file => {
-                    Deno.writeFileSync(path.join(Deno.cwd(), file), buffer);
-                });
-                return;
-            }
-            
-            const filePath = Config.getTemplateFile(src);
-            out.forEach(async file => {
-                let contents = Deno.readTextFileSync(filePath)
-                .replace(/\$PROJECTNAME\$/g, Config.Options.name)
-                .replace(/\$PROJECTAUTHOR\$/g, Config.Options.author)
-                .replace(/\$PROJECTNAMESPACE\$/g, Config.Options.namespace)
-                .replace(/\$PROJECTTYPE\$/g, Config.Options.type)
-                .replace(/\$PROJECTVERSION\$/g, Config.Options.version)
-                .replace(/\$FORMATVERSION\$/g, Config.Options.formatVersion)
-                .replace(/\$UUID\$/g, Config.Options.uuid);
-
-                for (const transform of transforms) {
-                    contents = await transform(contents);
-                }
-
-                Deno.mkdirSync(path.join(Deno.cwd(), path.dirname(file)), {recursive: true});
-                Deno.writeTextFileSync(path.join(Deno.cwd(), file), contents);
-            });
-        });
+        await TemplateFile.write();
     }
 
     private static async installDependencies(): Promise<void> {
