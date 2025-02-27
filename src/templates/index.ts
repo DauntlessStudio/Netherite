@@ -5,4 +5,5 @@ export const templateFileMap: Record<string, string[]> = {
     "netherite.config.txt": ["netherite.config.ts"],
     "main.ts": ["src/behavior_pack/scripts/main.ts"],
     "image_x256.png": ["src/behavior_pack/pack_icon.png", "src/resource_pack/pack_icon.png"],
+    "en_US.lang": ["src/behavior_pack/texts/en_US.lang", "src/resource_pack/texts/en_US.lang"],
 };

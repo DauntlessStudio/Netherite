@@ -8,6 +8,7 @@ import { Buffer } from "node:buffer";
 // TODO: Expand this to include a versions option for semantic versioning of the project
 export interface ConfigOptions extends ProjectBuilderOptions {
     uuid: string;
+    version: `${number}.${number}.${number}`;
 }
 
 interface ConfigPaths {
@@ -40,9 +41,9 @@ export class Config {
     }
 
     public static get Paths(): ConfigPaths {
-        const root = this.Options.projectType === "world" ? "./dist/Content/world_template/" : "./dist/Content/";
-        const bpRoot = root + "behavior_packs/" + this.Options.projectNamespace + "_bp/";
-        const rpRoot = root + "resource_packs/" + this.Options.projectNamespace + "_rp/";
+        const root = this.Options.type === "world" ? "./dist/Content/world_template/" : "./dist/Content/";
+        const bpRoot = root + "behavior_packs/" + this.Options.namespace + "_bp/";
+        const rpRoot = root + "resource_packs/" + this.Options.namespace + "_rp/";
 
         return {
             root,

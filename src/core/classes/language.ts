@@ -88,5 +88,19 @@ export class Language {
         }
 
         writeTextToDist(path.join(path.join(Config.Paths.rp.root, "texts"), "languages.json"), JSON.stringify([...this.langMap.keys()], null, "\t"));
+        this.buildBehaviorLangauge();
+    }
+
+    private static buildBehaviorLangauge(): void {
+        const langEntries: LangType[] = [];
+
+        for (const entry of Deno.readDirSync("./src/behavior_pack/texts")) {
+            if (!entry.name.endsWith(".lang")) continue;
+
+            const langKey = entry.name.replace(".lang", "") as LangType;
+            langEntries.push(langKey);
+        }
+
+        writeTextToDist(path.join(path.join(Config.Paths.bp.root, "texts"), "languages.json"), JSON.stringify(langEntries, null, "\t"));
     }
 }

@@ -1,10 +1,11 @@
 import * as netherite from "@coldiron/netherite";
 
 netherite.config({
-    projectName: "$PROJECTNAME$",
-    projectAuthor: "$PROJECTAUTHOR$",
-    projectNamespace: "$PROJECTNAMESPACE$",
-    projectType: "$PROJECTTYPE$",
-    projectFormatVersion: "$FORMATVERSION$",
+    name: "$PROJECTNAME$",
+    author: "$PROJECTAUTHOR$",
+    namespace: "$PROJECTNAMESPACE$",
+    type: "$PROJECTTYPE$",
+    version: "$PROJECTVERSION$",
+    formatVersion: "$FORMATVERSION$",
     uuid: "$UUID$",
 });

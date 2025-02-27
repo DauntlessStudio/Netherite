@@ -11,6 +11,7 @@ export class Static {
     private static readonly pendingChanges: Map<string, boolean> = new Map();
 
     public static build(watch?: boolean) {
+        Language.ingestLangFiles(path.join(this.resourcePath, "texts"));
         sendToDist(this.behaviorPath, Config.Paths.bp.root, ["**/*.ts", "**/manifest.json"]);
         sendToDist(this.resourcePath, Config.Paths.rp.root, ["**/.lang", "**/manifest.json"]);
 

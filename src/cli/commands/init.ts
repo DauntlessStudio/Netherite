@@ -74,48 +74,48 @@ function getProjectBuildData(args: InitCommandData): ProjectBuilderOptions {
     const buildOptions: Partial<ProjectBuilderOptions> = {};
 
     if (args.options.name) {
-        buildOptions.projectName = args.options.name;
+        buildOptions.name = args.options.name;
     } else {
         const val = prompt("Please enter the name of the project:");
         if (val === null || val === "") Deno.exit(1);
 
-        buildOptions.projectName = val;
+        buildOptions.name = val;
     }
 
     if (args.options.author) {
-        buildOptions.projectAuthor = args.options.author;
+        buildOptions.author = args.options.author;
     } else {
         const val = prompt("Please enter the author of the project:");
         if (val === null || val === "") Deno.exit(1);
 
-        buildOptions.projectAuthor = val;
+        buildOptions.author = val;
     }
 
     if (args.options.namespace) {
-        buildOptions.projectNamespace = args.options.namespace;
+        buildOptions.namespace = args.options.namespace;
     } else {
         const val = prompt("Please enter the namespace of the project:");
         if (val === null || val === "") Deno.exit(1);
 
-        buildOptions.projectNamespace = val;
+        buildOptions.namespace = val;
     }
 
     if (args.options.formatVersion) {
-        buildOptions.projectFormatVersion = args.options.formatVersion;
+        buildOptions.formatVersion = args.options.formatVersion;
     } else {
         let val = prompt("Please enter the format version of the project [default: 1.21.51]:");
         if (val === null) val = "1.21.51";
 
-        buildOptions.projectFormatVersion = val;
+        buildOptions.formatVersion = val;
     }
 
     if (args.options.type) {
-        buildOptions.projectType = args.options.type;
+        buildOptions.type = args.options.type;
     } else {
         let val = prompt("Please enter the type of the project (world, add-on, skin-pack) [default: world]:");
         if (val === null || !["world", "add-on", "skin-pack"].includes(val)) val = "world";
 
-        buildOptions.projectType = val as "world"|"add-on"|"skin-pack";
+        buildOptions.type = val as "world"|"add-on"|"skin-pack";
     }
 
     return buildOptions as ProjectBuilderOptions;

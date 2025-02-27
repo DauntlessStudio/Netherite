@@ -11,21 +11,21 @@ export class MinecraftServerEntity implements ModuleWriteable {
         }
 
         if (!entity["minecraft:entity"].description.identifier.includes(":")) {
-            entity["minecraft:entity"].description.identifier = `${Config.Options.projectNamespace}:${entity["minecraft:entity"].description.identifier}`;
+            entity["minecraft:entity"].description.identifier = `${Config.Options.namespace}:${entity["minecraft:entity"].description.identifier}`;
         }
 
         const family = entity["minecraft:entity"].components?.["minecraft:type_family"]?.family
         if (family) {
             entity["minecraft:entity"]!.components!["minecraft:type_family"]!.family = family.map((f: string) => {
                 if (!f.includes(":")) {
-                    return `${Config.Options.projectNamespace}:${f}`;
+                    return `${Config.Options.namespace}:${f}`;
                 }
                 return f;
             });
         }
 
         const baseline: ServerEntityStrict = {
-            format_version: Config.Options.projectFormatVersion,
+            format_version: Config.Options.formatVersion,
             "minecraft:entity": {
                 description: {
                     identifier: "",

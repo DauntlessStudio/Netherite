@@ -15,7 +15,7 @@ export class Manifest {
                     uuid: await Config.getUUID("behavior"),
                     pack_scope: "world",
                     version: [1, 0, 0],
-                    min_engine_version: Config.Options.projectFormatVersion.split(".").map(Number),
+                    min_engine_version: Config.Options.formatVersion.split(".").map(Number),
                 },
                 modules: [
                     {
@@ -47,7 +47,7 @@ export class Manifest {
                 ]
             };
     
-            if (Config.Options.projectType === "add-on") {
+            if (Config.Options.type === "add-on") {
                 manifest.metadata = {
                     product_type: "addon",
                 };
@@ -68,7 +68,7 @@ export class Manifest {
                     uuid: await Config.getUUID("resource"),
                     pack_scope: "world",
                     version: [1, 0, 0],
-                    min_engine_version: Config.Options.projectFormatVersion.split(".").map(Number),
+                    min_engine_version: Config.Options.formatVersion.split(".").map(Number),
                 },
                 modules: [
                     {
@@ -85,7 +85,7 @@ export class Manifest {
                 ],
             };
     
-            if (Config.Options.projectType === "add-on") {
+            if (Config.Options.type === "add-on") {
                 manifest.metadata = {
                     product_type: "addon",
                 };
@@ -108,7 +108,7 @@ export class Manifest {
     }
 
     public static async build(): Promise<void> {
-        if (Config.Options.projectType !== "skin-pack") {
+        if (Config.Options.type !== "skin-pack") {
             writeTextToDist(path.join(Config.Paths.bp.root, "manifest.json"), JSON.stringify(await this.BehaviorManifest, null, "\t"));
             writeTextToDist(path.join(Config.Paths.rp.root, "manifest.json"), JSON.stringify(await this.ResourceManifest, null, "\t"));
         }
