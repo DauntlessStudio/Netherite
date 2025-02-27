@@ -67,6 +67,7 @@ export class Project {
 
         emptyDirectorySync(path.join(Deno.cwd(), Config.Paths.bp.root));
         emptyDirectorySync(path.join(Deno.cwd(), Config.Paths.rp.root));
+        this.createSymlinks();
 
         await Module.build(watch);
         Static.build(watch);
@@ -82,20 +83,44 @@ export class Project {
 
         if (Config.Options.type === "skin-pack") return;
 
+        this.createSymlinks();
+    }
+
+    private static createSymlinks(): void {
         const projectNamespace = Config.Options.namespace;
 
         const mojangBP = path.join(Config.MojangDirectory, "development_behavior_packs", projectNamespace + "_bp");
         const mojangRP = path.join(Config.MojangDirectory, "development_resource_packs", projectNamespace + "_rp");
 
-        Deno.mkdirSync(mojangBP, {recursive: true});
-        Deno.mkdirSync(mojangRP, {recursive: true});
+        try {
+            Deno.mkdirSync(mojangBP, {recursive: true});
+            Deno.mkdirSync(mojangRP, {recursive: true});
+        } catch (_error) {
+            // Directory already exists
+        }
 
-        if (Config.Options.type === "world") {
-            Deno.symlinkSync(mojangBP, path.join(Deno.cwd(), "dist/Content/world_template/behavior_packs", projectNamespace + "_bp"), {type: "dir"});
-            Deno.symlinkSync(mojangRP, path.join(Deno.cwd(), "dist/Content/world_template/resource_packs", projectNamespace + "_rp"), {type: "dir"});
-        } else if (Config.Options.type === "add-on") {
-            Deno.symlinkSync(mojangBP, path.join(Deno.cwd(), "dist/Content/behavior_packs", projectNamespace + "_bp"), {type: "dir"});
-            Deno.symlinkSync(mojangRP, path.join(Deno.cwd(), "dist/Content/resource_packs", projectNamespace + "_rp"), {type: "dir"});
+        try {
+            if (Config.Options.type === "world") {
+                Deno.mkdirSync(path.join(Deno.cwd(), "dist/Content/world_template/behavior_packs"), {recursive: true});
+                Deno.mkdirSync(path.join(Deno.cwd(), "dist/Content/world_template/resource_packs"), {recursive: true});
+            } else if (Config.Options.type === "add-on") {
+                Deno.mkdirSync(path.join(Deno.cwd(), "dist/Content/behavior_packs"), {recursive: true});
+                Deno.mkdirSync(path.join(Deno.cwd(), "dist/Content/resource_packs"), {recursive: true});
+            }
+        } catch (_error) {
+            // Dist already exists
+        }
+
+        try {
+            if (Config.Options.type === "world") {
+                Deno.symlinkSync(mojangBP, path.join(Deno.cwd(), "dist/Content/world_template/behavior_packs", projectNamespace + "_bp"), {type: "dir"});
+                Deno.symlinkSync(mojangRP, path.join(Deno.cwd(), "dist/Content/world_template/resource_packs", projectNamespace + "_rp"), {type: "dir"});
+            } else if (Config.Options.type === "add-on") {
+                Deno.symlinkSync(mojangBP, path.join(Deno.cwd(), "dist/Content/behavior_packs", projectNamespace + "_bp"), {type: "dir"});
+                Deno.symlinkSync(mojangRP, path.join(Deno.cwd(), "dist/Content/resource_packs", projectNamespace + "_rp"), {type: "dir"});
+            }
+        } catch (_error) {
+            // Symlink already exists
         }
     }
 

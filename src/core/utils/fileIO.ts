@@ -2,9 +2,13 @@ import * as path from "jsr:@std/path";
 import { Config } from "../classes/config.ts";
 
 export function emptyDirectorySync(dir: string): void {
-    for (const entry of Deno.readDirSync(dir)) {
-        const entryPath = path.join(dir, entry.name);
-        Deno.removeSync(entryPath, {recursive: true});
+    try {
+        for (const entry of Deno.readDirSync(dir)) {
+            const entryPath = path.join(dir, entry.name);
+            Deno.removeSync(entryPath, {recursive: true});
+        }
+    } catch (_error) {
+        // Directory doesn't exist, no need to empty it
     }
 }
 
