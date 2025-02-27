@@ -4,7 +4,7 @@ import { Config } from "../core/classes/index.ts";
 interface Template {
     type: "text"|"buffer";
     contents: () => string|Promise<string>;
-    out: string[];
+    out: (string|(() => string))[];
 }
 
 export class TemplateFile {
@@ -30,8 +30,9 @@ export class TemplateFile {
         const contents = await this.template.contents();
 
         this.template.out.forEach(file => {
-            Deno.mkdirSync(path.join(Deno.cwd(), path.dirname(file)), {recursive: true});
-            Deno.writeTextFileSync(path.join(Deno.cwd(), file), contents);
+            const out = typeof file === "function" ? file() : file;
+            Deno.mkdirSync(path.join(Deno.cwd(), path.dirname(out)), {recursive: true});
+            Deno.writeTextFileSync(path.join(Deno.cwd(), out), contents);
         });
     }
 
@@ -39,8 +40,9 @@ export class TemplateFile {
         const contents = Deno.readFileSync(Config.getTemplateFile(this.template.contents() as string));
 
         this.template.out.forEach(file => {
-            Deno.mkdirSync(path.join(Deno.cwd(), path.dirname(file)), {recursive: true});
-            Deno.writeFileSync(path.join(Deno.cwd(), file), contents);
+            const out = typeof file === "function" ? file() : file;
+            Deno.mkdirSync(path.join(Deno.cwd(), path.dirname(out)), {recursive: true});
+            Deno.writeFileSync(path.join(Deno.cwd(), out), contents);
         });
     }
 }
