@@ -12,6 +12,6 @@ mc.system.run(main);`;
 
 new TemplateFile({
     type: "text",
-    out: ["src/main.ts"],
+    out: ["src/behavior_pack/scripts/main.ts"],
     contents,
 });

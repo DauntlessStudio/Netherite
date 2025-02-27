@@ -2,6 +2,8 @@ import * as path from "jsr:@std/path";
 import { Config, Language } from "./index.ts";
 import { sendToDist, sleep } from "../utils/index.ts";
 import { Module } from "./module.ts";
+import { Sound } from "./sound.ts";
+import { Texture } from "./texture.ts";
 
 export class Static {
     private static readonly behaviorPath = path.join(Deno.cwd(), "src/behavior_pack");
@@ -12,6 +14,9 @@ export class Static {
 
     public static build(watch?: boolean) {
         Language.ingestLangFiles(path.join(this.resourcePath, "texts"));
+        Sound.ingestSoundFiles(path.join(this.resourcePath, "sounds"));
+        Texture.ingestTextureFiles(path.join(this.resourcePath, "textures"));
+
         sendToDist(this.behaviorPath, Config.Paths.bp.root, ["**/*.ts", "**/manifest.json"]);
         sendToDist(this.resourcePath, Config.Paths.rp.root, ["**/.lang", "**/manifest.json"]);
 
@@ -27,6 +32,9 @@ export class Static {
                     
                     if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "rp")) {
                         Language.ingestLangFiles(path.join(subPath, "texts"));
+                        Sound.ingestSoundFiles(path.join(subPath, "sounds"));
+                        Texture.ingestTextureFiles(path.join(subPath, "textures"));
+                        
                         sendToDist(subPath, Config.Paths.rp.root, ["**/.lang", "**/manifest.json"]);
                         continue;
                     }

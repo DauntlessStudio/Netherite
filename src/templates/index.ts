@@ -1,5 +1,6 @@
 import "./images/pack_icon.ts";
 import "./texts/.gitignore.ts";
+import "./texts/deno.json.ts";
 import "./texts/en_US.lang.ts";
 import "./texts/launch.json.ts";
 import "./texts/main.ts";

@@ -1,14 +1,7 @@
-import "jsr:@std/dotenv/load";
 import * as path from "jsr:@std/path";
-import { Config } from "./config.ts";
 import { TemplateFile } from "../../templates/index.ts";
-import { replaceTextInFile } from "../utils/index.ts";
-import { emptyDirectorySync } from "../utils/fileIO.ts";
-import { Module } from "./module.ts";
-import { Static } from "./static.ts";
-import { Language } from "./language.ts";
-import { Manifest } from "./manifest.ts";
-import { Script } from "./script.ts";
+import { emptyDirectorySync } from "../utils/index.ts";
+import { Config, Sound, Texture, Script, Manifest, Language, Static, Module } from "./index.ts";
 
 export type ProjectType = "world"|"add-on"|"skin-pack";
 
@@ -79,6 +72,8 @@ export class Project {
         Static.build(watch);
         Script.build(watch);
         Language.build();
+        Sound.build();
+        Texture.build();
         Manifest.build();
     }
 
@@ -98,7 +93,7 @@ export class Project {
         if (Config.Options.type === "world") {
             Deno.symlinkSync(mojangBP, path.join(Deno.cwd(), "dist/Content/world_template/behavior_packs", projectNamespace + "_bp"), {type: "dir"});
             Deno.symlinkSync(mojangRP, path.join(Deno.cwd(), "dist/Content/world_template/resource_packs", projectNamespace + "_rp"), {type: "dir"});
-        } else {
+        } else if (Config.Options.type === "add-on") {
             Deno.symlinkSync(mojangBP, path.join(Deno.cwd(), "dist/Content/behavior_packs", projectNamespace + "_bp"), {type: "dir"});
             Deno.symlinkSync(mojangRP, path.join(Deno.cwd(), "dist/Content/resource_packs", projectNamespace + "_rp"), {type: "dir"});
         }
@@ -115,11 +110,5 @@ export class Project {
 
     private static async installDependencies(): Promise<void> {
         await new Deno.Command("deno", {args: ["install", ...this.dependencies]}).output();
-
-        if (Deno.env.get("LOCALAPI")) {
-            replaceTextInFile(path.join(Deno.cwd(), "netherite.config.ts"), {
-                "@coldiron/netherite": Deno.env.get("LOCALAPI") as string,
-            });
-        }
     }
 }
