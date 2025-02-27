@@ -110,19 +110,33 @@ export class Project {
             return;
         }
 
-        Object.entries(templateFileMap).forEach(([src, dest]) => {
+        Object.entries(templateFileMap).forEach(([src, {out, useBuffer, transforms}]) => {
+            if (useBuffer) {
+                const filePath = Config.getTemplateFile(src);
+                const buffer = Deno.readFileSync(filePath);
+                out.forEach(file => {
+                    Deno.writeFileSync(path.join(Deno.cwd(), file), buffer);
+                });
+                return;
+            }
+            
             const filePath = Config.getTemplateFile(src);
-            dest.forEach(d => {
-                Deno.writeTextFileSync(
-                    path.join(Deno.cwd(), d), Deno.readTextFileSync(filePath)
-                    .replace(/\$PROJECTNAME\$/g, Config.Options.name)
-                    .replace(/\$PROJECTAUTHOR\$/g, Config.Options.author)
-                    .replace(/\$PROJECTNAMESPACE\$/g, Config.Options.namespace)
-                    .replace(/\$PROJECTTYPE\$/g, Config.Options.type)
-                    .replace(/\$PROJECTVERSION\$/g, Config.Options.version)
-                    .replace(/\$FORMATVERSION\$/g, Config.Options.formatVersion)
-                    .replace(/\$UUID\$/g, Config.Options.uuid)
-                );
+            out.forEach(async file => {
+                let contents = Deno.readTextFileSync(filePath)
+                .replace(/\$PROJECTNAME\$/g, Config.Options.name)
+                .replace(/\$PROJECTAUTHOR\$/g, Config.Options.author)
+                .replace(/\$PROJECTNAMESPACE\$/g, Config.Options.namespace)
+                .replace(/\$PROJECTTYPE\$/g, Config.Options.type)
+                .replace(/\$PROJECTVERSION\$/g, Config.Options.version)
+                .replace(/\$FORMATVERSION\$/g, Config.Options.formatVersion)
+                .replace(/\$UUID\$/g, Config.Options.uuid);
+
+                for (const transform of transforms) {
+                    contents = await transform(contents);
+                }
+
+                Deno.mkdirSync(path.join(Deno.cwd(), path.dirname(file)), {recursive: true});
+                Deno.writeTextFileSync(path.join(Deno.cwd(), file), contents);
             });
         });
     }
