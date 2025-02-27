@@ -1,4 +1,4 @@
-import { initProject, type ProjectBuilderOptions } from "../../core/project_initializer.ts";
+import { Project, type ProjectBuilderOptions } from "../../core/classes/project.ts";
 import { Command } from "../command.ts";
 import type { CommandData } from "../command.ts";
 
@@ -56,7 +56,7 @@ new Command<InitCommandData>({
 		},
 	},
 	action(_args) {
-		initProject(getProjectBuildData(_args));
+		Project.init(getProjectBuildData(_args));
 	},
 	validateArgs(_args) {
         const validName = _args.options.name === undefined || (typeof _args.options.name === "string" && _args.options.name.length > 0);

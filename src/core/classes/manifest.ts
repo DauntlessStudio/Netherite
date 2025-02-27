@@ -107,7 +107,7 @@ export class Manifest {
         }
     }
 
-    public static async outputManifestFiles(): Promise<void> {
+    public static async build(): Promise<void> {
         if (Config.Options.projectType !== "skin-pack") {
             writeTextToDist(path.join(Config.Paths.bp.root, "manifest.json"), JSON.stringify(await this.BehaviorManifest, null, "\t"));
             writeTextToDist(path.join(Config.Paths.rp.root, "manifest.json"), JSON.stringify(await this.ResourceManifest, null, "\t"));

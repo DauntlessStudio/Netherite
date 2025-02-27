@@ -10,7 +10,7 @@ type ModuleSubdirectory = "bp"|"rp"|"root";
 
 export class Module {
     private static queue: ModuleWriteable[] = [];
-    private static moduleDir: string = path.join(Deno.cwd(), "src/modules");
+    private static readonly moduleDir: string = path.join(Deno.cwd(), "src/modules");
 
     public static register(module: ModuleWriteable): void {
         this.queue.push(module);

@@ -68,7 +68,7 @@ export class Language {
         }
     }
 
-    public static outputLangFiles(): void {
+    public static build(): void {
         for (const [lang, categories] of this.langMap) {
             const langFile = path.join(path.join(Config.Paths.rp.root, "texts"), `${lang}.lang`);
 

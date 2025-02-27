@@ -54,3 +54,17 @@ export function isTextFile(filename: string): boolean {
     const textFileExtensions = [".ts", ".json", ".txt", ".md", ".lang"];
     return textFileExtensions.some(ext => filename.endsWith(ext));
 }
+
+export function replaceTextInFile(filepath: string, replacements: Record<string, string>): void {
+    try {
+        const content = Deno.readTextFileSync(filepath);
+
+        const modifiedContent = Object.entries(replacements).reduce((acc, [key, value]) => {
+            return acc.replace(new RegExp(key, "g"), value);
+        }, content);
+        
+        Deno.writeTextFileSync(filepath, modifiedContent);
+    } catch (error) {
+        console.error(`Error replacing text in file: ${error}`);
+    }
+}
