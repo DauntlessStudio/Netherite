@@ -1,7 +1,7 @@
 import * as path from "jsr:@std/path";
 import { deepMerge, writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
-import type { ClientBlocks, ClientSoundDefinitions, ClientSounds } from "../../api/api.ts";
+import type { ClientBlocks} from "../../api/api.ts";
 
 export class Block {
     private static blocks: ClientBlocks = {};
