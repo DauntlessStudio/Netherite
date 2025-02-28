@@ -8,3 +8,4 @@ export * from "./server_entity_components.d.ts";
 export * from "./client_sound_definitions.d.ts";
 export * from "./client_terrain_texture.d.ts";
 export * from "./client_item_texture.d.ts";
+export * from "./client_sounds.d.ts";
