@@ -4,6 +4,7 @@ import { sendToDist, sleep } from "../utils/index.ts";
 import { Module } from "./module.ts";
 import { Sound } from "./sound.ts";
 import { Texture } from "./texture.ts";
+import { Block } from "./block.ts";
 
 export class Static {
     private static readonly behaviorPath = path.join(Deno.cwd(), "src/behavior_pack");
@@ -13,15 +14,19 @@ export class Static {
     private static readonly pendingChanges: Map<string, boolean> = new Map();
 
     private static readonly specialFiles: Map<string, (file: string) => void> = new Map([
+        ["**/sounds.json", Sound.watch.bind(Sound)],
+        ["**/blocks.json", Block.watch.bind(Block)],
         ["**/*.lang", Language.watch.bind(Language)],
-        ["**/sound/sound_definitions.json", Sound.watch.bind(Sound)],
         ["**/textures/*.json", Texture.watch.bind(Texture)],
+        ["**/sound/sound_definitions.json", Sound.watch.bind(Sound)],
     ]);
 
     public static build(watch?: boolean) {
+        Texture.ingestTextureFiles(path.join(this.resourcePath, "textures"));
         Language.ingestLangFiles(path.join(this.resourcePath, "texts"));
         Sound.ingestSoundFiles(path.join(this.resourcePath, "sounds"));
-        Texture.ingestTextureFiles(path.join(this.resourcePath, "textures"));
+        Block.ingestBlockFiles(this.resourcePath);
+        Sound.ingestSoundFiles(this.resourcePath);
 
         sendToDist(this.behaviorPath, Config.Paths.bp.root, ["**/*.ts", "**/manifest.json"]);
         sendToDist(this.resourcePath, Config.Paths.rp.root, ["**/.lang", "**/manifest.json"]);
@@ -37,9 +42,11 @@ export class Static {
                     }
                     
                     if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "rp")) {
+                        Texture.ingestTextureFiles(path.join(subPath, "textures"));
                         Language.ingestLangFiles(path.join(subPath, "texts"));
                         Sound.ingestSoundFiles(path.join(subPath, "sounds"));
-                        Texture.ingestTextureFiles(path.join(subPath, "textures"));
+                        Block.ingestBlockFiles(subPath);
+                        Sound.ingestSoundFiles(subPath);
                         
                         sendToDist(subPath, Config.Paths.rp.root, ["**/.lang", "**/manifest.json"]);
                         continue;
