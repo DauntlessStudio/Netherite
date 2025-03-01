@@ -23,6 +23,8 @@ export class Project {
 
     private static readonly directoryMap: Record<ProjectType, string[]> = {
         "world": [
+            "public/store",
+            "public/marketing",
             "src/modules",
             "src/marketing",
             "src/behavior_pack/scripts",
@@ -32,8 +34,9 @@ export class Project {
             "dist/Content/world_template/resource_packs",
         ],
         "add-on": [
+            "public/store",
+            "public/marketing",
             "src/modules",
-            "src/marketing",
             "src/behavior_pack/scripts",
             "src/behavior_pack/texts",
             "src/resource_pack/texts",
@@ -41,6 +44,8 @@ export class Project {
             "dist/Content/resource_packs",
         ],
         "skin-pack": [
+            "public/store",
+            "public/marketing",
             "src/skin_pack",
             "src/marketing",
             "dist/Content/skin_packs",
