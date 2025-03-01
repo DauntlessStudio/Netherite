@@ -4,6 +4,7 @@ import { emptyDirectorySync } from "../utils/index.ts";
 import { Config, Sound, Texture, Script, Manifest, Language, Static, Module } from "./index.ts";
 
 // TODO: Possibly remove skin-pack as an option and instead build a skin pack with the world or add-on
+// TODO: Generate level.dat and world_icon.jpeg for world projects
 export type ProjectType = "world"|"add-on"|"skin-pack";
 
 export interface ProjectBuilderOptions {
