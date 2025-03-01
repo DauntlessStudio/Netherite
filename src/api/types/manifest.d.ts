@@ -6,7 +6,10 @@ export interface Manifest {
         uuid: string;
         pack_scope: string;
         version: number[];
+        lock_template_options?: boolean;
+        allow_random_seed?: boolean;
         min_engine_version?: number[];
+        base_game_version?: number[];
     };
     modules: {
         type: string;

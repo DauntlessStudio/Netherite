@@ -105,7 +105,9 @@ export class Manifest {
                     description: "pack.description",
                     uuid: await Config.getUUID("world"),
                     pack_scope: "world",
+                    lock_template_options: true,
                     version: [1, 0, 0],
+                    base_game_version: Config.Options.formatVersion.split(".").map(Number),
                 },
                 modules: [
                     {
