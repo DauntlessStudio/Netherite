@@ -1,7 +1,7 @@
 import * as path from "jsr:@std/path";
 import { TemplateFile } from "../../templates/index.ts";
 import { emptyDirectorySync } from "../utils/index.ts";
-import { Config, Sound, Texture, Script, Manifest, Language, Static, Module } from "./index.ts";
+import { Config, Sound, Texture, Script, Manifest, Language, Static, Module, World } from "./index.ts";
 
 // TODO: Possibly remove skin-pack as an option and instead build a skin pack with the world or add-on
 // TODO: Generate level.dat and world_icon.jpeg for world projects
@@ -48,6 +48,7 @@ export class Project {
         await Module.build(watch);
         Static.build(watch);
         Script.build(watch);
+        World.build();
         Language.build();
         Sound.build();
         Texture.build();
@@ -57,6 +58,7 @@ export class Project {
     private static createDirectories(): void {
         if (Config.Options.type === "skin-pack") return;
 
+        Deno.mkdirSync(path.join(Deno.cwd(), "src/modules"), {recursive: true});
         this.createSymlinks();
     }
 
