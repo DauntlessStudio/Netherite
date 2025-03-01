@@ -1,10 +1,14 @@
 import * as path from "jsr:@std/path";
-import { Config } from "../config.ts";
+import { Config } from "../classes/config.ts";
 
 export function emptyDirectorySync(dir: string): void {
-    for (const entry of Deno.readDirSync(dir)) {
-        const entryPath = path.join(dir, entry.name);
-        Deno.removeSync(entryPath, {recursive: true});
+    try {
+        for (const entry of Deno.readDirSync(dir)) {
+            const entryPath = path.join(dir, entry.name);
+            Deno.removeSync(entryPath, {recursive: true});
+        }
+    } catch (_error) {
+        // Directory doesn't exist, no need to empty it
     }
 }
 
@@ -30,12 +34,25 @@ export function sendToDist(src: string, dest: string, excludeGlob: string[] = []
     }
 }
 
+export function writeBufferToDist(dest: string, content: Uint8Array): void {
+    Deno.mkdirSync(path.dirname(dest), {recursive: true});
+
+    if (isTextFile(dest)) {
+        writeTextToDist(dest, new TextDecoder().decode(content));
+    } else {
+        Deno.writeFileSync(dest, content);
+    }
+}
+
 export function writeTextToDist(dest: string, content: string): void {
     Deno.mkdirSync(path.dirname(dest), {recursive: true});
     
     const modifiedContent = content
-    .replace(/NAMESPACE/g, Config.Options.projectNamespace)
-    .replace(/FORMATVERSION/g, Config.Options.projectFormatVersion);
+    .replace(/NAME/g, Config.Options.name)
+    .replace(/AUTHOR/g, Config.Options.author)
+    .replace(/VERSION/g, Config.Options.version)
+    .replace(/NAMESPACE/g, Config.Options.namespace)
+    .replace(/FORMATVERSION/g, Config.Options.formatVersion);
     
     Deno.writeTextFileSync(dest, modifiedContent);
 }
@@ -43,4 +60,18 @@ export function writeTextToDist(dest: string, content: string): void {
 export function isTextFile(filename: string): boolean {
     const textFileExtensions = [".ts", ".json", ".txt", ".md", ".lang"];
     return textFileExtensions.some(ext => filename.endsWith(ext));
+}
+
+export function replaceTextInFile(filepath: string, replacements: Record<string, string>): void {
+    try {
+        const content = Deno.readTextFileSync(filepath);
+
+        const modifiedContent = Object.entries(replacements).reduce((acc, [key, value]) => {
+            return acc.replace(new RegExp(key, "g"), value);
+        }, content);
+        
+        Deno.writeTextFileSync(filepath, modifiedContent);
+    } catch (error) {
+        console.error(`Error replacing text in file: ${error}`);
+    }
 }

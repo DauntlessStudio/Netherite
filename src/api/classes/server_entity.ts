@@ -1,7 +1,5 @@
-import { Language } from "../../core/classes/language.ts";
-import { Config } from "../../core/config.ts";
-import { ModuleWriter, type ModuleWriteable } from "../../core/module_writer.ts";
-import { deepMerge } from "../../core/utils/object.ts";
+import { Language, Config, Module, type ModuleWriteable } from "../../core/classes/index.ts";
+import { deepMerge } from "../../core/utils/index.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.d.ts";
 
 export class MinecraftServerEntity implements ModuleWriteable {
@@ -13,21 +11,21 @@ export class MinecraftServerEntity implements ModuleWriteable {
         }
 
         if (!entity["minecraft:entity"].description.identifier.includes(":")) {
-            entity["minecraft:entity"].description.identifier = `${Config.Options.projectNamespace}:${entity["minecraft:entity"].description.identifier}`;
+            entity["minecraft:entity"].description.identifier = `${Config.Options.namespace}:${entity["minecraft:entity"].description.identifier}`;
         }
 
         const family = entity["minecraft:entity"].components?.["minecraft:type_family"]?.family
         if (family) {
             entity["minecraft:entity"]!.components!["minecraft:type_family"]!.family = family.map((f: string) => {
                 if (!f.includes(":")) {
-                    return `${Config.Options.projectNamespace}:${f}`;
+                    return `${Config.Options.namespace}:${f}`;
                 }
                 return f;
             });
         }
 
         const baseline: ServerEntityStrict = {
-            format_version: Config.Options.projectFormatVersion,
+            format_version: Config.Options.formatVersion,
             "minecraft:entity": {
                 description: {
                     identifier: "",
@@ -114,7 +112,7 @@ export class MinecraftServerEntity implements ModuleWriteable {
     
     constructor(entity: ServerEntityLoose) {
         this.entity = MinecraftServerEntity.validate(entity);
-        ModuleWriter.register(this);
+        Module.register(this);
     }
 
     public updateEntity(entity: ServerEntityLoose): MinecraftServerEntity {
