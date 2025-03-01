@@ -21,6 +21,7 @@ export interface Manifest {
         version: number[]|string;
     }[];
     metadata?: {
-        product_type: string;
+        product_type?: string;
+        authors?: string[];
     };
 }

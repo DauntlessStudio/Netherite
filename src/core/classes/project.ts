@@ -3,6 +3,7 @@ import { TemplateFile } from "../../templates/index.ts";
 import { emptyDirectorySync } from "../utils/index.ts";
 import { Config, Sound, Texture, Script, Manifest, Language, Static, Module } from "./index.ts";
 
+// TODO: Possibly remove skin-pack as an option and instead build a skin pack with the world or add-on
 export type ProjectType = "world"|"add-on"|"skin-pack";
 
 export interface ProjectBuilderOptions {
@@ -20,37 +21,6 @@ export class Project {
         "npm:@minecraft/server",
         "npm:@minecraft/server-ui",
     ];
-
-    private static readonly directoryMap: Record<ProjectType, string[]> = {
-        "world": [
-            "public/store",
-            "public/marketing",
-            "src/modules",
-            "src/marketing",
-            "src/behavior_pack/scripts",
-            "src/behavior_pack/texts",
-            "src/resource_pack/texts",
-            "dist/Content/world_template/behavior_packs",
-            "dist/Content/world_template/resource_packs",
-        ],
-        "add-on": [
-            "public/store",
-            "public/marketing",
-            "src/modules",
-            "src/behavior_pack/scripts",
-            "src/behavior_pack/texts",
-            "src/resource_pack/texts",
-            "dist/Content/behavior_packs",
-            "dist/Content/resource_packs",
-        ],
-        "skin-pack": [
-            "public/store",
-            "public/marketing",
-            "src/skin_pack",
-            "src/marketing",
-            "dist/Content/skin_packs",
-        ],
-    };
 
     public static async init(options: ProjectBuilderOptions): Promise<void> {
         Config.setOptions({...options, uuid: crypto.randomUUID(), version: "1.0.0"});
@@ -84,8 +54,6 @@ export class Project {
     }
 
     private static createDirectories(): void {
-        this.directoryMap[Config.Options.type].forEach(dir => Deno.mkdirSync(path.join(Deno.cwd(), dir), {recursive: true}));
-
         if (Config.Options.type === "skin-pack") return;
 
         this.createSymlinks();
