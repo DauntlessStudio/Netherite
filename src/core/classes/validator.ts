@@ -12,6 +12,7 @@ export class Validator {
             console.log("Updated MC Creator Tools");
             new Deno.Command("npm", {args: ["i", "-g", "@minecraft/creator-tools@latest"]}).outputSync();
 
+            // TODO: Look into sending the output to a temp file and parsing the CSV output
             console.log("Validating With MC Creator Tools");
             const args = ["mct", "validate", "-i", "./dist/Content", "-show"];
             if (Config.Options.type === "add-on") args.splice(2, 0, "addon");

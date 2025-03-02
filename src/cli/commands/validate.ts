@@ -1,6 +1,7 @@
 import { Command, type CommandData } from "../command.ts";
 import { Validator } from "../../core/classes/index.ts";
 
+// TODO: Create a GitHub action to run this command on PRs during project init
 export default new Command<CommandData>({
     name: "validate",
     usage: {
