@@ -1,3 +1,5 @@
+import { Config } from "./config.ts";
+
 export class Validator {
     public static validate(): { success: boolean, messages: string[] } {
         const messages: string[] = [];
@@ -11,9 +13,9 @@ export class Validator {
             new Deno.Command("npm", {args: ["i", "-g", "@minecraft/creator-tools@latest"]}).outputSync();
 
             console.log("Validating With MC Creator Tools");
-            const output = new Deno.Command("npx", {
-                args: ["mct", "validate", "-i", "./dist/Content", "-show"]
-            }).outputSync();
+            const args = ["mct", "validate", "-i", "./dist/Content", "-show"];
+            if (Config.Options.type === "add-on") args.splice(2, 0, "addon");
+            const output = new Deno.Command("npx", { args }).outputSync();
 
             mcValid = output.success;
             messages.push(new TextDecoder().decode(output.stderr));
