@@ -2,6 +2,7 @@ import * as path from "jsr:@std/path";
 import { formatText } from "../utils/text.ts";
 import { writeTextToDist } from "../utils/fileIO.ts";
 import { Config } from "./config.ts";
+import { sendToDist } from "../utils/index.ts";
 
 export type LangType = "en_US" | "en_GB" | "de_DE" | "es_ES" | "es_MX" | "fr_FR" | "fr_CA" | "it_IT" | "ja_JP" | "ko_KR" | "pt_BR" | "pt_PT" | "ru_RU" | "zh_CN" | "zh_TW" | "nl_NL" | "bg_BG" | "cs_CZ" | "da_DK" | "el_GR" | "fi_FI" | "hu_HU" | "id_ID" | "nb_NO" | "pl_PL" | "sk_SK" | "sv_SE" | "tr_TR" | "uk_UA";
 
@@ -92,10 +93,10 @@ export class Language {
         }
 
         writeTextToDist(path.join(path.join(Config.Paths.rp.root, "texts"), "languages.json"), JSON.stringify([...this.langMap.keys()], null, "\t"));
-        this.buildBehaviorLangauge();
+        this.buildNonResourceLanguages();
     }
 
-    private static buildBehaviorLangauge(): void {
+    private static buildNonResourceLanguages(): void {
         const langEntries: LangType[] = [];
 
         for (const entry of Deno.readDirSync("./src/behavior_pack/texts")) {
@@ -106,6 +107,11 @@ export class Language {
         }
 
         writeTextToDist(path.join(path.join(Config.Paths.bp.root, "texts"), "languages.json"), JSON.stringify(langEntries, null, "\t"));
+
+        if (Config.Options.type === "world") {
+            sendToDist("./src/behavior_pack/texts", path.join(Config.Paths.root, "texts"));
+            writeTextToDist(path.join(Config.Paths.root, "texts/languages.json"), JSON.stringify(["en_US"], null, "\t"));
+        }
     }
     
     public static watch(filePath: string): void {

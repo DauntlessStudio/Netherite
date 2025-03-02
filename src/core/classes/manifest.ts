@@ -95,6 +95,44 @@ export class Manifest {
         });
     }
     
+    public static get WorldManifest() : Promise<types.Manifest> {
+        // deno-lint-ignore no-async-promise-executor
+        return new Promise<types.Manifest>(async resolve => {
+            const manifest: types.Manifest = {
+                format_version: 2,
+                header: {
+                    name: "pack.name",
+                    description: "pack.description",
+                    uuid: await Config.getUUID("world"),
+                    pack_scope: "world",
+                    lock_template_options: true,
+                    version: [1, 0, 0],
+                    base_game_version: Config.Options.formatVersion.split(".").map(Number),
+                },
+                modules: [
+                    {
+                        type: "world_template",
+                        uuid: await Config.getUUID("world_template"),
+                        version: [1, 0, 0],
+                    },
+                ],
+                metadata: {
+                    authors: [
+                        Config.Options.author
+                    ],
+                },
+            };
+    
+            if (Config.Options.type === "add-on") {
+                manifest.metadata = {
+                    product_type: "addon",
+                };
+            }
+
+            resolve(manifest);
+        });
+    }
+    
     private static getVersionNumber(module: string): string {
         try {
             const deno = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
@@ -111,6 +149,10 @@ export class Manifest {
         if (Config.Options.type !== "skin-pack") {
             writeTextToDist(path.join(Config.Paths.bp.root, "manifest.json"), JSON.stringify(await this.BehaviorManifest, null, "\t"));
             writeTextToDist(path.join(Config.Paths.rp.root, "manifest.json"), JSON.stringify(await this.ResourceManifest, null, "\t"));
+
+            if (Config.Options.type === "world") {
+                writeTextToDist(path.join(Config.Paths.root, "manifest.json"), JSON.stringify(await this.WorldManifest, null, "\t"));
+            }
         }
     }
 }

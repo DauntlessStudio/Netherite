@@ -6,3 +6,5 @@ export * from "./script.ts";
 export * from "./static.ts";
 export * from "./sound.ts";
 export * from "./texture.ts";
+export * from "./validator.ts";
+export * from "./world.ts";
