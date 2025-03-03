@@ -48,11 +48,11 @@ export class Project {
         await Module.build(watch);
         Static.build(watch);
         Script.build(watch);
-        World.build();
+        await World.build();
         Language.build();
         Sound.build();
         Texture.build();
-        Manifest.build();
+        await Manifest.build();
     }
 
     private static createDirectories(): void {
