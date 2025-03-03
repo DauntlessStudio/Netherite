@@ -8,7 +8,7 @@ export type ExportType = "world"|"template"|"publish";
 
 export class Exporter {
     public static async export(type: ExportType, out: string = Config.DownloadDirectory): Promise<void> {
-        await Project.build();
+        await Project.build({ignoreSymlinks: true});
 
         if (type !== "publish" && Config.Options.type === "add-on") {
             await World.build(true);
@@ -21,7 +21,7 @@ export class Exporter {
 
         const filename = `${Config.Options.name}_v${Config.Options.version}.mc${type}`;
 
-        const zip = await zipDir(Config.Paths.root, {followSymlinks: true, includeDirs: true, includeFiles: true});
+        const zip = await zipDir(Config.Paths.root, {includeDirs: true, includeFiles: true});
         await zip.writeZip(path.join(out, filename));
 
         console.log("Exported project to " + path.join(out, filename));
