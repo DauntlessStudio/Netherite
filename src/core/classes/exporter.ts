@@ -8,6 +8,9 @@ export type ExportType = "world"|"template"|"publish";
 
 export class Exporter {
     public static async export(type: ExportType, out: string = Config.DownloadDirectory): Promise<void> {
+        out = path.resolve(out);
+        Deno.mkdirSync(out, {recursive: true});
+        
         await Project.build({ignoreSymlinks: true});
 
         if (type !== "publish" && Config.Options.type === "add-on") {
