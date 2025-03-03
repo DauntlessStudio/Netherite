@@ -39,6 +39,11 @@ export class Config {
         return `${APPDATA}/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang`;
     }
 
+    public static get DownloadDirectory() : string {
+        const home = (Deno.env.get("USERPROFILE") ?? Deno.env.get("HOME") ?? "").replace(/\\/g, '/');
+        return path.join(home, "Downloads");
+    }
+
     public static get Paths(): ConfigPaths {
         const root = this.Options.type === "world" ? "./dist/Content/world_template/" : "./dist/Content/";
         const bpRoot = root + "behavior_packs/" + this.Options.namespace + "_bp/";
@@ -71,7 +76,7 @@ export class Config {
 
     public static async getUUID(category: string): Promise<string> {
         const hash = await crypto.subtle.digest("SHA-256", Buffer.from(category + Config.Options.uuid));
-        return v4({rng: () => Buffer.from(hash, 0, 16)});
+        return v4({rng: () => new Uint8Array(Buffer.from(hash, 0, 16))});
     }
 
     public static getTemplateFile(file: string): string {

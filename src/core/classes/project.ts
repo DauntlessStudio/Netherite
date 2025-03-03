@@ -38,21 +38,20 @@ export class Project {
         await new Deno.Command("netherite", {args: ["build"]}).output();
     }
 
-    public static async build(watch?: boolean): Promise<void> {
+    public static async build(options?: {watch?: boolean, ignoreSymlinks?: boolean}): Promise<void> {
         await Config.ingestConfig();
 
-        emptyDirectorySync(path.join(Deno.cwd(), Config.Paths.bp.root));
-        emptyDirectorySync(path.join(Deno.cwd(), Config.Paths.rp.root));
-        this.createSymlinks();
+        emptyDirectorySync(path.join(Deno.cwd(), "dist"));
+        if (options?.ignoreSymlinks !== true) this.createSymlinks();
 
-        await Module.build(watch);
-        Static.build(watch);
-        Script.build(watch);
-        World.build();
+        await Module.build(options?.watch);
+        Static.build(options?.watch);
+        await Script.build(options?.watch);
+        await World.build();
         Language.build();
         Sound.build();
         Texture.build();
-        Manifest.build();
+        await Manifest.build();
     }
 
     private static createDirectories(): void {

@@ -1,5 +1,5 @@
 import * as path from "jsr:@std/path";
-import { deepMerge, writeTextToDist } from "../utils/index.ts";
+import { writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
 
 export class World {
@@ -31,12 +31,25 @@ export class World {
         });
     }
     
-    public static async build(): Promise<void> {
-        if (Config.Options.type === "world") {
+    public static async build(force?: boolean): Promise<void> {
+        if (Config.Options.type === "world" || force) {
             writeTextToDist(path.join(Config.Paths.root, "world_behavior_packs.json"), JSON.stringify(await this.BehaviorPacks, null, "\t"));
             writeTextToDist(path.join(Config.Paths.root, "world_resource_packs.json"), JSON.stringify(await this.ResourcePacks, null, "\t"));
 
             writeTextToDist(path.join(Config.Paths.root, "levelname.txt"), Config.Options.name);
+
+            // TODO: Use NBT editor to modify level.dat before building
+            try {
+                Deno.copyFileSync(path.join(Deno.cwd(), "src/world/level.dat"), path.join(Config.Paths.root, "level.dat"));
+            } catch (_error) {
+                Deno.copyFileSync(Config.getTemplateFile("misc/level.dat"), path.join(Config.Paths.root, "level.dat"));
+            }
+
+            try {
+                Deno.copyFileSync(path.join(Deno.cwd(), "src/world/world_icon.jpeg"), path.join(Config.Paths.root, "world_icon.jpeg"));
+            } catch (_error) {
+                // TODO: Get a placeholder world_icon.jpeg
+            }
         }
     }
 }

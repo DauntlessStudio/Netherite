@@ -72,7 +72,7 @@ export class Manifest {
                 },
                 modules: [
                     {
-                        type: "data",
+                        type: "resources",
                         uuid: await Config.getUUID("resources"),
                         version: [1, 0, 0],
                     },
