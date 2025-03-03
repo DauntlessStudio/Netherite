@@ -104,7 +104,7 @@ function getProjectBuildData(args: InitCommandData): ProjectBuilderOptions {
         buildOptions.formatVersion = args.options.formatVersion;
     } else {
         let val = prompt("Please enter the format version of the project [default: 1.21.51]:");
-        if (val === null) val = "1.21.51";
+        if (val === null || val === "") val = "1.21.51";
 
         buildOptions.formatVersion = val;
     }

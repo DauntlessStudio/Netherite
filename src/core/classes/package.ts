@@ -1,0 +1,271 @@
+import * as path from "jsr:@std/path";
+import { Config } from "./config.ts";
+
+interface NetheritePackage {
+    name: string;
+    uuid: string;
+    version: string;
+    description: string;
+}
+
+interface NetheriteManifest {
+    name: string;
+    uuid: string;
+    repository: string;
+    description: string;
+    versions: {
+        latest: string;
+        [version: string]: string;
+    };
+}
+
+export class Package {
+    private static latestVanillaVersion: string = "1.21.62";
+
+    public static get LatestVanillaVersion() : string {
+        try {
+            const version = JSON.parse(Deno.readTextFileSync(path.join(Config.NetheriteDirectory, "bedrock-samples", "version.json")));
+            const latest = (version.latest as string).split(".");
+            latest.length = 3;
+            return latest.join(".");
+        } catch (_error) {
+            return this.latestVanillaVersion;
+        }
+    }
+    
+    // Initial Setup, should only run once
+    public static async init(): Promise<void> {
+        try {
+            Deno.statSync(Config.NetheriteDirectory);
+            Deno.statSync(path.join(Config.NetheriteDirectory, "bedrock-samples"));
+        } catch (_error) {
+            const cwd = Deno.cwd();
+
+            Deno.mkdirSync(Config.NetheriteDirectory, {recursive: true});
+            Deno.mkdirSync(path.join(Config.NetheriteDirectory, "packages"));
+
+            Deno.chdir(Config.NetheriteDirectory);
+
+            const install = await new Deno.Command("git", {args: ["clone", "https://github.com/Mojang/bedrock-samples.git"]}).output();
+
+            if (!install.success) {
+                console.error("Failed to install bedrock-samples, is git installed and are you connected to the internet?");
+                Deno.exit(1);
+            }
+
+            Deno.chdir(cwd);
+        }
+    }
+
+    // Vanilla validation, uses git to check if .netherite/bedrock-samples exists and is up to date
+    public static async vanillaUpdate(): Promise<void> {
+        await this.init();
+
+        const cwd = Deno.cwd();
+        Deno.chdir(path.join(Config.NetheriteDirectory, "bedrock-samples"));
+
+        const update = await new Deno.Command("git", {args: ["pull"]}).output();
+
+        if (!update.success) {
+            console.error(`Failed to update bedrock-samples, is git installed and are you connected to the internet?`);
+            console.error(`Latest version defaulting to ${this.latestVanillaVersion}`);
+        }
+
+        Deno.chdir(cwd);
+    }
+
+    // Installs a package from a git repository into .netherite/packages
+    public static async install(url: string): Promise<void> {
+        await this.init();
+
+        const cwd = Deno.cwd();
+        Deno.chdir(Config.NetheriteDirectory);
+
+        const install = await new Deno.Command("git", {args: ["clone", url]}).output();
+
+        if (!install.success) {
+            console.error("Failed to install package, is git installed and are you connected to the internet?");
+            Deno.exit(1);
+        }
+
+        try {
+            Deno.statSync(path.join(Config.NetheriteDirectory, "packages", url.split("/")[-1].replace(".git", ""), "netherite.package.json"));
+        } catch (_error) {
+            console.error("Failed to install invalid package, missing netherite.package.json");
+            Deno.removeSync(path.join(Config.NetheriteDirectory, "packages", url.split("/")[-1].replace(".git", "")), {recursive: true});
+            Deno.exit(1);
+        }
+
+        Deno.chdir(cwd);
+    }
+
+    // Uninstalls a package from .netherite/packages
+    public static async uninstall(value: number|string): Promise<void> {
+        const {dir} = await this.getInstalledPackage(value);
+        Deno.removeSync(dir, {recursive: true});
+    }
+
+    // Lists all installed packages
+    public static async list(): Promise<{dir: string, manifest: NetheriteManifest}[]> {
+        const packages: {dir: string, manifest: NetheriteManifest}[] = [];
+
+        await this.iterateInstalledPackages((dir) => {
+            const manifest: NetheriteManifest = JSON.parse(Deno.readTextFileSync(path.join(dir, "netherite.manifest.json")));
+            packages.push({dir, manifest});
+        });
+
+        return packages;
+    }
+
+    // Loads an installed package into the current project
+    public static async load(value: number|string, version?: string): Promise<void> {
+        const nPackage = await this.getInstalledPackage(value);
+
+        if (version && !nPackage.manifest.versions[version]) {
+            console.error(`Invalid ${nPackage.manifest.name} package version`);
+            Deno.exit(1);
+        }
+
+        const useVersion = version ? version : nPackage.manifest.versions.latest;
+
+        try {
+            Deno.statSync(path.join(nPackage.dir, useVersion));
+        } catch (_error) {
+            console.error(`Failed to load ${nPackage.manifest.name} package, missing version ${useVersion}`);
+            Deno.exit(1);
+        }
+
+        Deno.copyFileSync(path.join(nPackage.dir, useVersion), path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name));
+    }
+
+    // Publishes a loaded package to a git repository
+    public static async publish(loadedPackage: {dir: string, package: NetheritePackage}): Promise<void> {
+        const installedPackage = await this.getInstalledPackage(loadedPackage.package.name);
+
+        if (!installedPackage.manifest.repository) {
+            console.error("Failed to publish package, missing repository in netherite.manifest.json");
+            Deno.exit(1);
+        }
+
+        const cwd = Deno.cwd();
+        Deno.chdir(installedPackage.dir);
+
+        const status = await new Deno.Command("git", {args: ["status"]}).output();
+
+        if (!status.success) {
+            console.error(`${installedPackage.manifest.name} repository is not a git repository, cannot publish`);
+            console.error(`You may need to remove the package and re-install it`);
+            Deno.exit(1);
+        }
+
+        await new Deno.Command("git", {args: ["pull"]}).output();
+        installedPackage.manifest = JSON.parse(Deno.readTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json")));
+
+        const loadedVersion = parseInt(loadedPackage.package.version.replace(/\./g, ""));
+        const lastestVersion = parseInt(installedPackage.manifest.versions.latest.replace(/\./g, ""));
+        
+        if (loadedVersion <= lastestVersion) {
+            console.error(`Failed to publish package, version ${loadedPackage.package.version} is not greater than ${installedPackage.manifest.versions.latest}`);
+            Deno.exit(1);
+        }
+
+        Deno.copyFileSync(loadedPackage.dir, path.join(installedPackage.dir, loadedPackage.package.version));
+
+        installedPackage.manifest.versions[loadedPackage.package.version] = loadedPackage.package.version;
+        installedPackage.manifest.versions.latest = loadedPackage.package.version;
+
+        Deno.writeTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json"), JSON.stringify(installedPackage.manifest, null, "\t"));
+
+        await new Deno.Command("git", {args: ["add", "."]}).output();
+        await new Deno.Command("git", {args: ["commit", "-m", loadedPackage.package.version]}).output();
+        await new Deno.Command("git", {args: ["push"]}).output();
+
+        Deno.chdir(cwd);
+    }
+
+    // Creates a new package in the current project, allows for publishing to a git repository on creation
+    public static async create(name: string, description: string, publish?: boolean): Promise<void> {
+        const dir = path.join(Deno.cwd(), "src", "modules", name);
+        Deno.mkdirSync(dir, {recursive: true});
+
+        const nPackage: NetheritePackage = {
+            name,
+            description,
+            uuid: crypto.randomUUID(),
+            version: "1.0.0"
+        };
+
+        Deno.writeTextFileSync(path.join(Deno.cwd(), "src", "modules", name, "netherite.package.json"), JSON.stringify(nPackage, null, "\t"));
+
+        if (publish) {
+            const cwd = Deno.cwd();
+            const installDir = path.join(Config.NetheriteDirectory, "packages", name);
+
+            Deno.mkdirSync(installDir, {recursive: true});
+            Deno.chdir(installDir);
+
+            console.log("Select 'Push an existing local repository to GitHub' when prompted and use '.' as the 'Path to local repository'");
+            await new Deno.Command("git", {args: ["init"]}).output();
+            const repo = await new Deno.Command("gh", {args: ["repo", "create"]}).spawn().output();
+
+            if (repo.success) {
+                Deno.writeTextFileSync(path.join(installDir, "netherite.manifest.json"), JSON.stringify({
+                    name,
+                    description,
+                    uuid: nPackage.uuid,
+                    versions: {latest: "0.0.0"}
+                }, null, "\t"));
+    
+                Deno.copyFileSync(dir, path.join(installDir, nPackage.version));
+                await this.publish({dir, package: nPackage});
+            } else {
+                console.error("Failed to create repository, is gh installed and are you connected to the internet?");
+                Deno.exit(1);
+            }
+
+            Deno.chdir(cwd);
+        }
+    }
+
+    private static async iterateInstalledPackages(callback: (path: string) => Promise<void>|void): Promise<void> {
+        try {
+            Deno.statSync(path.join(Config.NetheriteDirectory, "packages"));
+        } catch (_error) {
+            await this.vanillaUpdate();
+        }
+
+        for (const entry of Deno.readDirSync(path.join(Config.NetheriteDirectory, "packages"))) {
+            if (entry.isDirectory) {
+                try {
+                    Deno.statSync(path.join(Config.NetheriteDirectory, "packages", entry.name, "netherite.manifest.json"));
+                } catch (_error) {
+                    continue;
+                }
+
+                await callback(path.join(Config.NetheriteDirectory, "packages", entry.name));
+            }
+        };
+    }
+
+    private static async getInstalledPackage(value: number|string): Promise<{dir: string, manifest: NetheriteManifest}> {
+        const packages = await this.list();
+
+        if (typeof value === "number") {
+            if (value < 0 || value >= packages.length) {
+                console.error("Invalid package index");
+                Deno.exit(1);
+            }
+
+            return packages[value];
+        } else {
+            const packageValue = packages.find((item) => item.manifest.name === value);
+
+            if (!packageValue) {
+                console.error("Invalid package name");
+                Deno.exit(1);
+            }
+
+            return packageValue;
+        }
+    }
+}
