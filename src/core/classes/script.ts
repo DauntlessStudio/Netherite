@@ -23,10 +23,14 @@ export class Script {
         };
     
         if (watch) {
-            const context = await esbuild.context(buildOptions);
-            context.watch();
+            this.watch(buildOptions);
         } else {
             await esbuild.build(buildOptions);
         }
+    }
+
+    public static async watch(buildOptions: esbuild.BuildOptions): Promise<void> {
+        const context = await esbuild.context(buildOptions);
+        context.watch();
     }
 }

@@ -42,12 +42,11 @@ export class Project {
         await Config.ingestConfig();
 
         emptyDirectorySync(path.join(Deno.cwd(), "dist"));
-
         if (options?.ignoreSymlinks !== true) this.createSymlinks();
 
         await Module.build(options?.watch);
         Static.build(options?.watch);
-        Script.build(options?.watch);
+        await Script.build(options?.watch);
         await World.build();
         Language.build();
         Sound.build();
