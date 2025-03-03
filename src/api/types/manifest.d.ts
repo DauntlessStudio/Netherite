@@ -4,7 +4,7 @@ export interface Manifest {
         name: string;
         description: string;
         uuid: string;
-        pack_scope: string;
+        pack_scope?: string;
         version: number[];
         lock_template_options?: boolean;
         allow_random_seed?: boolean;
