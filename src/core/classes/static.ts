@@ -28,8 +28,8 @@ export class Static {
         Block.ingestBlockFiles(this.resourcePath);
         Sound.ingestSoundFiles(this.resourcePath);
 
-        sendToDist(this.behaviorPath, Config.Paths.bp.root, ["**/*.ts", "**/manifest.json"]);
-        sendToDist(this.resourcePath, Config.Paths.rp.root, ["**/.lang", "**/manifest.json"]);
+        sendToDist(this.behaviorPath, Config.Paths.bp.root, ["**/*.ts"]);
+        sendToDist(this.resourcePath, Config.Paths.rp.root, ["**/.lang"]);
 
         for (const entry of Deno.readDirSync(this.modulePath)) {
             if (entry.isDirectory) {
@@ -37,7 +37,7 @@ export class Static {
                     const subPath = path.join(this.modulePath, entry.name, subEntry.name);
     
                     if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "bp")) {
-                        sendToDist(subPath, Config.Paths.bp.root, ["**/*.ts", "**/manifest.json"]);
+                        sendToDist(subPath, Config.Paths.bp.root, ["**/*.ts"]);
                         continue;
                     }
                     
@@ -48,7 +48,7 @@ export class Static {
                         Block.ingestBlockFiles(subPath);
                         Sound.ingestSoundFiles(subPath);
                         
-                        sendToDist(subPath, Config.Paths.rp.root, ["**/.lang", "**/manifest.json"]);
+                        sendToDist(subPath, Config.Paths.rp.root, ["**/.lang"]);
                         continue;
                     }
                 }

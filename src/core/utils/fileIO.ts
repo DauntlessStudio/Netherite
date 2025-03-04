@@ -57,7 +57,7 @@ export function writeBufferToDist(dest: string, content: Uint8Array): void {
     }
 }
 
-export function writeTextToDist(dest: string, content: string): void {
+export function writeTextToDist(dest: string, content: string, overwrite: boolean = true): void {
     Deno.mkdirSync(path.dirname(dest), {recursive: true});
     
     const modifiedContent = content
@@ -67,11 +67,15 @@ export function writeTextToDist(dest: string, content: string): void {
     .replace(/AUTHOR/g, Config.Options.author)
     .replace(/NAME/g, Config.Options.name)
     
-    Deno.writeTextFileSync(dest, modifiedContent);
+    try {
+        Deno.writeTextFileSync(dest, modifiedContent, {createNew: !overwrite});
+    } catch (_error) {
+        // File already exists and overwrite is false
+    }
 }
 
 export function isTextFile(filename: string): boolean {
-    const textFileExtensions = [".ts", ".json", ".txt", ".md", ".lang"];
+    const textFileExtensions = [".ts", ".js", ".json", ".txt", ".md", ".lang"];
     return textFileExtensions.some(ext => filename.endsWith(ext));
 }
 
