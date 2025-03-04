@@ -39,9 +39,17 @@ export class Config {
         return `${APPDATA}/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang`;
     }
 
-    public static get DownloadDirectory() : string {
+    public static get HomeDirectory() : string {
         const home = (Deno.env.get("USERPROFILE") ?? Deno.env.get("HOME") ?? "").replace(/\\/g, '/');
-        return path.join(home, "Downloads");
+        return home;
+    }
+
+    public static get NetheriteDirectory() : string {
+        return path.join(this.HomeDirectory, ".netherite");
+    }
+
+    public static get DownloadDirectory() : string {
+        return path.join(this.HomeDirectory, "Downloads");
     }
 
     public static get Paths(): ConfigPaths {

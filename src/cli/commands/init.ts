@@ -1,3 +1,4 @@
+import { Package } from "../../core/classes/index.ts";
 import { Project, type ProjectBuilderOptions } from "../../core/classes/project.ts";
 import { Command } from "../command.ts";
 import type { CommandData } from "../command.ts";
@@ -55,8 +56,8 @@ new Command<InitCommandData>({
 			},
 		},
 	},
-	action(_args) {
-		Project.init(getProjectBuildData(_args));
+	async action(_args) {
+		Project.init(await getProjectBuildData(_args));
 	},
 	validateArgs(_args) {
         const validName = _args.options.name === undefined || (typeof _args.options.name === "string" && _args.options.name.length > 0);
@@ -70,8 +71,9 @@ new Command<InitCommandData>({
 	},
 });
 
-function getProjectBuildData(args: InitCommandData): ProjectBuilderOptions {
+async function getProjectBuildData(args: InitCommandData): Promise<ProjectBuilderOptions> {
     const buildOptions: Partial<ProjectBuilderOptions> = {};
+    await Package.vanillaUpdate();
 
     if (args.options.name) {
         buildOptions.name = args.options.name;
@@ -103,8 +105,8 @@ function getProjectBuildData(args: InitCommandData): ProjectBuilderOptions {
     if (args.options.formatVersion) {
         buildOptions.formatVersion = args.options.formatVersion;
     } else {
-        let val = prompt("Please enter the format version of the project [default: 1.21.51]:");
-        if (val === null) val = "1.21.51";
+        let val = prompt(`Please enter the format version of the project [default: ${Package.LatestVanillaVersion}]:`);
+        if (val === null || val === "") val = Package.LatestVanillaVersion;
 
         buildOptions.formatVersion = val;
     }

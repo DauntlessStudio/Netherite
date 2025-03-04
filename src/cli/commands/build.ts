@@ -30,6 +30,6 @@ export default new Command<BuildCommandData>({
         return _args.options.watch === undefined || typeof _args.options.watch === "boolean";
     },
     async action(_args) {
-        await Project.build(_args.options.watch);
+        await Project.build({watch: _args.options.watch});
     },
 });

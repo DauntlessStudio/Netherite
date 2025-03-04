@@ -48,8 +48,9 @@ export class Command<T extends CommandData> {
         }
     }
 
-    public addSubCommand(command: Command<CommandData>): void {
+    public addSubCommand(command: Command<CommandData>): Command<T> {
         this.subcommands.push(command);
+        return this;
     }
 
     public parse(args: string[]): boolean {
