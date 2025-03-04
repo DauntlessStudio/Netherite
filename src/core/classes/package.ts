@@ -310,7 +310,7 @@ export class Package {
         };
     }
 
-    private static async getInstalledPackage(value: number|string): Promise<{dir: string, manifest: NetheriteManifest}> {
+    public static async getInstalledPackage(value: number|string): Promise<{dir: string, manifest: NetheriteManifest}> {
         const packages = await this.list();
 
         if (typeof value === "number") {
@@ -354,7 +354,7 @@ export class Package {
         };
     }
 
-    private static async getLoadedPackage(value: number|string): Promise<{dir: string, package: NetheritePackage}> {
+    public static async getLoadedPackage(value: number|string): Promise<{dir: string, package: NetheritePackage}> {
         const packages = await this.listLoaded();
 
         if (typeof value === "number") {

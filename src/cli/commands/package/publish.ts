@@ -1,33 +1,26 @@
 import { Command, type CommandData } from "../../command.ts";
 import { Package } from "../../../core/classes/index.ts";
 
-interface UninstallCommandData extends CommandData {
+interface PublishCommandData extends CommandData {
     options: {
         package?: string|number;
-        "no-unload"?: boolean;
     }
 }
 
-export default new Command<UninstallCommandData>({
-    name: "uninstall",
+export default new Command<PublishCommandData>({
+    name: "publish",
     usage: {
-        description: "Uninstalls a package from the Netherite cache, and unloads it from the project",
-        usage: "[--package <name|index> --no-unload]",
+        description: "Attempts to publish a local package update. Requires the package to have been created correctly with a valid GitHub repository.",
+        usage: "[--package <name|index>]",
         flags: {
             package: {
                 type: "string|number",
                 description: "The name or index of the package to uninstall",
                 optional: true,
             },
-            "no-unload": {
-                type: "boolean",
-                description: "Does not load the package into the project",
-                optional: true,
-            },
         },
     },
     parse: {
-        boolean: ["no-unload"],
         string: ["package"],
         alias: {
             package: "p",
@@ -35,8 +28,7 @@ export default new Command<UninstallCommandData>({
     },
     validateArgs(_args) {
         const pack = _args.options["package"] === undefined || typeof _args.options["package"] === "string" || typeof _args.options["package"] === "number";
-        const noLoad = _args.options["no-unload"] === undefined || typeof _args.options["no-unload"] === "boolean";
-        return pack && noLoad;
+        return pack;
     },
     async action(_args) {
         if (!_args.options.package) {
@@ -48,11 +40,8 @@ export default new Command<UninstallCommandData>({
             }
         }
 
-        const manifest = await Package.uninstall(_args.options.package);
-
-        if (!_args.options["no-unload"]) {
-            await Package.unload(manifest.manifest.name);
-        }
+        const nPackage = await Package.getLoadedPackage(_args.options.package);
+        await Package.publish(nPackage);
     },
 });
 

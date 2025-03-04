@@ -1,5 +1,6 @@
 import { Command, type CommandData } from "../../command.ts";
 import Create from "./create.ts";
+import Publish from "./publish.ts";
 import Install from "./install.ts";
 import Uninstall from "./uninstall.ts";
 
@@ -14,5 +15,6 @@ export default new Command<CommandData>({
     },
 })
 .addSubCommand(Create)
+.addSubCommand(Publish)
 .addSubCommand(Install)
 .addSubCommand(Uninstall);
