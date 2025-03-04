@@ -61,11 +61,11 @@ export function writeTextToDist(dest: string, content: string): void {
     Deno.mkdirSync(path.dirname(dest), {recursive: true});
     
     const modifiedContent = content
-    .replace(/NAME/g, Config.Options.name)
-    .replace(/AUTHOR/g, Config.Options.author)
-    .replace(/VERSION/g, Config.Options.version)
+    .replace(/FORMATVERSION/g, Config.Options.formatVersion)
     .replace(/NAMESPACE/g, Config.Options.namespace)
-    .replace(/FORMATVERSION/g, Config.Options.formatVersion);
+    .replace(/VERSION/g, Config.Options.version)
+    .replace(/AUTHOR/g, Config.Options.author)
+    .replace(/NAME/g, Config.Options.name)
     
     Deno.writeTextFileSync(dest, modifiedContent);
 }

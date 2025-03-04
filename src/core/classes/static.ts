@@ -63,8 +63,6 @@ export class Static {
     public static getDistFromPath(src: string): string {
         src = path.resolve(src);
 
-        console.log(src);
-
         if (src.startsWith(this.behaviorPath)) {
             src = src.replace(this.behaviorPath, "");
             return path.join(Config.Paths.bp.root, src);
