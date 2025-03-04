@@ -1,5 +1,5 @@
 import { Package } from "../../core/classes/index.ts";
-import { Project, type ProjectBuilderOptions } from "../../core/classes/project.ts";
+import { Project, type ProjectType, type ProjectBuilderOptions, type ScriptType } from "../../core/classes/project.ts";
 import { Command } from "../command.ts";
 import type { CommandData } from "../command.ts";
 
@@ -9,20 +9,22 @@ interface InitCommandData extends CommandData {
         author?: string;
         namespace?: string;
         formatVersion?: string;
-        type?: "world"|"add-on"|"skin-pack";
+        type?: ProjectType;
+        script?: ScriptType;
     }
 }
 
 new Command<InitCommandData>({
 	name: "init",
 	parse: {
-		string: ["name", "author", "namespace", "formatVersion", "type"],
+		string: ["name", "author", "namespace", "formatVersion", "type", "script"],
         alias: {
             n: "name",
             a: "author",
             ns: "namespace",
             f: "formatVersion",
             t: "type",
+            s: "script",
         },
 	},
 	usage: {
@@ -54,6 +56,11 @@ new Command<InitCommandData>({
 				description: "The type of the project, will prompt if missing",
 				optional: true,
 			},
+			script: {
+				type: "string",
+				description: "The script compiler of the project, will prompt if missing",
+				optional: true,
+			},
 		},
 	},
 	async action(_args) {
@@ -66,8 +73,9 @@ new Command<InitCommandData>({
         const validNamespace = _args.options.namespace === undefined || (typeof _args.options.namespace === "string" && _args.options.namespace.length > 0);
         const validFormatVersion = _args.options.formatVersion === undefined || (typeof _args.options.formatVersion === "string" && _args.options.formatVersion.length > 0);
         const validType = _args.options.type === undefined || (typeof _args.options.type === "string" && ["world", "add-on", "skin-pack"].includes(_args.options.type));
+        const validScript = _args.options.script === undefined || (typeof _args.options.script === "string" && ["deno", "node"].includes(_args.options.script));
 
-		return validName && validAuthor && validNamespace && validFormatVersion && validType;
+		return validName && validAuthor && validNamespace && validFormatVersion && validType && validScript;
 	},
 });
 
@@ -117,7 +125,16 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectBuilde
         let val = prompt("Please enter the type of the project (world, add-on, skin-pack) [default: world]:");
         if (val === null || !["world", "add-on", "skin-pack"].includes(val)) val = "world";
 
-        buildOptions.type = val as "world"|"add-on"|"skin-pack";
+        buildOptions.type = val as ProjectType;
+    }
+
+    if (args.options.script) {
+        buildOptions.scripting = args.options.script;
+    } else {
+        let val = prompt("Please enter the TypeScript framework of the project. Deno is highly recommended unless you are converting a node project (deno, node) [default: deno]:");
+        if (val === null || !["deno", "node"].includes(val)) val = "deno";
+
+        buildOptions.scripting = val as ScriptType;
     }
 
     return buildOptions as ProjectBuilderOptions;

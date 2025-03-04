@@ -7,6 +7,7 @@ import { Logger } from "../utils/logger.ts";
 // TODO: Possibly remove skin-pack as an option and instead build a skin pack with the world or add-on
 // TODO: Generate level.dat and world_icon.jpeg for world projects
 export type ProjectType = "world"|"add-on"|"skin-pack";
+export type ScriptType = "deno" | "node";
 
 export interface ProjectBuilderOptions {
     name: string;
@@ -14,6 +15,7 @@ export interface ProjectBuilderOptions {
     namespace: string;
     formatVersion: string;
     type: ProjectType;
+    scripting: ScriptType;
 };
 
 export class Project {
@@ -55,7 +57,10 @@ export class Project {
         await Config.ingestConfig();
 
         emptyDirectorySync(path.join(Deno.cwd(), "dist"));
+        
         if (options?.ignoreSymlinks !== true) this.createSymlinks();
+        emptyDirectorySync(Config.Paths.bp.root);
+        emptyDirectorySync(Config.Paths.rp.root);
 
         await Module.build(options?.watch);
         Static.build(options?.watch);
@@ -124,6 +129,10 @@ export class Project {
     }
 
     private static async installDependencies(): Promise<void> {
-        await new Deno.Command("deno", {args: ["install", ...this.dependencies]}).output();
+        if (Config.Options.scripting === "deno") {
+            await new Deno.Command("deno", {args: ["install", ...this.dependencies]}).output();
+        } else {
+            await new Deno.Command("npm", {args: ["install", ...this.dependencies]}).output();
+        }
     }
 }

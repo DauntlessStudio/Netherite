@@ -2,7 +2,7 @@ import { Config } from "../../core/classes/index.ts";
 import { TemplateFile } from "../template.ts";
 
 const contents = () =>
-`import * as mc from "npm:@minecraft/server";
+`import * as mc from "@minecraft/server";
 
 function main() {
     console.log("Loaded [${Config.Options.name}]!");
