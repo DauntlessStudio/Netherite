@@ -19,7 +19,7 @@ export class Script {
             outfile: Config.Paths.bp.scripts + `/main.js`,
             bundle: true,
             format: "esm",
-            logLevel: "info",
+            logLevel: watch ? "info" : undefined,
         };
     
         if (watch) {

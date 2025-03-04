@@ -47,7 +47,11 @@ export class Project {
         Logger.Spinner.succeed("Project created successfully!");
     }
 
-    public static async build(options?: {watch?: boolean, ignoreSymlinks?: boolean}): Promise<void> {
+    public static async build(options?: {watch?: boolean, ignoreSymlinks?: boolean, silent?: boolean}): Promise<void> {
+        const cachedTime = Date.now();
+
+        if (options?.silent !== true) Logger.Spinner.start("Building Project...");
+
         await Config.ingestConfig();
 
         emptyDirectorySync(path.join(Deno.cwd(), "dist"));
@@ -61,6 +65,8 @@ export class Project {
         Sound.build();
         Texture.build();
         await Manifest.build();
+
+        if (options?.silent !== true) Logger.Spinner.succeed(`Project built in ${Date.now() - cachedTime}ms`);
     }
 
     private static createDirectories(): void {
