@@ -48,7 +48,7 @@ new Command<InitCommandData>({
 			},
 			formatVersion: {
 				type: "string",
-				description: "The format version of the project, will prompt if missing",
+				description: "The format version of the project, will prompt if missing. Use 'latest' to get the latest version",
 				optional: true,
 			},
 			type: {
@@ -111,6 +111,10 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectBuilde
     }
 
     if (args.options.formatVersion) {
+        if (args.options.formatVersion === "latest") {
+            args.options.formatVersion = Package.LatestVanillaVersion;
+        }
+
         buildOptions.formatVersion = args.options.formatVersion;
     } else {
         let val = prompt(`Please enter the format version of the project [default: ${Package.LatestVanillaVersion}]:`);
