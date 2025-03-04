@@ -10,7 +10,8 @@ const contents = async () => JSON.stringify({
 			"name": "Debug with Minecraft",
 			"mode": "listen",
 			"targetModuleUuid": await Config.getUUID("script"),
-			"localRoot": "${workspaceFolder}/" + Config.Paths.bp.scripts.replace("./", ""),
+			"sourceMapRoot": "${workspaceFolder}/" + Config.Paths.bp.scripts.replace("./", ""),
+			"localRoot": "${workspaceFolder}/src/behavior_pack/scripts/",
 			"port": 19144
 		}
 	]

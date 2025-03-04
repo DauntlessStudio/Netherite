@@ -18,6 +18,7 @@ export class Script {
             external: ["@minecraft/server", "@minecraft/server-ui"],
             outfile: Config.Paths.bp.scripts + `/main.js`,
             bundle: true,
+            sourcemap: "inline",
             format: "esm",
             logLevel: watch ? "info" : undefined,
         };
