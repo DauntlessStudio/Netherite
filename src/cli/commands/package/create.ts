@@ -1,7 +1,7 @@
 import { Command, type CommandData } from "../../command.ts";
 import { Package } from "../../../core/classes/index.ts";
 
-interface PublishCommandData extends CommandData {
+interface CreateCommandData extends CommandData {
     options: {
         name?: string;
         description?: string;
@@ -9,13 +9,13 @@ interface PublishCommandData extends CommandData {
     }
 }
 
-interface PublishData {
+interface CreateData {
     name: string;
     description: string;
     publish: boolean;
 }
 
-export default new Command<PublishCommandData>({
+export default new Command<CreateCommandData>({
     name: "create",
     usage: {
         description: "Creates a new package in the current project",
@@ -57,10 +57,10 @@ export default new Command<PublishCommandData>({
         const data = getData(_args);
         await Package.create(data.name, data.description, data.publish);
     },
-})
+});
 
-function getData(args: PublishCommandData): PublishData {
-    const options: Partial<PublishData> = {};
+function getData(args: CreateCommandData): CreateData {
+    const options: Partial<CreateData> = {};
 
     if (args.options.name) {
         options.name = args.options.name;
@@ -88,5 +88,5 @@ function getData(args: PublishCommandData): PublishData {
         options.publish = val;
     }
 
-    return options as PublishData;
+    return options as CreateData;
 }

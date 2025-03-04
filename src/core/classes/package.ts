@@ -56,6 +56,12 @@ export class Package {
 
             Deno.chdir(cwd);
         }
+
+        try {
+            Deno.statSync(path.join(Config.NetheriteDirectory, "packages"));
+        } catch (_error) {
+            Deno.mkdirSync(path.join(Config.NetheriteDirectory, "packages"));
+        }
     }
 
     // Vanilla validation, uses git to check if .netherite/bedrock-samples exists and is up to date
@@ -76,35 +82,55 @@ export class Package {
     }
 
     // Installs a package from a git repository into .netherite/packages
-    public static async install(url: string): Promise<void> {
+    public static async install(url: string): Promise<{dir: string, manifest: NetheriteManifest}> {
         await this.init();
 
+        const packageName = url.split("/").pop()!.replace(".git", "");
+
         const cwd = Deno.cwd();
-        Deno.chdir(Config.NetheriteDirectory);
+        Deno.chdir(path.join(Config.NetheriteDirectory, "packages"));
+
+        const cached = await this.list();
+
+        if (cached.find((item) => item.manifest.name === packageName)) {
+            console.log("Package already installed, updating to latest version");
+            Deno.chdir(path.join(Config.NetheriteDirectory, "packages", packageName));
+            const update = await new Deno.Command("git", {args: ["pull"]}).output();
+        
+            if (!update.success) {
+                console.error("Failed to update package, is git installed and are you connected to the internet?");
+                Deno.exit(1);
+            }
+
+            Deno.chdir(cwd);
+            return cached.find((item) => item.manifest.name === packageName)!;
+        }
 
         const install = await new Deno.Command("git", {args: ["clone", url]}).output();
+
+        Deno.chdir(cwd);
 
         if (!install.success) {
             console.error("Failed to install package, is git installed and are you connected to the internet?");
             Deno.exit(1);
         }
 
-        // TODO: Rename directory to match the name from the manifest
-        try {
-            Deno.statSync(path.join(Config.NetheriteDirectory, "packages", url.split("/")[-1].replace(".git", ""), "netherite.manifest.json"));
-        } catch (_error) {
-            console.error("Failed to install invalid package, missing netherite.manifest.json");
-            Deno.removeSync(path.join(Config.NetheriteDirectory, "packages", url.split("/")[-1].replace(".git", "")), {recursive: true});
+        const newPackage = (await this.list()).find((item) => !cached.find((cache) => cache.manifest.uuid === item.manifest.uuid));
+
+        if (!newPackage) {
+            console.error("Failed to install package, missing netherite.manifest.json");
             Deno.exit(1);
         }
 
-        Deno.chdir(cwd);
+        return newPackage;
     }
 
     // Uninstalls a package from .netherite/packages
-    public static async uninstall(value: number|string): Promise<void> {
-        const {dir} = await this.getInstalledPackage(value);
-        Deno.removeSync(dir, {recursive: true});
+    public static async uninstall(value: number|string): Promise<{dir: string, manifest: NetheriteManifest}> {
+        const manifest = await this.getInstalledPackage(value);
+        Deno.removeSync(manifest.dir, {recursive: true});
+
+        return manifest;
     }
 
     // Lists all installed packages
@@ -114,6 +140,18 @@ export class Package {
         await this.iterateInstalledPackages((dir) => {
             const manifest: NetheriteManifest = JSON.parse(Deno.readTextFileSync(path.join(dir, "netherite.manifest.json")));
             packages.push({dir, manifest});
+        });
+
+        return packages;
+    }
+
+    // Lists all installed packages
+    public static async listLoaded(): Promise<{dir: string, package: NetheritePackage}[]> {
+        const packages: {dir: string, package: NetheritePackage}[] = [];
+
+        await this.iterateLoadedPackages((dir) => {
+            const nPackage: NetheritePackage = JSON.parse(Deno.readTextFileSync(path.join(dir, "netherite.package.json")));
+            packages.push({dir, package: nPackage});
         });
 
         return packages;
@@ -138,6 +176,14 @@ export class Package {
         }
 
         copyDirSync(path.join(nPackage.dir, useVersion), path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name));
+    }
+
+    // Unloads a package from the current project
+    public static async unload(value: number|string): Promise<{dir: string, package: NetheritePackage}> {
+        const nPackage = await this.getLoadedPackage(value);
+        Deno.removeSync(nPackage.dir, {recursive: true});
+
+        return nPackage;
     }
 
     // Publishes a loaded package to a git repository
@@ -243,21 +289,23 @@ export class Package {
     }
 
     private static async iterateInstalledPackages(callback: (path: string) => Promise<void>|void): Promise<void> {
+        const dir = path.join(Config.NetheriteDirectory, "packages");
+
         try {
-            Deno.statSync(path.join(Config.NetheriteDirectory, "packages"));
+            Deno.statSync(dir);
         } catch (_error) {
             await this.vanillaUpdate();
         }
 
-        for (const entry of Deno.readDirSync(path.join(Config.NetheriteDirectory, "packages"))) {
+        for (const entry of Deno.readDirSync(dir)) {
             if (entry.isDirectory) {
                 try {
-                    Deno.statSync(path.join(Config.NetheriteDirectory, "packages", entry.name, "netherite.manifest.json"));
+                    Deno.statSync(path.join(dir, entry.name, "netherite.manifest.json"));
                 } catch (_error) {
                     continue;
                 }
 
-                await callback(path.join(Config.NetheriteDirectory, "packages", entry.name));
+                await callback(path.join(dir, entry.name));
             }
         };
     }
@@ -274,6 +322,50 @@ export class Package {
             return packages[value];
         } else {
             const packageValue = packages.find((item) => item.manifest.name === value);
+
+            if (!packageValue) {
+                console.error("Invalid package name");
+                Deno.exit(1);
+            }
+
+            return packageValue;
+        }
+    }
+
+    private static async iterateLoadedPackages(callback: (path: string) => Promise<void>|void): Promise<void> {
+        const dir = path.join(Deno.cwd(), "src", "modules");
+
+        try {
+            Deno.statSync(dir);
+        } catch (_error) {
+            Deno.mkdirSync(dir, {recursive: true});
+        }
+
+        for (const entry of Deno.readDirSync(dir)) {
+            if (entry.isDirectory) {
+                try {
+                    Deno.statSync(path.join(dir, entry.name, "netherite.package.json"));
+                } catch (_error) {
+                    continue;
+                }
+
+                await callback(path.join(dir, entry.name));
+            }
+        };
+    }
+
+    private static async getLoadedPackage(value: number|string): Promise<{dir: string, package: NetheritePackage}> {
+        const packages = await this.listLoaded();
+
+        if (typeof value === "number") {
+            if (value < 0 || value >= packages.length) {
+                console.error("Invalid package index");
+                Deno.exit(1);
+            }
+
+            return packages[value];
+        } else {
+            const packageValue = packages.find((item) => item.package.name === value);
 
             if (!packageValue) {
                 console.error("Invalid package name");
