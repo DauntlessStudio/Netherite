@@ -187,7 +187,7 @@ export class Package {
     }
 
     // Publishes a loaded package to a git repository
-    public static async publish(loadedPackage: {dir: string, package: NetheritePackage}): Promise<void> {
+    public static async publish(loadedPackage: {dir: string, package: NetheritePackage}, force?: boolean): Promise<void> {
         const installedPackage = await this.getInstalledPackage(loadedPackage.package.name);
 
         if (!installedPackage.manifest.repository) {
@@ -224,10 +224,20 @@ export class Package {
 
         Deno.writeTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json"), JSON.stringify(installedPackage.manifest, null, "\t"));
 
-        // TODO: Change this to switch to a new branch and attempt to make a PR instead of pushing directly
+        if (!force) {
+            await new Deno.Command("git", {args: ["checkout", "-b", loadedPackage.package.version]}).output();
+            await new Deno.Command("git", {args: ["push", "-u", "origin", loadedPackage.package.version]}).output();
+        }
+
         await new Deno.Command("git", {args: ["add", "."]}).output();
         await new Deno.Command("git", {args: ["commit", "-m", loadedPackage.package.version]}).output();
         await new Deno.Command("git", {args: ["push"]}).output();
+
+        if (!force) {
+            await new Deno.Command("gh", {args: ["pr", "create", "--assignee=@me", "--fill", `--title=${loadedPackage.package.version}`]}).output();
+            await new Deno.Command("git", {args: ["checkout", "main"]}).output();
+            new TextDecoder().decode
+        }
 
         Deno.chdir(cwd);
     }
@@ -278,7 +288,7 @@ export class Package {
                 await new Deno.Command("git", {args: ["push", "-u", "origin", "main"]}).output();
     
                 copyDirSync(dir, path.join(installDir, nPackage.version));
-                await this.publish({dir, package: nPackage});
+                await this.publish({dir, package: nPackage}, true);
             } else {
                 console.error("Failed to create repository, is gh installed and are you connected to the internet?");
                 Deno.exit(1);
