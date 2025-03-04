@@ -2,15 +2,17 @@ import { Config } from "../../core/classes/index.ts";
 import { TemplateFile } from "../template.ts";
 
 const contents = () => JSON.stringify({
-    "files.associations": {
-        "*.json": "jsonc",
-    },
-    "git.autofetch": true,
-    "deno.enable": Config.Options.scripting === "deno" ? true : undefined,
+    include: [
+        "src/behavior_pack/scripts/**/*.ts",
+    ],
+    exclude: [
+        "node_modules",
+    ]
 }, null, "\t")
 
 new TemplateFile({
     type: "text",
-    out: [".vscode/settings.json"],
+    out: ["tsconfig.json"],
+    conditions: [() => Config.Options.scripting === "node"],
     contents,
 });

@@ -20,7 +20,9 @@ export class TemplateFile {
     }
 
     private async write(): Promise<void> {
-        if (this.template.type === "text" && (!this.template.conditions || this.template.conditions.every(condition => condition()))) {
+        if (this.template.conditions && !this.template.conditions.every(condition => condition())) return;
+        
+        if (this.template.type === "text") {
             await this.writeText();
         } else {
             this.writeBuffer();
