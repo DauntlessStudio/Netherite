@@ -96,7 +96,8 @@ export class Package {
 
         const cached = await this.list();
 
-        if (cached.find((item) => item.manifest.name === packageName)) {
+        const foundPackage = cached.find((item) => item.manifest.name === packageName);
+        if (foundPackage) {
             Logger.Spinner.update("Package already installed, updating to latest version...");
             Deno.chdir(path.join(Config.NetheriteDirectory, "packages", packageName));
             const update = await new Deno.Command("git", {args: ["pull"]}).output();
@@ -107,7 +108,9 @@ export class Package {
             }
 
             Deno.chdir(cwd);
-            return cached.find((item) => item.manifest.name === packageName)!;
+
+            Logger.Spinner.succeed(`Installed ${Logger.Colors.green(foundPackage.manifest.name)}!`);
+            return foundPackage;
         }
 
         const install = await new Deno.Command("git", {args: ["clone", url]}).output();
