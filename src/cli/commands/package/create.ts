@@ -1,6 +1,5 @@
 import { Command, type CommandData } from "../../command.ts";
 import { Package } from "../../../core/classes/index.ts";
-import PackageCommand from "./package.ts";
 
 interface PublishCommandData extends CommandData {
     options: {
@@ -16,11 +15,11 @@ interface PublishData {
     publish: boolean;
 }
 
-PackageCommand.addSubCommand(new Command<PublishCommandData>({
+export default new Command<PublishCommandData>({
     name: "create",
     usage: {
         description: "Creates a new package in the current project",
-        usage: "<subcommand> [options]",
+        usage: "[--name <name> --description <description> --publish]",
         flags: {
             "publish": {
                 type: "boolean",
@@ -39,6 +38,15 @@ PackageCommand.addSubCommand(new Command<PublishCommandData>({
             },
         },
     },
+    parse: {
+        boolean: ["publish"],
+        string: ["name", "description"],
+        alias: {
+            publish: "p",
+            name: "n",
+            description: "d",
+        }
+    },
     validateArgs(_args) {
         const publish = _args.options.publish === undefined || typeof _args.options.publish === "boolean";
         const name = _args.options.name === undefined || typeof _args.options.name === "string";
@@ -49,7 +57,7 @@ PackageCommand.addSubCommand(new Command<PublishCommandData>({
         const data = getData(_args);
         await Package.create(data.name, data.description, data.publish);
     },
-}));
+})
 
 function getData(args: PublishCommandData): PublishData {
     const options: Partial<PublishData> = {};

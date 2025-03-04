@@ -1,5 +1,5 @@
 import { Command, type CommandData } from "../../command.ts";
-import "./create.ts";
+import Create from "./create.ts";
 
 export default new Command<CommandData>({
     name: "package",
@@ -10,4 +10,5 @@ export default new Command<CommandData>({
     validateArgs(_args) {
         return true;
     },
-});
+})
+.addSubCommand(Create);

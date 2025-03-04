@@ -1,5 +1,6 @@
 import * as path from "jsr:@std/path";
 import { Config } from "./config.ts";
+import { copyDirSync } from "../utils/index.ts";
 
 interface NetheritePackage {
     name: string;
@@ -88,10 +89,11 @@ export class Package {
             Deno.exit(1);
         }
 
+        // TODO: Rename directory to match the name from the manifest
         try {
-            Deno.statSync(path.join(Config.NetheriteDirectory, "packages", url.split("/")[-1].replace(".git", ""), "netherite.package.json"));
+            Deno.statSync(path.join(Config.NetheriteDirectory, "packages", url.split("/")[-1].replace(".git", ""), "netherite.manifest.json"));
         } catch (_error) {
-            console.error("Failed to install invalid package, missing netherite.package.json");
+            console.error("Failed to install invalid package, missing netherite.manifest.json");
             Deno.removeSync(path.join(Config.NetheriteDirectory, "packages", url.split("/")[-1].replace(".git", "")), {recursive: true});
             Deno.exit(1);
         }
@@ -135,7 +137,7 @@ export class Package {
             Deno.exit(1);
         }
 
-        Deno.copyFileSync(path.join(nPackage.dir, useVersion), path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name));
+        copyDirSync(path.join(nPackage.dir, useVersion), path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name));
     }
 
     // Publishes a loaded package to a git repository
@@ -169,13 +171,14 @@ export class Package {
             Deno.exit(1);
         }
 
-        Deno.copyFileSync(loadedPackage.dir, path.join(installedPackage.dir, loadedPackage.package.version));
+        copyDirSync(loadedPackage.dir, path.join(installedPackage.dir, loadedPackage.package.version));
 
         installedPackage.manifest.versions[loadedPackage.package.version] = loadedPackage.package.version;
         installedPackage.manifest.versions.latest = loadedPackage.package.version;
 
         Deno.writeTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json"), JSON.stringify(installedPackage.manifest, null, "\t"));
 
+        // TODO: Change this to switch to a new branch and attempt to make a PR instead of pushing directly
         await new Deno.Command("git", {args: ["add", "."]}).output();
         await new Deno.Command("git", {args: ["commit", "-m", loadedPackage.package.version]}).output();
         await new Deno.Command("git", {args: ["push"]}).output();
@@ -204,19 +207,31 @@ export class Package {
             Deno.mkdirSync(installDir, {recursive: true});
             Deno.chdir(installDir);
 
-            console.log("Select 'Push an existing local repository to GitHub' when prompted and use '.' as the 'Path to local repository'");
             await new Deno.Command("git", {args: ["init"]}).output();
+
+            console.log("Select 'Push an existing local repository to GitHub' when prompted and use '.' as the 'Path to local repository'");
             const repo = await new Deno.Command("gh", {args: ["repo", "create"]}).spawn().output();
 
             if (repo.success) {
+                const gitConfig = Deno.readTextFileSync(path.join(installDir, ".git", "config"));
+                const gitConfigLines = gitConfig.split("\n");
+                const urlLine = gitConfigLines.find(line => line.includes("url = "));
+                const repository = urlLine?.split(" = ")[1].trim();
+
                 Deno.writeTextFileSync(path.join(installDir, "netherite.manifest.json"), JSON.stringify({
                     name,
                     description,
+                    repository,
                     uuid: nPackage.uuid,
                     versions: {latest: "0.0.0"}
                 }, null, "\t"));
+
+                await new Deno.Command("git", {args: ["remote", "add", "origin", repository!]}).output();
+                await new Deno.Command("git", {args: ["add", "."]}).output();
+                await new Deno.Command("git", {args: ["commit", "-m", "Initial Commit"]}).output();
+                await new Deno.Command("git", {args: ["push", "-u", "origin", "main"]}).output();
     
-                Deno.copyFileSync(dir, path.join(installDir, nPackage.version));
+                copyDirSync(dir, path.join(installDir, nPackage.version));
                 await this.publish({dir, package: nPackage});
             } else {
                 console.error("Failed to create repository, is gh installed and are you connected to the internet?");

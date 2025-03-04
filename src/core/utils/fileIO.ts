@@ -12,6 +12,19 @@ export function emptyDirectorySync(dir: string): void {
     }
 }
 
+export function copyDirSync(src: string, dest: string): void {
+    const stat = Deno.statSync(src);
+    
+    if (stat.isDirectory) {
+        Deno.mkdirSync(dest, {recursive: true});
+        for (const entry of Deno.readDirSync(src)) {
+            copyDirSync(path.join(src, entry.name), path.join(dest, entry.name));
+        }
+    } else {
+        Deno.copyFileSync(src, dest);
+    }
+}
+
 export function sendToDist(src: string, dest: string, excludeGlob: string[] = []): void {
     const stat = Deno.statSync(src);
 
