@@ -270,7 +270,7 @@ export class Package {
             name,
             description,
             uuid: crypto.randomUUID(),
-            version: "1.0.0"
+            version: "0.0.1"
         };
 
         Deno.writeTextFileSync(path.join(Deno.cwd(), "src", "modules", name, "netherite.package.json"), JSON.stringify(nPackage, null, "\t"));
