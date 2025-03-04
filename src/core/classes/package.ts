@@ -266,6 +266,8 @@ export class Package {
 
     // Creates a new package in the current project, allows for publishing to a git repository on creation
     public static async create(name: string, description: string, publish?: boolean): Promise<void> {
+        name = name.replace(/\s/g, "-");
+        
         const dir = path.join(Deno.cwd(), "src", "modules", name);
         Deno.mkdirSync(dir, {recursive: true});
 
