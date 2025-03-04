@@ -12,8 +12,6 @@ class Spinner extends Kia {
     }
 }
 
-type LogType = "info" | "warn" | "error";
-
 export class Logger {
     private static spinner: Spinner;
     
@@ -36,19 +34,21 @@ export class Logger {
 
     public static Colors = Colors;
 
-    public static log(type: LogType, message: string, verbose?: boolean) {
+    public static log(message: string, verbose?: boolean) {
         if (!Logger.Verbose && verbose) return;
 
-        switch (type) {
-            case "info":
-                console.log(message);
-                break;
-            case "warn":
-                console.warn(this.Colors.yellow(message));
-                break;
-            case "error":
-                console.error(this.Colors.red(message));
-                break;
-        }
+        console.log(message);
+    }
+
+    public static warn(message: string, verbose?: boolean) {
+        if (!Logger.Verbose && verbose) return;
+
+        console.warn(this.Colors.yellow(message));
+    }
+
+    public static error(message: string, verbose?: boolean) {
+        if (!Logger.Verbose && verbose) return;
+
+        console.error(this.Colors.red(message));
     }
 }
