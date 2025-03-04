@@ -1,6 +1,6 @@
 import * as path from "jsr:@std/path";
 import { Config } from "./config.ts";
-import { copyDirSync } from "../utils/index.ts";
+import { copyDirSync, Logger } from "../utils/index.ts";
 
 interface NetheritePackage {
     name: string;
@@ -40,6 +40,7 @@ export class Package {
             Deno.statSync(Config.NetheriteDirectory);
             Deno.statSync(path.join(Config.NetheriteDirectory, "bedrock-samples"));
         } catch (_error) {
+            Logger.Spinner.start("Performing one-time inital setup...");
             const cwd = Deno.cwd();
 
             Deno.mkdirSync(Config.NetheriteDirectory, {recursive: true});
@@ -50,11 +51,12 @@ export class Package {
             const install = await new Deno.Command("git", {args: ["clone", "https://github.com/Mojang/bedrock-samples.git"]}).output();
 
             if (!install.success) {
-                console.error("Failed to install bedrock-samples, is git installed and are you connected to the internet?");
+                Logger.Spinner.fail("Failed to install bedrock-samples, is git installed and are you connected to the internet?");
                 Deno.exit(1);
             }
 
             Deno.chdir(cwd);
+            Logger.Spinner.succeed("One-time inital setup complete!");
         }
 
         try {
@@ -74,8 +76,8 @@ export class Package {
         const update = await new Deno.Command("git", {args: ["pull"]}).output();
 
         if (!update.success) {
-            console.error(`Failed to update bedrock-samples, is git installed and are you connected to the internet?`);
-            console.error(`Latest version defaulting to ${this.latestVanillaVersion}`);
+            Logger.error(`Failed to update bedrock-samples, is git installed and are you connected to the internet?`);
+            Logger.error(`Latest version defaulting to ${this.latestVanillaVersion}`);
         }
 
         Deno.chdir(cwd);
@@ -87,23 +89,28 @@ export class Package {
 
         const packageName = url.split("/").pop()!.replace(".git", "");
 
+        Logger.Spinner.start(`Installing ${Logger.Colors.green(packageName)}...`);
+
         const cwd = Deno.cwd();
         Deno.chdir(path.join(Config.NetheriteDirectory, "packages"));
 
         const cached = await this.list();
 
-        if (cached.find((item) => item.manifest.name === packageName)) {
-            console.log("Package already installed, updating to latest version");
+        const foundPackage = cached.find((item) => item.manifest.name === packageName);
+        if (foundPackage) {
+            Logger.Spinner.update("Package already installed, updating to latest version...");
             Deno.chdir(path.join(Config.NetheriteDirectory, "packages", packageName));
             const update = await new Deno.Command("git", {args: ["pull"]}).output();
         
             if (!update.success) {
-                console.error("Failed to update package, is git installed and are you connected to the internet?");
+                Logger.Spinner.fail("Failed to update package, is git installed and are you connected to the internet?");
                 Deno.exit(1);
             }
 
             Deno.chdir(cwd);
-            return cached.find((item) => item.manifest.name === packageName)!;
+
+            Logger.Spinner.succeed(`Installed ${Logger.Colors.green(foundPackage.manifest.name)}!`);
+            return foundPackage;
         }
 
         const install = await new Deno.Command("git", {args: ["clone", url]}).output();
@@ -111,25 +118,29 @@ export class Package {
         Deno.chdir(cwd);
 
         if (!install.success) {
-            console.error("Failed to install package, is git installed and are you connected to the internet?");
+            Logger.Spinner.fail("Failed to install package, is git installed and are you connected to the internet?");
             Deno.exit(1);
         }
 
         const newPackage = (await this.list()).find((item) => !cached.find((cache) => cache.manifest.uuid === item.manifest.uuid));
 
         if (!newPackage) {
-            console.error("Failed to install package, missing netherite.manifest.json");
+            Logger.Spinner.fail("Failed to install package, missing netherite.manifest.json");
             Deno.exit(1);
         }
 
+        Logger.Spinner.succeed(`Installed ${Logger.Colors.green(newPackage.manifest.name)}!`);
         return newPackage;
     }
 
     // Uninstalls a package from .netherite/packages
     public static async uninstall(value: number|string): Promise<{dir: string, manifest: NetheriteManifest}> {
         const manifest = await this.getInstalledPackage(value);
+
+        Logger.Spinner.start(`Uninstalling ${Logger.Colors.green(manifest.manifest.name)}...`);
         Deno.removeSync(manifest.dir, {recursive: true});
 
+        Logger.Spinner.succeed(`Uninstalled ${Logger.Colors.green(manifest.manifest.name)}...`);
         return manifest;
     }
 
@@ -161,8 +172,10 @@ export class Package {
     public static async load(value: number|string, version?: string): Promise<void> {
         const nPackage = await this.getInstalledPackage(value);
 
+        Logger.Spinner.start(`Loading ${Logger.Colors.green(nPackage.manifest.name)}...`);
+
         if (version && !nPackage.manifest.versions[version]) {
-            console.error(`Invalid ${nPackage.manifest.name} package version`);
+            Logger.Spinner.fail(`Invalid ${nPackage.manifest.name} package version`);
             Deno.exit(1);
         }
 
@@ -171,11 +184,12 @@ export class Package {
         try {
             Deno.statSync(path.join(nPackage.dir, useVersion));
         } catch (_error) {
-            console.error(`Failed to load ${nPackage.manifest.name} package, missing version ${useVersion}`);
+            Logger.Spinner.fail(`Failed to load ${nPackage.manifest.name} package, missing version ${useVersion}`);
             Deno.exit(1);
         }
 
         copyDirSync(path.join(nPackage.dir, useVersion), path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name));
+        Logger.Spinner.succeed(`Loaded ${Logger.Colors.green(nPackage.manifest.name)}!`);
     }
 
     // Unloads a package from the current project
@@ -189,9 +203,11 @@ export class Package {
     // Publishes a loaded package to a git repository
     public static async publish(loadedPackage: {dir: string, package: NetheritePackage}, force?: boolean): Promise<void> {
         const installedPackage = await this.getInstalledPackage(loadedPackage.package.name);
+        
+        Logger.Spinner.start(`Publishing ${Logger.Colors.green(loadedPackage.package.name)}...`);
 
         if (!installedPackage.manifest.repository) {
-            console.error("Failed to publish package, missing repository in netherite.manifest.json");
+            Logger.Spinner.fail("Failed to publish package, missing repository in netherite.manifest.json");
             Deno.exit(1);
         }
 
@@ -201,8 +217,8 @@ export class Package {
         const status = await new Deno.Command("git", {args: ["status"]}).output();
 
         if (!status.success) {
-            console.error(`${installedPackage.manifest.name} repository is not a git repository, cannot publish`);
-            console.error(`You may need to remove the package and re-install it`);
+            Logger.Spinner.fail(`${installedPackage.manifest.name} repository is not a git repository, cannot publish`);
+            Logger.error(`You may need to remove the package and re-install it`);
             Deno.exit(1);
         }
 
@@ -213,7 +229,7 @@ export class Package {
         const lastestVersion = parseInt(installedPackage.manifest.versions.latest.replace(/\./g, ""));
         
         if (loadedVersion <= lastestVersion) {
-            console.error(`Failed to publish package, version ${loadedPackage.package.version} is not greater than ${installedPackage.manifest.versions.latest}`);
+            Logger.Spinner.fail(`Failed to publish package, version ${loadedPackage.package.version} is not greater than ${installedPackage.manifest.versions.latest}`);
             Deno.exit(1);
         }
 
@@ -225,25 +241,33 @@ export class Package {
         Deno.writeTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json"), JSON.stringify(installedPackage.manifest, null, "\t"));
 
         if (!force) {
+            Logger.Spinner.update(`Creating branch ${Logger.Colors.green(loadedPackage.package.version)}...`);
             await new Deno.Command("git", {args: ["checkout", "-b", loadedPackage.package.version]}).output();
             await new Deno.Command("git", {args: ["push", "-u", "origin", loadedPackage.package.version]}).output();
         }
 
+        Logger.Spinner.update(`Pushing ${Logger.Colors.green(loadedPackage.package.version)} changes...`);
         await new Deno.Command("git", {args: ["add", "."]}).output();
         await new Deno.Command("git", {args: ["commit", "-m", loadedPackage.package.version]}).output();
         await new Deno.Command("git", {args: ["push"]}).output();
 
         if (!force) {
+            Logger.Spinner.update(`Creating pull request for ${Logger.Colors.green(loadedPackage.package.version)}...`);
             await new Deno.Command("gh", {args: ["pr", "create", "--assignee=@me", "--fill", `--title=${loadedPackage.package.version}`]}).output();
             await new Deno.Command("git", {args: ["checkout", "main"]}).output();
             new TextDecoder().decode
         }
 
         Deno.chdir(cwd);
+
+        if (force) Logger.Spinner.succeed(`Published ${Logger.Colors.green(loadedPackage.package.name)} version ${Logger.Colors.green(loadedPackage.package.version)}!`);
+        else Logger.Spinner.succeed(`Created Pull Request ${Logger.Colors.green(loadedPackage.package.version)} for ${Logger.Colors.green(loadedPackage.package.name)}!`);
     }
 
     // Creates a new package in the current project, allows for publishing to a git repository on creation
     public static async create(name: string, description: string, publish?: boolean): Promise<void> {
+        name = name.replace(/\s/g, "-");
+        
         const dir = path.join(Deno.cwd(), "src", "modules", name);
         Deno.mkdirSync(dir, {recursive: true});
 
@@ -251,7 +275,7 @@ export class Package {
             name,
             description,
             uuid: crypto.randomUUID(),
-            version: "1.0.0"
+            version: "0.0.1"
         };
 
         Deno.writeTextFileSync(path.join(Deno.cwd(), "src", "modules", name, "netherite.package.json"), JSON.stringify(nPackage, null, "\t"));
@@ -265,10 +289,14 @@ export class Package {
 
             await new Deno.Command("git", {args: ["init"]}).output();
 
-            console.log("Select 'Push an existing local repository to GitHub' when prompted and use '.' as the 'Path to local repository'");
+            Logger.log(`\nSelect ${Logger.Colors.green('Push an existing local repository to GitHub')} when prompted and use ${Logger.Colors.green('.')} as the 'Path to local repository'`);
+            Logger.log(`Ensure the Repository name is ${Logger.Colors.green(name)}\n`);
+
             const repo = await new Deno.Command("gh", {args: ["repo", "create"]}).spawn().output();
 
             if (repo.success) {
+                Logger.log(`Repository created, preparing for initial version publish`);
+
                 const gitConfig = Deno.readTextFileSync(path.join(installDir, ".git", "config"));
                 const gitConfigLines = gitConfig.split("\n");
                 const urlLine = gitConfigLines.find(line => line.includes("url = "));
@@ -290,7 +318,7 @@ export class Package {
                 copyDirSync(dir, path.join(installDir, nPackage.version));
                 await this.publish({dir, package: nPackage}, true);
             } else {
-                console.error("Failed to create repository, is gh installed and are you connected to the internet?");
+                Logger.error("Failed to create repository, is gh installed and are you connected to the internet?");
                 Deno.exit(1);
             }
 
@@ -325,7 +353,7 @@ export class Package {
 
         if (typeof value === "number") {
             if (value < 0 || value >= packages.length) {
-                console.error("Invalid package index");
+                Logger.error("Invalid package index");
                 Deno.exit(1);
             }
 
@@ -334,7 +362,7 @@ export class Package {
             const packageValue = packages.find((item) => item.manifest.name === value);
 
             if (!packageValue) {
-                console.error("Invalid package name");
+                Logger.error("Invalid package name");
                 Deno.exit(1);
             }
 
@@ -369,7 +397,7 @@ export class Package {
 
         if (typeof value === "number") {
             if (value < 0 || value >= packages.length) {
-                console.error("Invalid package index");
+                Logger.error("Invalid package index");
                 Deno.exit(1);
             }
 
@@ -378,7 +406,7 @@ export class Package {
             const packageValue = packages.find((item) => item.package.name === value);
 
             if (!packageValue) {
-                console.error("Invalid package name");
+                Logger.error("Invalid package name");
                 Deno.exit(1);
             }
 

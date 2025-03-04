@@ -9,7 +9,7 @@ const contents = async () => JSON.stringify({
 			"request": "attach",
 			"name": "Debug with Minecraft",
 			"mode": "listen",
-			"targetModuleUuid": await Config.getUUID("scripts"),
+			"targetModuleUuid": await Config.getUUID("script"),
 			"localRoot": "${workspaceFolder}/" + Config.Paths.bp.scripts.replace("./", ""),
 			"port": 19144
 		}

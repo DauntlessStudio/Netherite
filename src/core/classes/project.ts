@@ -2,6 +2,7 @@ import * as path from "jsr:@std/path";
 import { TemplateFile } from "../../templates/index.ts";
 import { emptyDirectorySync } from "../utils/index.ts";
 import { Config, Sound, Texture, Script, Manifest, Language, Static, Module, World } from "./index.ts";
+import { Logger } from "../utils/logger.ts";
 
 // TODO: Possibly remove skin-pack as an option and instead build a skin pack with the world or add-on
 // TODO: Generate level.dat and world_icon.jpeg for world projects
@@ -31,14 +32,26 @@ export class Project {
         Deno.mkdirSync(projectDir, {recursive: true});
         Deno.chdir(projectDir);
 
+        Logger.Spinner.start("Creating Directories...");
         this.createDirectories();
+        
+        Logger.Spinner.update("Creating Files...");
         await this.createFiles();
+
+        Logger.Spinner.update("Installing Dependencies...");
         await this.installDependencies();
 
+        Logger.Spinner.update("Building Project...");
         await new Deno.Command("netherite", {args: ["build"]}).output();
+
+        Logger.Spinner.succeed("Project created successfully!");
     }
 
-    public static async build(options?: {watch?: boolean, ignoreSymlinks?: boolean}): Promise<void> {
+    public static async build(options?: {watch?: boolean, ignoreSymlinks?: boolean, silent?: boolean}): Promise<void> {
+        const cachedTime = Date.now();
+
+        if (options?.silent !== true) Logger.Spinner.start("Building Project...");
+
         await Config.ingestConfig();
 
         emptyDirectorySync(path.join(Deno.cwd(), "dist"));
@@ -52,6 +65,8 @@ export class Project {
         Sound.build();
         Texture.build();
         await Manifest.build();
+
+        if (options?.silent !== true) Logger.Spinner.succeed(`Project built in ${Date.now() - cachedTime}ms`);
     }
 
     private static createDirectories(): void {

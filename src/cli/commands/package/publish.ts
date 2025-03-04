@@ -1,5 +1,6 @@
 import { Command, type CommandData } from "../../command.ts";
 import { Package } from "../../../core/classes/index.ts";
+import { Logger } from "../../../core/utils/index.ts";
 
 interface PublishCommandData extends CommandData {
     options: {
@@ -58,13 +59,13 @@ async function getPromptData(): Promise<string|number> {
     const packages = await Package.list();
 
     for (let i = 0; i < packages.length; i++) {
-        console.log(`${i}: ${packages[i].manifest.name}`);
+        Logger.log(`[${Logger.Colors.green(i.toString())}]: ${Logger.Colors.green(packages[i].manifest.name)}`);
     }
     
-    const val = prompt("Enter the name or index of the package to uninstall: ");
+    const val = prompt("Enter the name or index of the package to uninstall:");
 
     if (val === null) {
-        console.log("No package specified.");
+        Logger.error("No package specified.");
         Deno.exit(1);
     }
 

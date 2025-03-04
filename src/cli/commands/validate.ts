@@ -1,5 +1,6 @@
 import { Command, type CommandData } from "../command.ts";
 import { Validator } from "../../core/classes/index.ts";
+import { Logger } from "../../core/utils/index.ts";
 
 // TODO: Create a GitHub action to run this command on PRs during project init
 export default new Command<CommandData>({
@@ -15,11 +16,11 @@ export default new Command<CommandData>({
         const result = await Validator.validate();
 
         if (result.success) {
-            console.log("Project is valid.");
+            Logger.log(Logger.Colors.green("Project is valid."));
         } else {
-            console.error("Project is invalid.");
+            Logger.error("Project is invalid.");
             for (const message of result.messages) {
-                console.error(message);
+                Logger.log(message);
             }
         }
 
