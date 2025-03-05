@@ -37,8 +37,11 @@ export class Texture {
     }
     
     public static build(): void {
-        writeTextToDist(path.join(path.join(Config.Paths.rp.root, "textures"), "terrain_texture.json"), JSON.stringify(this.terrainTexture, null, "\t"));
-        writeTextToDist(path.join(path.join(Config.Paths.rp.root, "textures"), "item_texture.json"), JSON.stringify(this.itemTexture, null, "\t"));
+        if (Object.keys(this.terrainTexture.texture_data).length) 
+            writeTextToDist(path.join(path.join(Config.Paths.rp.root, "textures"), "terrain_texture.json"), JSON.stringify(this.terrainTexture, null, "\t"));
+
+        if (Object.keys(this.itemTexture.texture_data).length)
+            writeTextToDist(path.join(path.join(Config.Paths.rp.root, "textures"), "item_texture.json"), JSON.stringify(this.itemTexture, null, "\t"));
     }
 
     public static watch(filePath: string): void {
