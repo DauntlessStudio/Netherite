@@ -1,5 +1,6 @@
 import Kia from "https://deno.land/x/kia@0.4.1/mod.ts";
 import { Colors } from "https://deno.land/x/kia@0.4.1/deps.ts";
+import { clearLine } from "https://deno.land/x/kia@0.4.1/util.ts";
 
 class Spinner extends Kia {
     override succeed(text?: string): this {
@@ -22,6 +23,7 @@ export class Logger {
             Logger.spinner = new Spinner(text).start();
         },
         update: function(text: string) {
+            clearLine(Deno.stdout, new TextEncoder());
             Logger.spinner.set(text);
         },
         succeed: function(text: string) {

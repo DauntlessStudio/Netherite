@@ -5,6 +5,8 @@ import { Config } from "./config.ts";
 
 export class Script {
     public static async build(watch?: boolean): Promise<void> {
+        if (Config.Options.type === "skin-pack") return;
+        
         try {
             Deno.statSync(path.join(Deno.cwd(), "src/behavior_pack/scripts/main.ts"));
         } catch (_error) {

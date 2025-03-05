@@ -6,7 +6,7 @@ export interface ModuleWriteable {
     generate(): {outputPath: string, content: Uint8Array};
 }
 
-type ModuleSubdirectory = "bp"|"rp"|"root";
+type ModuleSubdirectory = "bp"|"rp"|"skin_pack"|"root";
 
 export class Module {
     private static queue: ModuleWriteable[] = [];
@@ -17,6 +17,12 @@ export class Module {
     }
 
     public static async build(watch?: boolean): Promise<void> {
+        try {
+            Deno.statSync(this.moduleDir);
+        } catch (_error) {
+            return;
+        }
+
         await this.iterate(async (filepath: string) => {
             if (filepath.endsWith(".mod.ts")) {
                 await this.process(filepath);

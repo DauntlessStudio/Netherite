@@ -30,8 +30,11 @@ export class Sound {
     }
     
     public static build(): void {
-        writeTextToDist(path.join(Config.Paths.rp.root, "sounds.json"), JSON.stringify(this.soundDefinitions, null, "\t"));
-        writeTextToDist(path.join(Config.Paths.rp.root, "sounds", "sound_definitions.json"), JSON.stringify(this.soundDefinitions, null, "\t"));
+        if (Object.keys(this.soundDefinitions.sound_definitions).length)
+            writeTextToDist(path.join(Config.Paths.rp.root, "sounds.json"), JSON.stringify(this.soundDefinitions, null, "\t"));
+
+        if (Object.keys(this.sounds).length)
+            writeTextToDist(path.join(Config.Paths.rp.root, "sounds", "sound_definitions.json"), JSON.stringify(this.soundDefinitions, null, "\t"));
     }
 
     public static watch(filePath: string): void {

@@ -2,10 +2,10 @@ export interface Manifest {
     format_version: number;
     header: {
         name: string;
-        description: string;
         uuid: string;
-        pack_scope?: string;
         version: number[];
+        description?: string;
+        pack_scope?: string;
         lock_template_options?: boolean;
         allow_random_seed?: boolean;
         min_engine_version?: number[];
