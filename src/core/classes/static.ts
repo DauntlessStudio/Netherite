@@ -5,15 +5,18 @@ import { Module } from "./module.ts";
 import { Sound } from "./sound.ts";
 import { Texture } from "./texture.ts";
 import { Block } from "./block.ts";
+import { Skin } from "./skin.ts";
 
 export class Static {
     private static readonly behaviorPath = path.join(Deno.cwd(), "src/behavior_pack");
     private static readonly resourcePath = path.join(Deno.cwd(), "src/resource_pack");
+    private static readonly skinsPath = path.join(Deno.cwd(), "src/skin_pack");
     private static readonly modulePath = path.join(Deno.cwd(), "src/modules");
 
     private static readonly pendingChanges: Map<string, boolean> = new Map();
 
     private static readonly specialFiles: Map<string, (file: string) => void> = new Map([
+        ["**/skins.json", Skin.watch.bind(Skin)],
         ["**/sounds.json", Sound.watch.bind(Sound)],
         ["**/blocks.json", Block.watch.bind(Block)],
         ["**/*.lang", Language.watch.bind(Language)],
@@ -22,43 +25,80 @@ export class Static {
     ]);
 
     public static build(watch?: boolean) {
-        Texture.ingestTextureFiles(path.join(this.resourcePath, "textures"));
-        Language.ingestLangFiles(path.join(this.resourcePath, "texts"));
-        Sound.ingestSoundFiles(path.join(this.resourcePath, "sounds"));
-        Block.ingestBlockFiles(this.resourcePath);
-        Sound.ingestSoundFiles(this.resourcePath);
+        if (Config.Options.type === "skin-pack") {
+            this.processSkinPath(this.skinsPath);
+        } else {
+            if (Config.Options.include_skin_pack === true) {
+                this.processSkinPath(this.skinsPath);
+            }
+            
+            this.processBehaviorPath(this.behaviorPath);
+            this.processResourcePath(this.resourcePath);
+        }
 
-        sendToDist(this.behaviorPath, Config.Paths.bp.root, ["**/*.ts"]);
-        sendToDist(this.resourcePath, Config.Paths.rp.root, ["**/.lang"]);
-
-        for (const entry of Deno.readDirSync(this.modulePath)) {
-            if (entry.isDirectory) {
-                for (const subEntry of Deno.readDirSync(path.join(this.modulePath, entry.name))) {
-                    const subPath = path.join(this.modulePath, entry.name, subEntry.name);
-    
-                    if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "bp")) {
-                        sendToDist(subPath, Config.Paths.bp.root, ["**/*.ts"]);
-                        continue;
-                    }
-                    
-                    if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "rp")) {
-                        Texture.ingestTextureFiles(path.join(subPath, "textures"));
-                        Language.ingestLangFiles(path.join(subPath, "texts"));
-                        Sound.ingestSoundFiles(path.join(subPath, "sounds"));
-                        Block.ingestBlockFiles(subPath);
-                        Sound.ingestSoundFiles(subPath);
+        try {
+            for (const entry of Deno.readDirSync(this.modulePath)) {
+                if (entry.isDirectory) {
+                    for (const subEntry of Deno.readDirSync(path.join(this.modulePath, entry.name))) {
+                        const subPath = path.join(this.modulePath, entry.name, subEntry.name);
+        
+                        if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "bp")) {
+                            this.processBehaviorPath(subPath);
+                            continue;
+                        }
                         
-                        sendToDist(subPath, Config.Paths.rp.root, ["**/.lang"]);
-                        continue;
+                        if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "rp")) {
+                            this.processResourcePath(subPath);
+                            continue;
+                        }
+                        
+                        if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "skin_pack")) {
+                            this.processSkinPath(subPath);
+                            continue;
+                        }
                     }
                 }
             }
+        } catch (_error) {
+            // Do Nothing
         }
 
         if (watch) {
             this.watch();
         }
-    } 
+    }
+
+    private static processBehaviorPath(src: string): void {
+        try {
+            sendToDist(src, Config.Paths.bp.root, ["**/*.ts"]);
+        } catch (_error) {
+            // Do Nothing
+        }
+    }
+
+    private static processResourcePath(src: string): void {
+        try {
+            Texture.ingestTextureFiles(path.join(src, "textures"));
+            Language.ingestLangFiles(path.join(src, "texts"));
+            Sound.ingestSoundFiles(path.join(src, "sounds"));
+            Block.ingestBlockFiles(src);
+            Sound.ingestSoundFiles(src);
+    
+            sendToDist(src, Config.Paths.rp.root, ["**/.lang"]);
+        } catch (_error) {
+            // Do Nothing
+        }
+    }
+
+    private static processSkinPath(src: string): void {
+        try {
+            Skin.ingestSkinFiles(src);
+        
+            sendToDist(src, Config.Paths.skins.root, ["**/*.json", "**/*.lang"]);
+        } catch (_error) {
+            // Do Nothing
+        }
+    }
 
     public static getDistFromPath(src: string): string {
         src = path.resolve(src);

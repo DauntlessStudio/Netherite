@@ -122,6 +122,29 @@ export class Manifest {
         });
     }
     
+    public static get SkinManifest() : Promise<types.Manifest> {
+        // deno-lint-ignore no-async-promise-executor
+        return new Promise<types.Manifest>(async resolve => {
+            const manifest: types.Manifest = {
+                format_version: 1,
+                header: {
+                    name: "pack.name",
+                    uuid: await Config.getUUID("skin"),
+                    version: [1, 0, 0],
+                },
+                modules: [
+                    {
+                        type: "skin_pack",
+                        uuid: await Config.getUUID("skin_pack"),
+                        version: [1, 0, 0],
+                    },
+                ]
+            };
+
+            resolve(manifest);
+        });
+    }
+    
     private static getVersionNumber(module: string): string {
         try {
             const deno = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
@@ -138,10 +161,14 @@ export class Manifest {
         if (Config.Options.type !== "skin-pack") {
             writeTextToDist(path.join(Config.Paths.bp.root, "manifest.json"), JSON.stringify(await this.BehaviorManifest, null, "\t"), false);
             writeTextToDist(path.join(Config.Paths.rp.root, "manifest.json"), JSON.stringify(await this.ResourceManifest, null, "\t"), false);
+        }
 
-            if (Config.Options.type === "world") {
-                writeTextToDist(path.join(Config.Paths.root, "manifest.json"), JSON.stringify(await this.WorldManifest, null, "\t"), false);
-            }
+        if (Config.Options.type === "world") {
+            writeTextToDist(path.join(Config.Paths.root, "manifest.json"), JSON.stringify(await this.WorldManifest, null, "\t"), false);
+        }
+
+        if (Config.Options.type === "skin-pack" || Config.Options.include_skin_pack) {
+            writeTextToDist(path.join(Config.Paths.skins.root, "manifest.json"), JSON.stringify(await this.SkinManifest, null, "\t"), false);
         }
     }
 }

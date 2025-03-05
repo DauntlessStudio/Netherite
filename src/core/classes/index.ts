@@ -5,6 +5,7 @@ export * from "./manifest.ts";
 export * from "./module.ts";
 export * from "./package.ts";
 export * from "./script.ts";
+export * from "./skin.ts";
 export * from "./static.ts";
 export * from "./sound.ts";
 export * from "./texture.ts";

@@ -10,6 +10,7 @@ import "./texts/netherite.config.ts";
 import "./texts/package.json.ts";
 import "./texts/README.md.ts";
 import "./texts/settings.json.ts";
+import "./texts/skins.json.ts";
 import "./texts/tsconfig.json.ts";
 
 export * from "./template.ts"

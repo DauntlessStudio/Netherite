@@ -1,7 +1,7 @@
 import * as path from "jsr:@std/path";
 import { TemplateFile } from "../../templates/index.ts";
 import { emptyDirectorySync } from "../utils/index.ts";
-import { Config, Sound, Texture, Script, Manifest, Language, Static, Module, World } from "./index.ts";
+import { Config, Sound, Texture, Script, Manifest, Language, Static, Module, World, Skin } from "./index.ts";
 import { Logger } from "../utils/logger.ts";
 
 // TODO: Possibly remove skin-pack as an option and instead build a skin pack with the world or add-on
@@ -64,7 +64,7 @@ export class Project {
         await this.installDependencies();
 
         Logger.Spinner.update("Building Project...");
-        await new Deno.Command("netherite", {args: ["build"]}).output();
+        await new Deno.Command("netherite", {args: ["build", "-s"]}).output();
 
         Logger.Spinner.succeed("Project created successfully!");
     }
@@ -78,9 +78,11 @@ export class Project {
 
         emptyDirectorySync(path.join(Deno.cwd(), "dist"));
         
-        if (options?.ignoreSymlinks !== true) this.createSymlinks();
-        emptyDirectorySync(Config.Paths.bp.root);
-        emptyDirectorySync(Config.Paths.rp.root);
+        if (Config.Options.type !== "skin-pack") {
+            if (options?.ignoreSymlinks !== true) this.createSymlinks();
+            emptyDirectorySync(Config.Paths.bp.root);
+            emptyDirectorySync(Config.Paths.rp.root);
+        }
 
         await Module.build(options?.watch);
         Static.build(options?.watch);
@@ -89,19 +91,20 @@ export class Project {
         Language.build();
         Sound.build();
         Texture.build();
+        Skin.build();
         await Manifest.build();
 
         if (options?.silent !== true) Logger.Spinner.succeed(`Project built in ${Date.now() - cachedTime}ms`);
     }
 
     private static createDirectories(): void {
-        if (Config.Options.type === "skin-pack") return;
-
         Deno.mkdirSync(path.join(Deno.cwd(), "src/modules"), {recursive: true});
         this.createSymlinks();
     }
 
     private static createSymlinks(): void {
+        if (Config.Options.type === "skin-pack") return;
+
         const projectNamespace = Config.Options.namespace;
 
         const mojangBP = path.join(Config.MojangDirectory, "development_behavior_packs", projectNamespace + "_bp");
@@ -140,11 +143,6 @@ export class Project {
     }
 
     private static async createFiles(): Promise<void> {
-        if (Config.Options.type === "skin-pack") {
-            // TODO: Add skin pack files
-            return;
-        }
-
         await TemplateFile.write();
     }
 

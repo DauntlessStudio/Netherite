@@ -74,43 +74,62 @@ export class Language {
     }
 
     public static build(): void {
-        for (const [lang, categories] of this.langMap) {
-            const langFile = path.join(path.join(Config.Paths.rp.root, "texts"), `${lang}.lang`);
-
-            let contents = "";
-
-            for (const [category, keys] of categories) {
-                contents += `## ${category.toUpperCase()} ${"=".repeat(117 - category.length)}\n`;
-
-                for (const [key, value] of keys) {
-                    contents += `${key}=${value}\n`;
+        if (Config.Options.type !== "skin-pack") {
+            for (const [lang, categories] of this.langMap) {
+                const langFile = path.join(path.join(Config.Paths.rp.root, "texts"), `${lang}.lang`);
+    
+                let contents = "";
+    
+                for (const [category, keys] of categories) {
+                    contents += `## ${category.toUpperCase()} ${"=".repeat(117 - category.length)}\n`;
+    
+                    for (const [key, value] of keys) {
+                        contents += `${key}=${value}\n`;
+                    }
+    
+                    contents += "\n";
                 }
-
-                contents += "\n";
+    
+                writeTextToDist(langFile, contents.trim());
             }
-
-            writeTextToDist(langFile, contents.trim());
+    
+            writeTextToDist(path.join(path.join(Config.Paths.rp.root, "texts"), "languages.json"), JSON.stringify([...this.langMap.keys()], null, "\t"));
         }
 
-        writeTextToDist(path.join(path.join(Config.Paths.rp.root, "texts"), "languages.json"), JSON.stringify([...this.langMap.keys()], null, "\t"));
         this.buildNonResourceLanguages();
     }
 
     private static buildNonResourceLanguages(): void {
-        const langEntries: LangType[] = [];
+        try {
+            const langEntries: LangType[] = [];
 
-        for (const entry of Deno.readDirSync("./src/behavior_pack/texts")) {
-            if (!entry.name.endsWith(".lang")) continue;
+            for (const entry of Deno.readDirSync("./src/behavior_pack/texts")) {
+                if (!entry.name.endsWith(".lang")) continue;
 
-            const langKey = entry.name.replace(".lang", "") as LangType;
-            langEntries.push(langKey);
+                const langKey = entry.name.replace(".lang", "") as LangType;
+                langEntries.push(langKey);
+            }
+            writeTextToDist(path.join(path.join(Config.Paths.bp.root, "texts"), "languages.json"), JSON.stringify(langEntries, null, "\t"));
+        } catch (_error) {
+            // Do Nothing
         }
 
-        writeTextToDist(path.join(path.join(Config.Paths.bp.root, "texts"), "languages.json"), JSON.stringify(langEntries, null, "\t"));
-
         if (Config.Options.type === "world") {
-            sendToDist("./src/behavior_pack/texts", path.join(Config.Paths.root, "texts"));
-            writeTextToDist(path.join(Config.Paths.root, "texts/languages.json"), JSON.stringify(["en_US"], null, "\t"));
+            try {
+                sendToDist("./src/behavior_pack/texts", path.join(Config.Paths.root, "texts"));
+                writeTextToDist(path.join(Config.Paths.root, "texts/languages.json"), JSON.stringify(["en_US"], null, "\t"));
+            } catch (_error) {
+                // Do Nothing
+            }
+        }
+
+        if (Config.Options.type === "skin-pack" || Config.Options.include_skin_pack) {
+            try {
+                sendToDist("./src/skin_pack/texts", path.join(Config.Paths.skins.root, "/texts"));
+                writeTextToDist(path.join(Config.Paths.skins.root, "texts/languages.json"), JSON.stringify(["en_US"], null, "\t"));
+            } catch (_error) {
+                // Do Nothing
+            }
         }
     }
     

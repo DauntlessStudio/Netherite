@@ -20,5 +20,6 @@ const contents = async () => JSON.stringify({
 new TemplateFile({
 	type: "text",
 	out: [".vscode/launch.json"],
+	conditions: [() => Config.Options.type !== "skin-pack"],
 	contents,
 });
