@@ -14,7 +14,7 @@ export class Language {
 
     public static addLangEntry(lang: LangType, category: string, key: string, value: string): void {
         category = category.toLowerCase().trim();
-        key = key.toLocaleLowerCase().trim();
+        key = key.replace("NAMESPACE", Config.Options.namespace).toLocaleLowerCase().trim();
         value = value.trim();
 
         if (!this.langMap.has(lang)) {
