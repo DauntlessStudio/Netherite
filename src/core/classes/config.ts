@@ -4,6 +4,7 @@ import { v4 } from "npm:uuid";
 import * as path from "jsr:@std/path";
 import type { ProjectBuilderOptions } from "./project.ts";
 import { Buffer } from "node:buffer";
+import { Logger } from "../utils/index.ts";
 
 export interface ConfigOptions extends ProjectBuilderOptions {
     uuid: string;
@@ -23,17 +24,37 @@ interface ConfigPaths {
 
 export class Config {
     private static options: ConfigOptions;
+    private static studioName: string;
+    private static packName: string;
     private static readonly templatePath = path.join(path.fromFileUrl(Deno.mainModule), "../..", "templates");
     
     public static get Options() : ConfigOptions {
         if (!this.options) {
-            console.log("No config options set, is your netherite.config.ts file missing?");
+            Logger.error("No config options set, is your netherite.config.ts file missing?");
             Deno.exit(1);
         }
 
-        return Object.freeze(this.options);
+        return this.options;
     }
+    
+    public static get StudioName() : string {
+        if (!this.options) {
+            Logger.error("No config options set, is your netherite.config.ts file missing?");
+            Deno.exit(1);
+        }
 
+        return this.studioName;
+    }
+    
+    public static get PackName() : string {
+        if (!this.options) {
+            Logger.error("No config options set, is your netherite.config.ts file missing?");
+            Deno.exit(1);
+        }
+
+        return this.packName;
+    }
+    
     public static get MojangDirectory() : string {
         const APPDATA = (Deno.env.get("LOCALAPPDATA") || (platform == 'darwin' ? Deno.env.get("HOME") + '/Library/Preferences' : Deno.env.get("HOME") + "/.local/share")).replace(/\\/g, '/');
         return `${APPDATA}/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang`;
@@ -70,7 +91,17 @@ export class Config {
     }
     
     public static setOptions(options: ConfigOptions): void {
-        this.options = options;
+        this.options = Object.freeze(options);
+
+        const namespaceParts = this.Options.namespace.split("_");
+
+        if (namespaceParts.length !== 2) {
+            Logger.error("Namespace must be in the format of 'author_name'");
+            Deno.exit(1);
+        }
+
+        this.studioName = namespaceParts[0];
+        this.packName = namespaceParts[1];
     }
 
     public static async ingestConfig(): Promise<void> {
@@ -78,7 +109,7 @@ export class Config {
             const url = new URL("file://" + path.join(Deno.cwd(), "netherite.config.ts"));
             await import(url.toString());
         } catch (_error) {
-            console.error("No config file found in the root of your project, please create a netherite.config.ts file.");
+            Logger.error("No config file found in the root of your project, please create a netherite.config.ts file.");
         }
     }
 
