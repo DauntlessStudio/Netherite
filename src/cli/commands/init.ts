@@ -1,5 +1,5 @@
 import { Package } from "../../core/classes/index.ts";
-import { Project, type ProjectType, type ProjectBuilderOptions, type ScriptType } from "../../core/classes/project.ts";
+import { Project, type ProjectType, type ProjectOptions, type ScriptType } from "../../core/classes/project.ts";
 import { Command } from "../command.ts";
 import type { CommandData } from "../command.ts";
 
@@ -11,6 +11,7 @@ interface InitCommandData extends CommandData {
         formatVersion?: string;
         type?: ProjectType;
         script?: ScriptType;
+        skinpack?: boolean;
     }
 }
 
@@ -18,6 +19,7 @@ new Command<InitCommandData>({
 	name: "init",
 	parse: {
 		string: ["name", "author", "namespace", "formatVersion", "type", "script"],
+        boolean: ["skinpack"],
         alias: {
             n: "name",
             a: "author",
@@ -25,6 +27,7 @@ new Command<InitCommandData>({
             f: "formatVersion",
             t: "type",
             s: "script",
+            sp: "skinpack",
         },
 	},
 	usage: {
@@ -61,6 +64,11 @@ new Command<InitCommandData>({
 				description: "The script compiler of the project, will prompt if missing",
 				optional: true,
 			},
+			skinpack: {
+				type: "boolean",
+				description: "When the type is a world or add-on, should a skin pack be included? will prompt if missing",
+				optional: true,
+			},
 		},
 	},
 	async action(_args) {
@@ -74,13 +82,18 @@ new Command<InitCommandData>({
         const validFormatVersion = _args.options.formatVersion === undefined || (typeof _args.options.formatVersion === "string" && _args.options.formatVersion.length > 0);
         const validType = _args.options.type === undefined || (typeof _args.options.type === "string" && ["world", "add-on", "skin-pack"].includes(_args.options.type));
         const validScript = _args.options.script === undefined || (typeof _args.options.script === "string" && ["deno", "node"].includes(_args.options.script));
+        const validSkinpack = _args.options.skinpack === undefined || (typeof _args.options.skinpack === "boolean");
 
-		return validName && validAuthor && validNamespace && validFormatVersion && validType && validScript;
+		return validName && validAuthor && validNamespace && validFormatVersion && validType && validScript && validSkinpack;
 	},
 });
 
-async function getProjectBuildData(args: InitCommandData): Promise<ProjectBuilderOptions> {
-    const buildOptions: Partial<ProjectBuilderOptions> = {};
+async function getProjectBuildData(args: InitCommandData): Promise<ProjectOptions> {
+    const buildOptions: Partial<ProjectOptions> = {
+        uuid: crypto.randomUUID(),
+        version: "1.0.0",
+    };
+
     await Package.vanillaUpdate();
 
     if (args.options.name) {
@@ -132,6 +145,15 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectBuilde
         buildOptions.type = val as ProjectType;
     }
 
+    if (buildOptions.type === "world" || buildOptions.type === "add-on") {
+        if (args.options.skinpack) {
+            buildOptions.include_skin_pack = args.options.skinpack;
+        } else {
+            const val = confirm("Do you want to include a skin pack?:");
+            buildOptions.include_skin_pack = val;
+        }
+    }
+
     if (args.options.script) {
         buildOptions.scripting = args.options.script;
     } else {
@@ -141,5 +163,5 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectBuilde
         buildOptions.scripting = val as ScriptType;
     }
 
-    return buildOptions as ProjectBuilderOptions;
+    return buildOptions as ProjectOptions;
 }

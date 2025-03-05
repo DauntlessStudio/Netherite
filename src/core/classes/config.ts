@@ -2,14 +2,9 @@ import "jsr:@std/dotenv/load";
 import { platform } from 'node:process';
 import { v4 } from "npm:uuid";
 import * as path from "jsr:@std/path";
-import type { ProjectBuilderOptions } from "./project.ts";
+import type { ProjectOptions } from "./project.ts";
 import { Buffer } from "node:buffer";
 import { Logger } from "../utils/index.ts";
-
-export interface ConfigOptions extends ProjectBuilderOptions {
-    uuid: string;
-    version: `${number}.${number}.${number}`;
-}
 
 interface ConfigPaths {
     root: string;
@@ -23,12 +18,12 @@ interface ConfigPaths {
 }
 
 export class Config {
-    private static options: ConfigOptions;
+    private static options: ProjectOptions;
     private static studioName: string;
     private static packName: string;
     private static readonly templatePath = path.join(path.fromFileUrl(Deno.mainModule), "../..", "templates");
     
-    public static get Options() : ConfigOptions {
+    public static get Options() : ProjectOptions {
         if (!this.options) {
             Logger.error("No config options set, is your netherite.config.ts file missing?");
             Deno.exit(1);
@@ -90,7 +85,7 @@ export class Config {
         }
     }
     
-    public static setOptions(options: ConfigOptions): void {
+    public static setOptions(options: ProjectOptions): void {
         this.options = Object.freeze(options);
 
         const namespaceParts = this.Options.namespace.split("_");

@@ -9,14 +9,34 @@ import { Logger } from "../utils/logger.ts";
 export type ProjectType = "world"|"add-on"|"skin-pack";
 export type ScriptType = "deno" | "node";
 
-export interface ProjectBuilderOptions {
+interface ProjectOptionsBase {
+    type: ProjectType;
     name: string;
     author: string;
     namespace: string;
     formatVersion: string;
-    type: ProjectType;
     scripting: ScriptType;
+    uuid: string;
+    version: `${number}.${number}.${number}`;
 };
+
+interface ProjectOptionsWorld extends ProjectOptionsBase {
+    type: "world";
+    include_skin_pack?: boolean;
+    random_seed?: boolean;
+}
+
+interface ProjectOptionsAddOn extends ProjectOptionsBase {
+    type: "add-on";
+    include_skin_pack?: boolean;
+    random_seed?: boolean;
+}
+
+interface ProjectOptionsSkinPack extends ProjectOptionsBase {
+    type: "skin-pack";
+}
+
+export type ProjectOptions = ProjectOptionsWorld | ProjectOptionsAddOn | ProjectOptionsSkinPack;
 
 export class Project {
     private static readonly processDir: string = Deno.cwd();
@@ -26,8 +46,8 @@ export class Project {
         "npm:@minecraft/server-ui",
     ];
 
-    public static async init(options: ProjectBuilderOptions): Promise<void> {
-        Config.setOptions({...options, uuid: crypto.randomUUID(), version: "1.0.0"});
+    public static async init(options: ProjectOptions): Promise<void> {
+        Config.setOptions(options);
 
         const projectDir = path.join(this.processDir, options.name);
 
