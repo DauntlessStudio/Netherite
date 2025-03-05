@@ -13,7 +13,7 @@ export class Manifest {
                     name: "pack.name",
                     description: "pack.description",
                     uuid: await Config.getUUID("behavior"),
-                    pack_scope: "world",
+                    pack_scope: Config.Options.type === "add-on" ? "world" : undefined,
                     version: [1, 0, 0],
                     min_engine_version: Config.Options.formatVersion.split(".").map(Number),
                 },
@@ -44,14 +44,11 @@ export class Manifest {
                         module_name: "@minecraft/server-ui",
                         version: this.getVersionNumber("@minecraft/server-ui"),
                     },
-                ]
-            };
-    
-            if (Config.Options.type === "add-on") {
-                manifest.metadata = {
+                ],
+                metadata: Config.Options.type === "add-on" ? {
                     product_type: "addon",
-                };
-            }
+                } : undefined,
+            };
 
             resolve(manifest);
         });
@@ -66,7 +63,7 @@ export class Manifest {
                     name: "pack.name",
                     description: "pack.description",
                     uuid: await Config.getUUID("resource"),
-                    pack_scope: "world",
+                    pack_scope: Config.Options.type === "add-on" ? "world" : undefined,
                     version: [1, 0, 0],
                     min_engine_version: Config.Options.formatVersion.split(".").map(Number),
                 },
@@ -83,13 +80,10 @@ export class Manifest {
                         version: [1, 0, 0],
                     },
                 ],
-            };
-    
-            if (Config.Options.type === "add-on") {
-                manifest.metadata = {
+                metadata: Config.Options.type === "add-on" ? {
                     product_type: "addon",
-                };
-            }
+                } : undefined,
+            };
 
             resolve(manifest);
         });
@@ -104,7 +98,7 @@ export class Manifest {
                     name: "pack.name",
                     description: "pack.description",
                     uuid: await Config.getUUID("world"),
-                    pack_scope: "world",
+                    pack_scope: Config.Options.type === "add-on" ? "world" : undefined,
                     lock_template_options: true,
                     version: [1, 0, 0],
                     base_game_version: Config.Options.formatVersion.split(".").map(Number),
@@ -117,17 +111,12 @@ export class Manifest {
                     },
                 ],
                 metadata: {
+                    product_type: Config.Options.type === "add-on" ? "addon" : undefined,
                     authors: [
                         Config.Options.author
                     ],
                 },
             };
-    
-            if (Config.Options.type === "add-on") {
-                manifest.metadata = {
-                    product_type: "addon",
-                };
-            }
 
             resolve(manifest);
         });
