@@ -146,14 +146,26 @@ export class Manifest {
     }
     
     private static getVersionNumber(module: string): string {
-        try {
-            const deno = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
-            const value = deno.imports[module] as string|undefined;
-    
-            if (!value) throw new Error(`Could not find module ${module} in deno.json`);
-            return value.split("@^")[1]; // TODO: handle beta versions correctly
-        } catch (_error) {
-            throw new Error(`Could not get version number for module ${module} as deno.json doesn't exist`);
+        if (Config.Options.scripting === "deno") {
+            try {
+                const file = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
+                const value = file.imports[module] as string|undefined;
+        
+                if (!value) throw new Error(`Could not find module ${module} in deno.json`);
+                return value.split("@^")[1]; // TODO: handle beta versions correctly
+            } catch (_error) {
+                throw new Error(`Could not get version number for module ${module} as deno.json doesn't exist`);
+            }
+        } else {
+            try {
+                const file = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "package.json")));
+                const value = file.dependencies[module] as string|undefined;
+        
+                if (!value) throw new Error(`Could not find module ${module} in package.json`);
+                return value.replace("^", ""); // TODO: handle beta versions correctly
+            } catch (_error) {
+                throw new Error(`Could not get version number for module ${module} as package.json doesn't exist`);
+            }
         }
     }
 
