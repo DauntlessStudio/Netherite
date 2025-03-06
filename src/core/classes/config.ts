@@ -108,10 +108,16 @@ export class Config {
 
     public static async ingestConfig(): Promise<void> {
         try {
+            Deno.statSync(path.join(Deno.cwd(), "netherite.config.ts"));
+        } catch (_error) {
+            throw new Error("No config file found in the root of your project, please create a netherite.config.ts file.");
+        }
+        
+        try {
             const url = new URL("file://" + path.join(Deno.cwd(), "netherite.config.ts"));
             await import(url.toString());
-        } catch (_error) {
-            Logger.error("No config file found in the root of your project, please create a netherite.config.ts file.");
+        } catch (error) {
+            throw new Error("Failed to ingest netherite.config.ts due to " + error);
         }
     }
 

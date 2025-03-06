@@ -74,7 +74,13 @@ export class Project {
 
         if (options?.silent !== true) Logger.Spinner.start("Building Project...");
 
-        await Config.ingestConfig();
+        try {
+            await Config.ingestConfig();
+        } catch (error) {
+            if (options?.silent !== true) Logger.Spinner.fail("Build Failed");
+            Logger.error(String(error));
+            Deno.exit(1);
+        }
 
         emptyDirectorySync(path.join(Deno.cwd(), "dist"));
         
