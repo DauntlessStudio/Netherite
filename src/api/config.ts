@@ -10,7 +10,7 @@ class OptionsGenerator {
     public generate(): WorkerResponse<ProjectOptions> {
         return {
             endpoint: "options",
-            data: this.options,
+            response: this.options,
         }
     }
 }

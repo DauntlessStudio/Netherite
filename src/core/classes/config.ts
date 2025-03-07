@@ -115,7 +115,7 @@ export class Config {
         
         try {
             const value = await WorkerManager.run<ProjectOptions>(path.join(Deno.cwd(), "netherite.config.ts"));
-            this.setOptions(value[0].data);
+            this.setOptions(value[0].response);
         } catch (error) {
             throw new Error("Failed to ingest netherite.config.ts due to " + error);
         }

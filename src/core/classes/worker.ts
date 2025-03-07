@@ -1,6 +1,6 @@
 export interface WorkerResponse<T> {
     endpoint: string;
-    data: T;
+    response: T;
 }
 
 export class WorkerManager {

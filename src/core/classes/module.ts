@@ -1,20 +1,28 @@
 import * as path from "jsr:@std/path";
 import { debounce } from "jsr:@std/async/debounce";
 import { writeBufferToDist } from "../utils/fileIO.ts";
+import { WorkerManager, type ProjectOptions, type WorkerResponse } from "./index.ts";
+import { Config } from "./config.ts";
+import { Logger } from "../utils/index.ts";
 
+export interface ModuleResponse {
+    name: string;
+    data: Uint8Array;
+}
 export interface ModuleWriteable {
-    generate(): {outputPath: string, content: Uint8Array};
+    generate(options: ProjectOptions): WorkerResponse<ModuleResponse>;
+}
+
+interface WriteData {
+    outputPath: string;
+    content: Uint8Array;
 }
 
 type ModuleSubdirectory = "bp"|"rp"|"skin_pack"|"root";
 
 export class Module {
-    private static queue: ModuleWriteable[] = [];
     private static readonly moduleDir: string = path.join(Deno.cwd(), "src/modules");
-
-    public static register(module: ModuleWriteable): void {
-        this.queue.push(module);
-    }
+    private static readonly queue: Map<string, Map<string, Uint8Array>> = new Map();
 
     public static async build(watch?: boolean): Promise<void> {
         try {
@@ -88,19 +96,54 @@ export class Module {
     private static async process(path: string): Promise<void> {
         if (!path.endsWith(".mod.ts")) return;
 
-        const url = new URL("file://" + path + "?version=" + Date.now());
-
         try {
-            await import(url.toString());
+            const result = await WorkerManager.run<ModuleResponse>(path, Config.Options);
+
+            if (result.length > 0) {
+                if (!this.queue.has(path)) {
+                    this.queue.set(path, new Map());
+                }
+
+                const cachedFiles = this.queue.get(path)?.keys().toArray() ?? [];
+
+                for (const {endpoint, response} of result) {
+                    let entry: WriteData | undefined;
+
+                    switch (endpoint) {
+                        case "minecraft_server_entity":
+                            entry = {
+                                outputPath: `${Config.Paths.bp.root}entities/${response.name}.json`,
+                                content: response.data,
+                            }
+                            break;
+                    
+                        default:
+                            Logger.error(`Unknown endpoint: ${endpoint}`);
+                            break;
+                    }
+
+                    if (entry) {
+                        this.queue.get(path)?.set(entry.outputPath, entry.content);
+
+                        if (cachedFiles.includes(entry.outputPath)) {
+                            cachedFiles.splice(cachedFiles.indexOf(entry.outputPath), 1);
+                        }
+                    }
+                }
+
+                for (const file of cachedFiles) {
+                    this.queue.get(path)?.delete(file);
+                    Deno.removeSync(file);
+                }
+            }
         } catch (error) {
             throw error;
         }
 
-        for (const module of this.queue) {
-            const { outputPath, content } = module.generate();
-            writeBufferToDist(outputPath, content);
+        for (const module of this.queue.values()) {
+            for (const [key, data] of module) {
+                writeBufferToDist(key, data);
+            }
         }
-
-        this.queue = [];
     }
 }
