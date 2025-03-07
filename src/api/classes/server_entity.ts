@@ -1,4 +1,4 @@
-import { Language, type WorkerResponse, type ModuleWriteable, type ProjectOptions, type ModuleResponse } from "../../core/classes/index.ts";
+import { Language, type WorkerResponse, type ModuleWriteable, type ProjectOptions, type ModuleResponse, WorkerWriter } from "../../core/classes/index.ts";
 import { deepMerge } from "../../core/utils/index.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.d.ts";
 
@@ -111,6 +111,7 @@ export class MinecraftServerEntity implements ModuleWriteable {
     }
     
     constructor(entity: ServerEntityLoose) {
+        WorkerWriter.register(this);
         this.entity = entity as ServerEntityStrict;
     }
 

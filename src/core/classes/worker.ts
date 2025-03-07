@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 export interface WorkerResponse<T> {
     endpoint: string;
     response: T;
@@ -7,7 +8,7 @@ export class WorkerManager {
     public static run<T>(script: string, options?: unknown): Promise<WorkerResponse<T>[]> {
         const id = crypto.randomUUID();
 
-        const blob = new Blob([generateWorker.toString() + "generateWorker();"], { type: "application/typescript" });
+        const blob = new Blob([WorkerWriter.toString() + "WorkerWriter.generateWorker();"], { type: "application/typescript" });
         const worker = new Worker(URL.createObjectURL(blob), {
             type: "module",
             deno: {
@@ -50,29 +51,63 @@ export class WorkerManager {
     }
 }
 
-function generateWorker(): void {
-    const worker = self as unknown as Worker;
+declare global {
+    interface WorkerGlobalScope {
+        workerRegistry: {
+            workers: WorkerWriteable<unknown, unknown>[];
+            register: <T, U>(worker: WorkerWriteable<T, U>) => void;
+        };
+    }
+}
 
-    worker.addEventListener("message", async (event) => {
-        const data = event.data as { id: string, script: string, options: unknown };
-        const {id, script, options} = data;
-
-        const values: unknown[] = [];
-        const blob = new Blob([Deno.readTextFileSync(script)], { type: "application/typescript" });
-
-        const result = await import(URL.createObjectURL(blob));
-        try {
-
-            for (const value of Object.values(result)) {
-                if (typeof value === "object" && value !== null && "generate" in value && typeof value.generate === "function") {
-                    values.push(value.generate(options));
-                } else {
-                    console.warn("No generate function found in" + value);
-                }
-            }
-            worker.postMessage({ id, result: true, contents: values });
-        } catch (error) {
-            worker.postMessage({ id, result: false, message: error });
+if (!('workerRegistry' in self)) {
+    (self as any).workerRegistry = {
+        workers: [],
+        register: function <T, U>(worker: WorkerWriteable<T, U>): void {
+            this.workers.push(worker as WorkerWriteable<unknown, unknown>);
         }
-    });
+    };
+}
+
+export interface WorkerWriteable<T, U> {
+    generate(options: T): WorkerResponse<U>;
+}
+
+export class WorkerWriter {
+    public static register<T, U>(worker: WorkerWriteable<T, U>): void {
+        (self as any).workerRegistry.register(worker);
+    }
+
+    public static write(options: unknown): WorkerResponse<unknown>[] {
+        const responses: WorkerResponse<unknown>[] = [];
+        const registry = (self as any).workerRegistry;
+
+        for (const worker of registry.workers)
+        {
+            responses.push(worker.generate(options));
+        }
+
+        return responses;
+    }
+
+    public static generateWorker(): void {
+        const worker = self as unknown as Worker;
+
+        worker.addEventListener("message", async (event) => {
+            const data = event.data as { id: string, script: string, options: unknown };
+            const { id, script, options } = data;
+
+            const blob = new Blob([Deno.readTextFileSync(script)], { type: "application/typescript" });
+
+            try
+            {
+                await import(URL.createObjectURL(blob));
+
+                worker.postMessage({ id, result: true, contents: this.write(options) });
+            } catch (error)
+            {
+                worker.postMessage({ id, result: false, message: error });
+            }
+        });
+    }
 }

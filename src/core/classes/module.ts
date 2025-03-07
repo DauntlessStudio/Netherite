@@ -1,7 +1,7 @@
 import * as path from "jsr:@std/path";
 import { debounce } from "jsr:@std/async/debounce";
 import { writeBufferToDist } from "../utils/fileIO.ts";
-import { WorkerManager, type ProjectOptions, type WorkerResponse } from "./index.ts";
+import { WorkerManager, type WorkerWriteable, type ProjectOptions } from "./index.ts";
 import { Config } from "./config.ts";
 import { Logger } from "../utils/index.ts";
 
@@ -9,9 +9,7 @@ export interface ModuleResponse {
     name: string;
     data: Uint8Array;
 }
-export interface ModuleWriteable {
-    generate(options: ProjectOptions): WorkerResponse<ModuleResponse>;
-}
+export interface ModuleWriteable extends WorkerWriteable<ProjectOptions, ModuleResponse> {}
 
 interface WriteData {
     outputPath: string;
