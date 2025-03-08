@@ -100,7 +100,7 @@ export class Static {
         }
     }
 
-    public static getDistFromPath(src: string): string {
+    public static getDistFromPath(src: string): string|undefined {
         src = path.resolve(src);
 
         if (src.startsWith(this.behaviorPath)) {
@@ -124,8 +124,6 @@ export class Static {
             const segments = src.split(path.SEPARATOR_PATTERN).filter(Boolean);
             return path.join(Config.Paths.rp.root, ...segments.slice(2));
         }
-
-        throw new Error("Path is not in a valid directory");
     }
 
     private static async watch(): Promise<void> {
@@ -144,6 +142,7 @@ export class Static {
             }
 
             const dest = this.getDistFromPath(src);
+            if (!dest) return;
 
             switch (event.kind) {
                 case "create": {
