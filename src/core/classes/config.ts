@@ -5,6 +5,7 @@ import * as path from "jsr:@std/path";
 import type { ProjectOptions } from "./project.ts";
 import { Buffer } from "node:buffer";
 import { Logger } from "../utils/index.ts";
+import { WorkerManager } from "./index.ts";
 
 interface ConfigPaths {
     root: string;
@@ -24,7 +25,6 @@ export class Config {
     private static options: ProjectOptions;
     private static studioName: string;
     private static packName: string;
-    private static readonly templatePath = path.join(path.fromFileUrl(Deno.mainModule), "../..", "templates");
     
     public static get Options() : ProjectOptions {
         if (!this.options) {
@@ -114,8 +114,8 @@ export class Config {
         }
         
         try {
-            const url = new URL("file://" + path.join(Deno.cwd(), "netherite.config.ts"));
-            await import(url.toString());
+            const value = await WorkerManager.run<ProjectOptions>(path.join(Deno.cwd(), "netherite.config.ts"));
+            this.setOptions(value[0].response);
         } catch (error) {
             throw new Error("Failed to ingest netherite.config.ts due to " + error);
         }
@@ -127,6 +127,6 @@ export class Config {
     }
 
     public static getTemplateFile(file: string): string {
-        return path.join(this.templatePath, file);
+        return path.join(path.fromFileUrl(Deno.mainModule), "../..", "templates", file);
     }
 }

@@ -1,31 +1,31 @@
-import { Language, Config, Module, type ModuleWriteable } from "../../core/classes/index.ts";
+import { Language, type WorkerResponse, type ModuleWriteable, type ProjectOptions, type ModuleResponse, WorkerWriter } from "../../core/classes/index.ts";
 import { deepMerge } from "../../core/utils/index.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.d.ts";
 
 export class MinecraftServerEntity implements ModuleWriteable {
     // #region Static
 
-    private static validate(entity: ServerEntityLoose): ServerEntityStrict {
+    private static validate(entity: ServerEntityLoose, options: ProjectOptions): ServerEntityStrict {
         if (!entity["minecraft:entity"]?.description?.identifier) {
             throw new Error("Entity identifier is required");
         }
 
         if (!entity["minecraft:entity"].description.identifier.includes(":")) {
-            entity["minecraft:entity"].description.identifier = `${Config.Options.namespace}:${entity["minecraft:entity"].description.identifier}`;
+            entity["minecraft:entity"].description.identifier = `${options.namespace}:${entity["minecraft:entity"].description.identifier}`;
         }
 
         const family = entity["minecraft:entity"].components?.["minecraft:type_family"]?.family
         if (family) {
             entity["minecraft:entity"]!.components!["minecraft:type_family"]!.family = family.map((f: string) => {
                 if (!f.includes(":")) {
-                    return `${Config.Options.namespace}:${f}`;
+                    return `${options.namespace}:${f}`;
                 }
                 return f;
             });
         }
 
         const baseline: ServerEntityStrict = {
-            format_version: Config.Options.formatVersion,
+            format_version: options.formatVersion,
             "minecraft:entity": {
                 description: {
                     identifier: "",
@@ -111,16 +111,18 @@ export class MinecraftServerEntity implements ModuleWriteable {
     }
     
     constructor(entity: ServerEntityLoose) {
-        this.entity = MinecraftServerEntity.validate(entity);
-        Module.register(this);
+        WorkerWriter.register(this);
+        this.entity = entity as ServerEntityStrict;
     }
 
     public updateEntity(entity: ServerEntityLoose): MinecraftServerEntity {
-        this.entity = MinecraftServerEntity.validate(deepMerge(this.entity, entity));
+        this.entity = deepMerge(this.entity, entity);
         return this;
     }
 
-    generate(): { outputPath: string; content: Uint8Array; } {
+    generate(options: ProjectOptions): WorkerResponse<ModuleResponse> {
+        this.entity = MinecraftServerEntity.validate(this.entity, options);
+
         Language.addPlaceholderEntry("entity names", `entity.${this.Identifier}.name`, this.Shortname);
 
         if (this.entity["minecraft:entity"].description.is_spawnable) {
@@ -128,8 +130,11 @@ export class MinecraftServerEntity implements ModuleWriteable {
         }
 
         return {
-            outputPath: `${Config.Paths.bp.root}entities/${this.Shortname}.json`,
-            content: new TextEncoder().encode(JSON.stringify(this.entity, null, "\t"))
+            endpoint: "minecraft_server_entity",
+            response: {
+                name: `${this.Shortname}`,
+                data: new TextEncoder().encode(JSON.stringify(this.entity, null, "\t")),
+            },
         };
     }
 }

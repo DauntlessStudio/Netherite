@@ -4,7 +4,7 @@
   "tasks": {
     "dev": "deno run --allow-read --allow-write --allow-run --allow-env src/cli/cli.ts",
     "init": "netherite init --name 'Test' --author 'Caleb Coldiron' --namespace 'cld_test' --formatVersion 'latest' --type 'world' --script 'deno' --skinpack",
-    "install": "deno install -f -g --name netherite --allow-read --allow-write --allow-run --allow-env src/cli/cli.ts",
+    "install": "deno install -f -g --name netherite --allow-import --allow-read --allow-write --allow-run --allow-env --unstable-worker-options src/cli/cli.ts",
     "test": "rm -rf Test && deno task install && deno task init"
   },
   "exports": {
