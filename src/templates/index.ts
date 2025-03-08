@@ -12,5 +12,6 @@ import "./texts/README.md.ts";
 import "./texts/settings.json.ts";
 import "./texts/skins.json.ts";
 import "./texts/tsconfig.json.ts";
+import "./texts/workspace.ts";
 
 export * from "./template.ts"
