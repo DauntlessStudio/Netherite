@@ -31,7 +31,7 @@ export class Module {
 
         await this.iterate(async (filepath: string) => {
             if (filepath.endsWith(".mod.ts")) {
-                await this.process(filepath);
+                await this.process(filepath, true);
             }
         });
 
@@ -73,14 +73,40 @@ export class Module {
 
     private static async watch(): Promise<void> {
         const ingest = debounce(async (event: Deno.FsEvent) => {
-            if (event.kind === "modify" && event.paths[0].endsWith(".mod.ts")) {
-                try {
-                    console.log("[%s] %s", event.kind, event.paths[0]);
-                    await this.process(event.paths[0]);
-                } catch (e) {
-                    console.error(`Error loading module: ${event.paths[0]}`);
-                    console.error(e);
+            if (!event.paths[0].endsWith(".mod.ts")) return;
+
+            switch (event.kind) {
+                case "modify": {
+                    try {
+                        await this.process(event.paths[0]);
+                    } catch (e) {
+                        console.error(`Error loading module: ${event.paths[0]}`);
+                        console.error(e);
+                    }
+                    break;
                 }
+                case "remove": {
+                    const cache = this.queue.get(event.paths[0]);
+
+                    if (cache) {
+                        for (const file of cache.keys()) {
+                            Deno.removeSync(file);
+                        }
+
+                        this.queue.delete(event.paths[0]);
+                    }
+                    break;
+                }
+                case "rename": {
+                    const cache = this.queue.get(event.paths[0]);
+
+                    if (cache && event.paths[1]) {
+                        this.queue.delete(event.paths[0]);
+                        this.queue.set(event.paths[1], cache);
+                    }
+                    break;
+                }
+                default: return;                    
             }
         }, 200);
 
@@ -91,18 +117,25 @@ export class Module {
         }
     }
 
-    private static async process(path: string): Promise<void> {
-        if (!path.endsWith(".mod.ts")) return;
+    private static async process(file: string, silent?: boolean): Promise<void> {
+        if (!file.endsWith(".mod.ts")) return;
 
         try {
-            const result = await WorkerManager.run<ModuleResponse>(path, Config.Options);
+            const stat = Deno.statSync(file);
+            if (stat.isDirectory) return;
+        } catch (_error) {
+            // Do Nothing
+        }
+
+        try {
+            const result = await WorkerManager.run<ModuleResponse>(file, Config.Options);
 
             if (result.length > 0) {
-                if (!this.queue.has(path)) {
-                    this.queue.set(path, new Map());
+                if (!this.queue.has(file)) {
+                    this.queue.set(file, new Map());
                 }
 
-                const cachedFiles = this.queue.get(path)?.keys().toArray() ?? [];
+                const cachedFiles = this.queue.get(file)?.keys().toArray() ?? [];
 
                 for (const {endpoint, response} of result) {
                     let entry: WriteData | undefined;
@@ -121,7 +154,7 @@ export class Module {
                     }
 
                     if (entry) {
-                        this.queue.get(path)?.set(entry.outputPath, entry.content);
+                        this.queue.get(file)?.set(entry.outputPath, entry.content);
 
                         if (cachedFiles.includes(entry.outputPath)) {
                             cachedFiles.splice(cachedFiles.indexOf(entry.outputPath), 1);
@@ -129,9 +162,10 @@ export class Module {
                     }
                 }
 
-                for (const file of cachedFiles) {
-                    this.queue.get(path)?.delete(file);
-                    Deno.removeSync(file);
+                for (const cachedFile of cachedFiles) {
+                    Deno.removeSync(cachedFile);
+                    this.queue.get(file)?.delete(cachedFile);
+                    if (!silent) Logger.log(`[${Logger.Colors.red("remove")}] ${path.resolve(cachedFile)}`);
                 }
             }
         } catch (error) {
@@ -141,6 +175,7 @@ export class Module {
         for (const module of this.queue.values()) {
             for (const [key, data] of module) {
                 writeBufferToDist(key, data);
+                if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(key)}`);
             }
         }
     }

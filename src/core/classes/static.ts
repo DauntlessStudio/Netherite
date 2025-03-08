@@ -1,6 +1,6 @@
 import * as path from "jsr:@std/path";
 import { Config, Language } from "./index.ts";
-import { sendToDist, sleep } from "../utils/index.ts";
+import { Logger, sendToDist, sleep } from "../utils/index.ts";
 import { Module } from "./module.ts";
 import { Sound } from "./sound.ts";
 import { Texture } from "./texture.ts";
@@ -105,35 +105,40 @@ export class Static {
 
         if (src.startsWith(this.behaviorPath)) {
             src = src.replace(this.behaviorPath, "");
-            return path.join(Config.Paths.bp.root, src);
+            return path.resolve(path.join(Config.Paths.bp.root, src));
         }
 
         if (src.startsWith(this.resourcePath)) {
             src = src.replace(this.resourcePath, "");
-            return path.join(Config.Paths.rp.root, src);
+            return path.resolve(path.join(Config.Paths.rp.root, src));
         }
 
         if (Module.isInModuleDirectory(src, "bp")) {
             src = src.replace(this.modulePath, "");
             const segments = src.split(path.SEPARATOR_PATTERN).filter(Boolean);
-            return path.join(Config.Paths.bp.root, ...segments.slice(2));
+            return path.resolve(path.join(Config.Paths.bp.root, ...segments.slice(2)));
         }
 
         if (Module.isInModuleDirectory(src, "rp")) {
             src = src.replace(this.modulePath, "");
             const segments = src.split(path.SEPARATOR_PATTERN).filter(Boolean);
-            return path.join(Config.Paths.rp.root, ...segments.slice(2));
+            return path.resolve(path.join(Config.Paths.rp.root, ...segments.slice(2)));
         }
     }
 
     private static async watch(): Promise<void> {
         const sync = (event: Deno.FsEvent) => {
             const src = event.paths[0];
-
+            
             if (src.endsWith(".ts") || !this.canWrite(src)) return;
 
-            console.log("[%s] %s", event.kind, event.paths[0]);
-
+            try {
+                const stat = Deno.statSync(src);
+                if (stat.isDirectory) return;
+            } catch (_error) {
+                // Do Nothing
+            }
+            
             for (const [file, callback] of this.specialFiles.entries()) {
                 if (path.globToRegExp(file).test(src)) {
                     callback(src);
@@ -147,20 +152,22 @@ export class Static {
             switch (event.kind) {
                 case "create": {
                     sendToDist(src, dest);
+                    Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
                     break;
                 }
                 case "modify": {
-                    const stat = Deno.statSync(src);
-                    if (stat.isDirectory) return;
                     sendToDist(src, dest);
+                    Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
                     break;
                 }
                 case "rename": {
                     sendToDist(src, dest);
+                    Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
                     break;
                 }
                 case "remove": {
                     Deno.removeSync(dest, {recursive: true});
+                    Logger.log(`[${Logger.Colors.red("remove")}] ${dest}`);
                     break;
                 }
                 default:
