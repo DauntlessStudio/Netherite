@@ -29,7 +29,7 @@ interface ClientEntityScripts {
     animate?: string[];
     initialize?: string[];
     parent_setup?: string;
-    pre_animation?: string;
+    pre_animation?: string[];
     should_update_effects_offscreen?: boolean;
     should_update_bones_and_effects_offscreen?: boolean;
 }

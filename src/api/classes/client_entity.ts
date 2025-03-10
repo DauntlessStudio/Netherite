@@ -1,5 +1,5 @@
 import { type WorkerResponse, type ModuleWriteable, type ProjectOptions, type ModuleResponse, WorkerWriter } from "../../core/classes/index.ts";
-import { deepMerge } from "../../core/utils/index.ts";
+import { deepMerge, keywordReplacer } from "../../core/utils/index.ts";
 import type { ClientEntityStrict, ClientEntityLoose } from "../types/index.d.ts";
 
 export class MinecraftClientEntity implements ModuleWriteable {
@@ -44,12 +44,21 @@ export class MinecraftClientEntity implements ModuleWriteable {
         return deepMerge(baseline, entity);
     }
 
+    private static encode(entity: MinecraftClientEntity, options: ProjectOptions): Uint8Array {
+        let content = JSON.stringify(entity, null, "\t");
+        content = keywordReplacer(content, options);
+        content = content.replace(/SHORTNAME/g, entity.Shortname);
+        content = content.replace(/IDENTIFIER/g, entity.Identifier);
+
+        return new TextEncoder().encode(content);
+    }
+
     // #endregion
 
-    private entity: ClientEntityStrict;
+    protected entity: ClientEntityLoose;
     
     public get Identifier() : string {
-        return this.entity["minecraft:client_entity"].description.identifier;
+        return this.entity["minecraft:client_entity"].description.identifier ?? "NAMESPACE:SHORTNAME";
     }
     
     public get Shortname() : string {
@@ -73,7 +82,7 @@ export class MinecraftClientEntity implements ModuleWriteable {
             endpoint: "minecraft_client_entity",
             response: {
                 name: this.Shortname,
-                data: new TextEncoder().encode(JSON.stringify(this.entity, null, "\t")),
+                data: MinecraftClientEntity.encode(this, options),
             }
         }
     }
