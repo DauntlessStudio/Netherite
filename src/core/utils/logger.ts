@@ -29,11 +29,11 @@ export class Logger {
         },
         succeed: function(text: string) {
             Logger.spinner.succeed(text);
-            Logger.spinnerResolve("success");
+            Logger.spinnerResolve?.("success");
         },
         fail: function(text: string) {
             Logger.spinner.fail(text);
-            Logger.spinnerResolve("failure");
+            Logger.spinnerResolve?.("failure");
         },
     });
 

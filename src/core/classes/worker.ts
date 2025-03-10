@@ -82,8 +82,7 @@ export class WorkerWriter {
         const responses: WorkerResponse<unknown>[] = [];
         const registry = (self as any).workerRegistry;
 
-        for (const worker of registry.workers)
-        {
+        for (const worker of registry.workers) {
             responses.push(worker.generate(options));
         }
 
@@ -97,15 +96,25 @@ export class WorkerWriter {
             const data = event.data as { id: string, script: string, options: unknown };
             const { id, script, options } = data;
 
-            const blob = new Blob([Deno.readTextFileSync(script)], { type: "application/typescript" });
+            let contents = await Deno.readTextFile(script);
+            const dir = "file:" + script.split(/[/\\]/).slice(0, -1).join('/') + "/";
 
-            try
-            {
+            contents = contents.replace(
+                /import\s+(?:{[^}]*}|\*\s+as\s+[^;]*|[^;]*)\s+from\s+['"](\.\/?[^'"]+)['"]/g,
+                (match, relativePath) => {
+                    // Create absolute path by resolving the relative path against the script directory
+                    const absolutePath = new URL(relativePath, new URL(dir, self.location.href)).href;
+                    return match.replace(relativePath, absolutePath);
+                }
+            );
+
+            const blob = new Blob([contents], { type: "application/typescript" });
+
+            try {
                 await import(URL.createObjectURL(blob));
 
                 worker.postMessage({ id, result: true, contents: this.write(options) });
-            } catch (error)
-            {
+            } catch (error) {
                 worker.postMessage({ id, result: false, message: error });
             }
         });

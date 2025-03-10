@@ -176,7 +176,8 @@ export class Module {
                 }
             }
         } catch (error) {
-            throw error;
+            Logger.error(`Error processing module: ${file}`);
+            Logger.error(String(error));
         }
 
         for (const module of this.queue.values()) {
