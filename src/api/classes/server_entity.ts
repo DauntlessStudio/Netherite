@@ -115,12 +115,12 @@ export class MinecraftServerEntity implements ModuleWriteable {
         this.entity = entity as ServerEntityStrict;
     }
 
-    public updateEntity(entity: ServerEntityLoose): MinecraftServerEntity {
+    public modify(entity: ServerEntityLoose): MinecraftServerEntity {
         this.entity = deepMerge(this.entity, entity);
         return this;
     }
 
-    generate(options: ProjectOptions): WorkerResponse<ModuleResponse> {
+    public generate(options: ProjectOptions): WorkerResponse<ModuleResponse> {
         this.entity = MinecraftServerEntity.validate(this.entity, options);
 
         Language.addPlaceholderEntry("entity names", `entity.${this.Identifier}.name`, this.Shortname);

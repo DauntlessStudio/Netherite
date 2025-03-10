@@ -141,13 +141,20 @@ export class Module {
                     let entry: WriteData | undefined;
 
                     switch (endpoint) {
-                        case "minecraft_server_entity":
+                        case "minecraft_server_entity": {
                             entry = {
                                 outputPath: `${Config.Paths.bp.root}entities/${response.name}.json`,
                                 content: response.data,
                             }
                             break;
-                    
+                        }
+                        case "minecraft_client_entity": {
+                            entry = {
+                                outputPath: `${Config.Paths.rp.root}entity/${response.name}.entity.json`,
+                                content: response.data,
+                            }
+                            break;
+                        }
                         default:
                             Logger.error(`Unknown endpoint: ${endpoint}`);
                             break;

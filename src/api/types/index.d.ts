@@ -10,4 +10,5 @@ export * from "./client_sound_definitions.d.ts";
 export * from "./client_terrain_texture.d.ts";
 export * from "./client_item_texture.d.ts";
 export * from "./client_sounds.d.ts";
+export * from "./client_entity.d.ts";
 export * from "./skins.d.ts";
