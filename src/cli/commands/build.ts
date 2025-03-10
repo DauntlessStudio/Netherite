@@ -1,7 +1,7 @@
 import * as path from "jsr:@std/path";
 import { Command, type CommandData } from "../command.ts";
 import { Project } from "../../core/classes/project.ts";
-import { Logger } from "../../core/utils/index.ts";
+import { abortOnKeypress, Logger } from "../../core/utils/index.ts";
 
 interface BuildCommandData extends CommandData {
     options: {
@@ -57,6 +57,8 @@ export default new Command<BuildCommandData>({
             if (_args.options.watch) args.push("--watch");
             if (_args.options.silent) args.push("--silent");
 
+            const abortCallbacks: (() => void)[] = [];
+
             try {
                 for (const dir of Deno.readDirSync(_args.options.all)) {
                     if (dir.isDirectory) {
@@ -77,13 +79,19 @@ export default new Command<BuildCommandData>({
                         if (!_args.options.watch) {
                             await command.output();
                         } else {
-                            command.spawn().output();
+                            const task = command.spawn();
+                            task.output();
+                            abortCallbacks.push(() => task.kill());
                         }
                     }
                 }
             } catch (_error) {
                 Logger.error(`The directory ${_args.options.all} does not exist`);
                 Deno.exit(1);
+            }
+
+            if (abortCallbacks.length) {
+                abortOnKeypress(abortCallbacks);
             }
         }
     },
