@@ -1,38 +1,38 @@
 import type { ServerFilters } from "./filters.d.ts";
 import type { Components } from "./server_entity_components.d.ts";
 
-interface Property {
+interface ServerEntityProperty {
     client_sync?: boolean;
     type: "float"|"int"|"enum"|"bool";
 }
 
-interface FloatProperty extends Property {
+interface ServerEntityFloatProperty extends ServerEntityProperty {
     type: "float";
     // TODO: add float type so this can maintain precision
     default: number;
     range: [number, number];
 }
 
-interface IntProperty extends Property {
+interface ServerEntityIntProperty extends ServerEntityProperty {
     type: "int";
     default: number;
     range: [number, number];
 }
 
-interface EnumProperty extends Property {
+interface ServerEntityEnumProperty extends ServerEntityProperty {
     type: "enum";
     default: string;
     values: string[];
 }
 
-interface BoolProperty extends Property {
+interface ServerEntityBoolProperty extends ServerEntityProperty {
     type: "bool";
     default: boolean;
 }
 
-type PropertyType = FloatProperty | IntProperty | EnumProperty | BoolProperty;
+type ServerEntityPropertyType = ServerEntityFloatProperty | ServerEntityIntProperty | ServerEntityEnumProperty | ServerEntityBoolProperty;
 
-interface Description {
+interface ServerEntityDescription {
     identifier: string;
     is_spawnable: boolean;
     is_summonable: boolean;
@@ -44,11 +44,11 @@ interface Description {
         animate: (string | {[key: string]: string})[];
     },
     properties?: {
-        [key: string]: PropertyType;
+        [key: string]: ServerEntityPropertyType;
     }
 }
 
-interface Events {
+interface ServerEntityEvents {
     add?: {
         component_groups: string[];
     };
@@ -56,8 +56,8 @@ interface Events {
         component_groups: string[];
     };
     trigger?: string;
-    randomize?: Events[];
-    sequence?: Events[];
+    randomize?: ServerEntityEvents[];
+    sequence?: ServerEntityEvents[];
     set_property?: {
         [key: string]: string|number|boolean;
     };
@@ -70,13 +70,13 @@ interface Events {
 export interface ServerEntityStrict {
     format_version: string;
     "minecraft:entity": {
-        description: Description;
+        description: ServerEntityDescription;
         component_groups: {
             [key: string]: Components;
         };
         components: Components;
         events: {
-            [key: string]: Events;
+            [key: string]: ServerEntityEvents;
         }
     }
 }
@@ -84,13 +84,13 @@ export interface ServerEntityStrict {
 export interface ServerEntityLoose {
     format_version?: string;
     "minecraft:entity": {
-        description?: Partial<Description>;
+        description?: Partial<ServerEntityDescription>;
         component_groups?: {
             [key: string]: Components;
         };
         components?: Components;
         events?: {
-            [key: string]: Events;
+            [key: string]: ServerEntityEvents;
         }
     }
 }

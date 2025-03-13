@@ -1,5 +1,6 @@
 import * as path from "jsr:@std/path";
 import { Config } from "../classes/config.ts";
+import { keywordReplacer } from "./index.ts";
 
 interface DistDirectoryMapEntry {
     destDirGlob: RegExp;
@@ -123,12 +124,7 @@ export function writeBufferToDist(dest: string, content: Uint8Array): void {
 export function writeTextToDist(dest: string, content: string, overwrite: boolean = true): void {
     Deno.mkdirSync(path.dirname(dest), {recursive: true});
     
-    const modifiedContent = content
-    .replace(/FORMATVERSION/g, Config.Options.formatVersion)
-    .replace(/NAMESPACE/g, Config.Options.namespace)
-    .replace(/VERSION/g, Config.Options.version)
-    .replace(/AUTHOR/g, Config.Options.author)
-    .replace(/NAME/g, Config.Options.name)
+    const modifiedContent = keywordReplacer(content, Config.Options);
     
     try {
         Deno.writeTextFileSync(dest, modifiedContent, {createNew: !overwrite});

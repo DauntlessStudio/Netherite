@@ -1,5 +1,5 @@
 import { Language, type WorkerResponse, type ModuleWriteable, type ProjectOptions, type ModuleResponse, WorkerWriter } from "../../core/classes/index.ts";
-import { deepMerge } from "../../core/utils/index.ts";
+import { deepMerge, keywordReplacer } from "../../core/utils/index.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.d.ts";
 
 export class MinecraftServerEntity implements ModuleWriteable {
@@ -39,6 +39,17 @@ export class MinecraftServerEntity implements ModuleWriteable {
         }
 
         return deepMerge(baseline, entity);
+    }
+
+    private static encode(entity: MinecraftServerEntity, options: ProjectOptions): Uint8Array {
+        let content = JSON.stringify(entity.entity, null, "\t");
+        content = content.replace(/IDENTIFIER/g, entity.Identifier);
+        content = content.replace(/SHORTNAME/g, entity.Shortname);
+        content = keywordReplacer(content, options);
+
+        // TODO: Handle Floats
+
+        return new TextEncoder().encode(content);
     }
 
     public static dummy(identifier: string): MinecraftServerEntity {
@@ -100,10 +111,10 @@ export class MinecraftServerEntity implements ModuleWriteable {
 
     // #endregion
 
-    private entity: ServerEntityStrict;
+    protected entity: ServerEntityLoose;
 
     public get Identifier() : string {
-        return this.entity["minecraft:entity"].description.identifier;
+        return this.entity["minecraft:entity"].description?.identifier ?? "NAMESPACE:SHORTNAME";
     }
     
     public get Shortname() : string {
@@ -112,20 +123,20 @@ export class MinecraftServerEntity implements ModuleWriteable {
     
     constructor(entity: ServerEntityLoose) {
         WorkerWriter.register(this);
-        this.entity = entity as ServerEntityStrict;
+        this.entity = entity;
     }
 
-    public updateEntity(entity: ServerEntityLoose): MinecraftServerEntity {
+    public modify(entity: ServerEntityLoose): MinecraftServerEntity {
         this.entity = deepMerge(this.entity, entity);
         return this;
     }
 
-    generate(options: ProjectOptions): WorkerResponse<ModuleResponse> {
+    public generate(options: ProjectOptions): WorkerResponse<ModuleResponse> {
         this.entity = MinecraftServerEntity.validate(this.entity, options);
 
         Language.addPlaceholderEntry("entity names", `entity.${this.Identifier}.name`, this.Shortname);
 
-        if (this.entity["minecraft:entity"].description.is_spawnable) {
+        if (this.entity["minecraft:entity"].description?.is_spawnable) {
             Language.addPlaceholderEntry("spawn eggs", `item.spawn_egg.entity.${this.Identifier}.spawn`, `Spawn ${this.Shortname}`);
         }
 
@@ -133,7 +144,7 @@ export class MinecraftServerEntity implements ModuleWriteable {
             endpoint: "minecraft_server_entity",
             response: {
                 name: `${this.Shortname}`,
-                data: new TextEncoder().encode(JSON.stringify(this.entity, null, "\t")),
+                data: MinecraftServerEntity.encode(this, options),
             },
         };
     }

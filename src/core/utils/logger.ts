@@ -15,6 +15,7 @@ class Spinner extends Kia {
 
 export class Logger {
     private static spinner: Spinner;
+    private static spinnerResolve: (result: "success"| "failure") => void;
     
     public static Verbose: boolean = false;
 
@@ -28,9 +29,11 @@ export class Logger {
         },
         succeed: function(text: string) {
             Logger.spinner.succeed(text);
+            Logger.spinnerResolve?.("success");
         },
         fail: function(text: string) {
             Logger.spinner.fail(text);
+            Logger.spinnerResolve?.("failure");
         },
     });
 
@@ -39,18 +42,29 @@ export class Logger {
     public static log(message: string, verbose?: boolean) {
         if (!Logger.Verbose && verbose) return;
 
-        console.log(message);
+        this.spinnerResult().then(() => console.log(message));
     }
 
     public static warn(message: string, verbose?: boolean) {
         if (!Logger.Verbose && verbose) return;
 
-        console.warn(this.Colors.yellow(message));
+        this.spinnerResult().then(() => console.log(this.Colors.yellow(message)));
     }
 
     public static error(message: string, verbose?: boolean) {
         if (!Logger.Verbose && verbose) return;
 
-        console.error(this.Colors.red(message));
+        this.spinnerResult().then(() => console.log(this.Colors.red(message)));
+    }
+
+    private static spinnerResult(): Promise<"success" | "failure" | "inactive"> {
+        return new Promise((resolve) => {
+            if (!Logger.spinner?.isSpinning()) {
+                resolve("inactive");
+                return;
+            }
+
+            Logger.spinnerResolve = resolve;
+        });
     }
 }
