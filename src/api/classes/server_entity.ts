@@ -43,9 +43,9 @@ export class MinecraftServerEntity implements ModuleWriteable {
 
     private static encode(entity: MinecraftServerEntity, options: ProjectOptions): Uint8Array {
         let content = JSON.stringify(entity.entity, null, "\t");
-        content = keywordReplacer(content, options);
-        content = content.replace(/SHORTNAME/g, entity.Shortname);
         content = content.replace(/IDENTIFIER/g, entity.Identifier);
+        content = content.replace(/SHORTNAME/g, entity.Shortname);
+        content = keywordReplacer(content, options);
 
         // TODO: Handle Floats
 
