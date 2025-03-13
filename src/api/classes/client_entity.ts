@@ -46,9 +46,9 @@ export class MinecraftClientEntity implements ModuleWriteable {
 
     private static encode(entity: MinecraftClientEntity, options: ProjectOptions): Uint8Array {
         let content = JSON.stringify(entity.entity, null, "\t");
-        content = keywordReplacer(content, options);
         content = content.replace(/SHORTNAME/g, entity.Shortname);
         content = content.replace(/IDENTIFIER/g, entity.Identifier);
+        content = keywordReplacer(content, options);
 
         return new TextEncoder().encode(content);
     }
