@@ -1,5 +1,5 @@
 import { zipDir } from "https://deno.land/x/jszip@0.11.0/mod.ts";
-import * as path from "jsr:@std/path";
+import * as path from "@std/path";
 import { Project } from "./project.ts";
 import { Config, World } from "./index.ts";
 import { sendToDist } from "../utils/index.ts";

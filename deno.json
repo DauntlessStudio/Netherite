@@ -4,7 +4,7 @@
   "tasks": {
     "dev": "deno run --allow-read --allow-write --allow-run --allow-env src/cli/cli.ts",
     "init": "netherite init --name 'Test' --author 'Caleb Coldiron' --namespace 'cld_test' --formatVersion 'latest' --type 'world' --script 'deno' --skinpack",
-    "install": "deno install -f -g --name netherite --allow-import --allow-read --allow-write --allow-run --allow-env --unstable-worker-options src/cli/cli.ts",
+    "install": "deno install -f -g -c deno.json --name netherite --allow-import --allow-read --allow-write --allow-run --allow-env --unstable-worker-options src/cli/cli.ts",
     "test": "rm -rf Test && deno task install && deno task init"
   },
   "exports": {
@@ -12,10 +12,17 @@
     "./api": "./src/api/api.ts"
   },
   "imports": {
+    "@jonasschiano/kia": "jsr:@jonasschiano/kia@^0.0.120",
     "@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader@^0.11.1",
     "@std/assert": "jsr:@std/assert@1",
-    "@std/cli": "jsr:@std/cli@^1.0.11",
+    "@std/async": "jsr:@std/async@^1.0.11",
+    "@std/cli": "jsr:@std/cli@^1.0.14",
+    "@std/collections": "jsr:@std/collections@^1.0.10",
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.3",
+    "@std/fmt": "jsr:@std/fmt@^1.0.6",
+    "@std/path": "jsr:@std/path@^1.0.8",
     "@std/uuid": "jsr:@std/uuid@^1.0.4",
-    "esbuild": "npm:esbuild@^0.24.2"
+    "esbuild": "npm:esbuild@^0.24.2",
+    "uuid": "npm:uuid@^11.1.0"
   }
 }

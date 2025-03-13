@@ -1,4 +1,4 @@
-import * as path from "jsr:@std/path";
+import * as path from "@std/path";
 import { TemplateFile } from "../../templates/index.ts";
 import { emptyDirectorySync } from "../utils/index.ts";
 import { Config, Sound, Texture, Script, Manifest, Language, Static, Module, World, Skin } from "./index.ts";

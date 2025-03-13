@@ -1,7 +1,7 @@
-import "jsr:@std/dotenv/load";
+import "@std/dotenv/load";
 import { platform } from 'node:process';
-import { v4 } from "npm:uuid";
-import * as path from "jsr:@std/path";
+import { v4 } from "uuid";
+import * as path from "@std/path";
 import type { ProjectOptions } from "./project.ts";
 import { Buffer } from "node:buffer";
 import { Logger } from "../utils/index.ts";

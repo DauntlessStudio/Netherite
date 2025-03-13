@@ -1,4 +1,4 @@
-import "jsr:@std/dotenv/load";
+import "@std/dotenv/load";
 import { TemplateFile } from "../template.ts";
 import { Config } from "../../core/classes/index.ts";
 

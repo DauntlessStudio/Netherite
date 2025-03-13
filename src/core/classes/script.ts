@@ -1,6 +1,6 @@
-import * as path from "jsr:@std/path";
-import * as esbuild from "npm:esbuild";
-import {denoPlugins} from "jsr:@luca/esbuild-deno-loader";
+import * as path from "@std/path";
+import * as esbuild from "esbuild";
+import {denoPlugins} from "@luca/esbuild-deno-loader";
 import { Config } from "./config.ts";
 
 export class Script {

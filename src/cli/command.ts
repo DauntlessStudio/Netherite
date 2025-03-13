@@ -1,5 +1,5 @@
-import type { ParseOptions } from "jsr:@std/cli/parse-args";
-import { parseArgs } from "jsr:@std/cli/parse-args";
+import type { ParseOptions } from "@std/cli/parse-args";
+import { parseArgs } from "@std/cli/parse-args";
 
 export interface CommandData {
     arguments: (number|string|boolean)[];

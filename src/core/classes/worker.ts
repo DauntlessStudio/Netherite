@@ -51,15 +51,6 @@ export class WorkerManager {
     }
 }
 
-declare global {
-    interface WorkerGlobalScope {
-        workerRegistry: {
-            workers: WorkerWriteable<unknown, unknown>[];
-            register: <T, U>(worker: WorkerWriteable<T, U>) => void;
-        };
-    }
-}
-
 if (!('workerRegistry' in self)) {
     (self as any).workerRegistry = {
         workers: [],

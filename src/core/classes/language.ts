@@ -1,4 +1,4 @@
-import * as path from "jsr:@std/path";
+import * as path from "@std/path";
 import { formatText } from "../utils/text.ts";
 import { writeTextToDist } from "../utils/fileIO.ts";
 import { Config } from "./config.ts";

@@ -1,4 +1,4 @@
-import * as path from "jsr:@std/path";
+import * as path from "@std/path";
 import type * as types from "../../api/types/index.d.ts";
 import { Config } from "./config.ts";
 import { writeTextToDist } from "../utils/fileIO.ts";

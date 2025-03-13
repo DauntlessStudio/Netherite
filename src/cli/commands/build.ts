@@ -1,4 +1,4 @@
-import * as path from "jsr:@std/path";
+import * as path from "@std/path";
 import { Command, type CommandData } from "../command.ts";
 import { Project } from "../../core/classes/project.ts";
 import { abortOnKeypress, Logger } from "../../core/utils/index.ts";

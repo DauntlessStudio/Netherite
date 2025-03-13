@@ -1,4 +1,4 @@
-import * as path from "jsr:@std/path";
+import * as path from "@std/path";
 import { Config, Language } from "./index.ts";
 import { Logger, sendToDist, sleep } from "../utils/index.ts";
 import { Module } from "./module.ts";

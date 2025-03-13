@@ -1,4 +1,4 @@
-import * as path from "jsr:@std/path";
+import * as path from "@std/path";
 import { Config } from "./config.ts";
 import { copyDirSync, Logger } from "../utils/index.ts";
 

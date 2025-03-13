@@ -1,5 +1,5 @@
-import * as path from "jsr:@std/path";
-import { debounce } from "jsr:@std/async/debounce";
+import * as path from "@std/path";
+import { debounce } from "@std/async/debounce";
 import { writeBufferToDist } from "../utils/fileIO.ts";
 import { WorkerManager, type WorkerWriteable, type ProjectOptions } from "./index.ts";
 import { Config } from "./config.ts";
