@@ -113,7 +113,7 @@ export class WorkerWriter {
             // Convert import maps to absolute imports
             for (const [key, value] of Object.entries(data.importMap)) {
                 contents = contents.replace(
-                    new RegExp(`import.+(${key}).+`, "g"),
+                    new RegExp(`import.+['"](${key})['"].+`, "g"),
                     (match, group) => {
                         return match.replace(group, value);
                     }
