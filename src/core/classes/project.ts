@@ -1,7 +1,7 @@
 import * as path from "@std/path";
 import { TemplateFile } from "../../templates/index.ts";
 import { emptyDirectorySync } from "../utils/index.ts";
-import { Config, Sound, Texture, Script, Manifest, Language, Static, Module, World, Skin } from "./index.ts";
+import { Config, Sound, Texture, Script, Manifest, Language, Static, Module, World, Skin, WorkerManager } from "./index.ts";
 import { Logger } from "../utils/logger.ts";
 
 // TODO: Possibly remove skin-pack as an option and instead build a skin pack with the world or add-on
@@ -100,6 +100,7 @@ export class Project {
         Skin.build();
         await Manifest.build();
 
+        WorkerManager.stopServer();
         if (options?.silent !== true) Logger.Spinner.succeed(`Project built in ${Date.now() - cachedTime}ms`);
     }
 

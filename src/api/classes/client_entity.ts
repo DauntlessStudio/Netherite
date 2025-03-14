@@ -44,13 +44,13 @@ export class MinecraftClientEntity implements ModuleWriteable {
         return deepMerge(baseline, entity);
     }
 
-    private static encode(entity: MinecraftClientEntity, options: ProjectOptions): Uint8Array {
+    private static encode(entity: MinecraftClientEntity, options: ProjectOptions): number[] {
         let content = JSON.stringify(entity.entity, null, "\t");
         content = content.replace(/SHORTNAME/g, entity.Shortname);
         content = content.replace(/IDENTIFIER/g, entity.Identifier);
         content = keywordReplacer(content, options);
 
-        return new TextEncoder().encode(content);
+        return Array.from(new TextEncoder().encode(content));
     }
 
     // #endregion
@@ -66,8 +66,8 @@ export class MinecraftClientEntity implements ModuleWriteable {
     }
     
     constructor(entity: ClientEntityLoose) {
-        WorkerWriter.register(this);
         this.entity = entity as ClientEntityStrict;
+        WorkerWriter.broadcast(this);
     }
 
     public modify(entity: ClientEntityLoose): MinecraftClientEntity {

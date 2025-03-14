@@ -1,74 +1,72 @@
-// deno-lint-ignore-file no-explicit-any
 export interface WorkerResponse<T> {
     endpoint: string;
     response: T;
 }
 
 export class WorkerManager {
-    private static importMap?: Record<string, string>;
-    
-    public static get ImportMap() : Record<string, string> {
-        if (this.importMap) return this.importMap;
+    private static server?: Deno.HttpServer<Deno.NetAddr>;
+    private static responses: WorkerResponse<unknown>[] = [];
+    private static options: unknown = {};
 
-        this.importMap = JSON.parse(Deno.readTextFileSync("deno.json")).imports;
-
-        return this.importMap!;
-    }
-    
-    public static run<T>(script: string, options?: unknown): Promise<WorkerResponse<T>[]> {
-        const id = crypto.randomUUID();
-        const importMap = this.ImportMap;
-
-        const blob = new Blob([WorkerWriter.toString() + "WorkerWriter.generateWorker();"], { type: "application/typescript" });
-        const worker = new Worker(URL.createObjectURL(blob), {
-            type: "module",
-            deno: {
-                permissions: {
-                    env: true,
-                    ffi: false,
-                    import: true,
-                    net: false,
-                    read: true,
-                    run: false,
-                    write: false,
-                    sys: false,
-                }
-            }
-        });
-
-        return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => {
-                worker.terminate();
-                reject(new Error(`Worker timed out for ${script}`));
-            }, 10000);
-
-            worker.addEventListener("message", (event) => {
-                const data = event.data as { id: string, result: boolean, message?: string, contents?: WorkerResponse<T>[] };
-
-                if (data.id === id) {
-                    clearTimeout(timeout);
-                    worker.terminate();
-
-                    if (data.result && data.contents) {
-                        resolve(data.contents);
-                    } else {
-                        reject(data.message);
+    private static startServer(): void {
+        if (!this.server) {
+            this.server = Deno.serve(
+                {
+                    port: 3000,
+                    hostname: "localhost",
+                    onListen: () => {},
+                },
+                async (req: Request) => {
+                    switch (req.method) {
+                        case "POST": {
+                            try {
+                                const body = await req.json();
+                                this.responses.push(body);
+                                return new Response(JSON.stringify({ message: "Response stored successfully" }), { status: 200 });
+                            } catch (_error) {
+                                return new Response(JSON.stringify({ message: "Invalid request" }), { status: 400 });
+                            }
+                        }
+                        case "GET": {
+                            return new Response(JSON.stringify({message: "Requested Data", data: this.options}), { status: 200 });
+                        }
+                        default: {
+                            return new Response(JSON.stringify({ message: "Method not allowed" }), { status: 405 });
+                        }
                     }
                 }
-            });
-
-            worker.postMessage({ id, script, options, importMap });
-        });
-    }
-}
-
-if (!('workerRegistry' in self)) {
-    (self as any).workerRegistry = {
-        workers: [],
-        register: function <T, U>(worker: WorkerWriteable<T, U>): void {
-            this.workers.push(worker as WorkerWriteable<unknown, unknown>);
+            );
         }
-    };
+    }
+
+    public static stopServer(): void {
+        this.server?.shutdown();
+    }
+    
+    public static async run<T>(script: string, options?: unknown): Promise<WorkerResponse<T>[]> {
+        this.startServer();
+        this.responses = [];
+        this.options = options || {};
+
+        const task = new Deno.Command("deno", {
+            args: [
+                "run",
+                "--allow-read",
+                "--allow-env",
+                "--allow-net=localhost:3000",
+                script
+            ],
+            stderr: "piped",
+        }).spawn();
+
+        const result = await task.output();
+
+        if (!result.success) {
+            throw new Error(`Failed to run ${script}: ${new TextDecoder().decode(result.stderr)}`);
+        } else {
+            return this.responses as WorkerResponse<T>[];
+        }
+    }
 }
 
 export interface WorkerWriteable<T, U> {
@@ -76,59 +74,23 @@ export interface WorkerWriteable<T, U> {
 }
 
 export class WorkerWriter {
-    public static register<T, U>(worker: WorkerWriteable<T, U>): void {
-        (self as any).workerRegistry.register(worker);
-    }
-
-    public static write(options: unknown): WorkerResponse<unknown>[] {
-        const responses: WorkerResponse<unknown>[] = [];
-        const registry = (self as any).workerRegistry;
-
-        for (const worker of registry.workers) {
-            responses.push(worker.generate(options));
-        }
-
-        return responses;
-    }
-
-    public static generateWorker(): void {
-        const worker = self as unknown as Worker;
-
-        worker.addEventListener("message", async (event) => {
-            const data = event.data as { id: string, script: string, options: unknown, importMap: Record<string, string> };
-            const { id, script, options } = data;
-
-            let contents = await Deno.readTextFile(script);
-            const dir = "file:" + script.split(/[/\\]/).slice(0, -1).join('/') + "/";
-
-            // Convert relative imports to absolute imports
-            contents = contents.replace(
-                /import\s+(?:{[^}]*}|\*\s+as\s+[^;]*|[^;]*)\s+from\s+['"](\.\/?[^'"]+)['"]/g,
-                (match, relativePath) => {
-                    const absolutePath = new URL(relativePath, new URL(dir, self.location.href)).href;
-                    return match.replace(relativePath, absolutePath);
-                }
-            );
-
-            // Convert import maps to absolute imports
-            for (const [key, value] of Object.entries(data.importMap)) {
-                contents = contents.replace(
-                    new RegExp(`import.+['"](${key})['"].+`, "g"),
-                    (match, group) => {
-                        return match.replace(group, value);
-                    }
-                )
-            }
-
-            const blob = new Blob([contents], { type: "application/typescript" });
-
-            try {
-                await import(URL.createObjectURL(blob));
-
-                worker.postMessage({ id, result: true, contents: this.write(options) });
-            } catch (error) {
-                worker.postMessage({ id, result: false, message: error });
-            }
+    public static async broadcast<T, U>(worker: WorkerWriteable<T, U>): Promise<void> {
+        const response = await fetch('http://localhost:3000', {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            },
         });
+
+        const options = (await response.json()).data;
+        const data = worker.generate(options);
+
+        fetch('http://localhost:3000', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
     }
 }

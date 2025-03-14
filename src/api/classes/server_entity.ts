@@ -41,7 +41,7 @@ export class MinecraftServerEntity implements ModuleWriteable {
         return deepMerge(baseline, entity);
     }
 
-    private static encode(entity: MinecraftServerEntity, options: ProjectOptions): Uint8Array {
+    private static encode(entity: MinecraftServerEntity, options: ProjectOptions): number[] {
         let content = JSON.stringify(entity.entity, null, "\t");
         content = content.replace(/IDENTIFIER/g, entity.Identifier);
         content = content.replace(/SHORTNAME/g, entity.Shortname);
@@ -49,7 +49,7 @@ export class MinecraftServerEntity implements ModuleWriteable {
 
         // TODO: Handle Floats
 
-        return new TextEncoder().encode(content);
+        return Array.from(new TextEncoder().encode(content));
     }
 
     public static dummy(identifier: string): MinecraftServerEntity {
@@ -122,8 +122,8 @@ export class MinecraftServerEntity implements ModuleWriteable {
     }
     
     constructor(entity: ServerEntityLoose) {
-        WorkerWriter.register(this);
         this.entity = entity;
+        WorkerWriter.broadcast(this);
     }
 
     public modify(entity: ServerEntityLoose): MinecraftServerEntity {
