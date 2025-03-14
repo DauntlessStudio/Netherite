@@ -5,8 +5,19 @@ export interface WorkerResponse<T> {
 }
 
 export class WorkerManager {
+    private static importMap?: Record<string, string>;
+    
+    public static get ImportMap() : Record<string, string> {
+        if (this.importMap) return this.importMap;
+
+        this.importMap = JSON.parse(Deno.readTextFileSync("deno.json")).imports;
+
+        return this.importMap!;
+    }
+    
     public static run<T>(script: string, options?: unknown): Promise<WorkerResponse<T>[]> {
         const id = crypto.randomUUID();
+        const importMap = this.ImportMap;
 
         const blob = new Blob([WorkerWriter.toString() + "WorkerWriter.generateWorker();"], { type: "application/typescript" });
         const worker = new Worker(URL.createObjectURL(blob), {
@@ -46,7 +57,7 @@ export class WorkerManager {
                 }
             });
 
-            worker.postMessage({ id, script, options });
+            worker.postMessage({ id, script, options, importMap });
         });
     }
 }
@@ -84,20 +95,30 @@ export class WorkerWriter {
         const worker = self as unknown as Worker;
 
         worker.addEventListener("message", async (event) => {
-            const data = event.data as { id: string, script: string, options: unknown };
+            const data = event.data as { id: string, script: string, options: unknown, importMap: Record<string, string> };
             const { id, script, options } = data;
 
             let contents = await Deno.readTextFile(script);
             const dir = "file:" + script.split(/[/\\]/).slice(0, -1).join('/') + "/";
 
+            // Convert relative imports to absolute imports
             contents = contents.replace(
                 /import\s+(?:{[^}]*}|\*\s+as\s+[^;]*|[^;]*)\s+from\s+['"](\.\/?[^'"]+)['"]/g,
                 (match, relativePath) => {
-                    // Create absolute path by resolving the relative path against the script directory
                     const absolutePath = new URL(relativePath, new URL(dir, self.location.href)).href;
                     return match.replace(relativePath, absolutePath);
                 }
             );
+
+            // Convert import maps to absolute imports
+            for (const [key, value] of Object.entries(data.importMap)) {
+                contents = contents.replace(
+                    new RegExp(`import.+(${key}).+`, "g"),
+                    (match, group) => {
+                        return match.replace(group, value);
+                    }
+                )
+            }
 
             const blob = new Blob([contents], { type: "application/typescript" });
 
