@@ -41,11 +41,6 @@ export type ProjectOptions = ProjectOptionsWorld | ProjectOptionsAddOn | Project
 export class Project {
     private static readonly processDir: string = Deno.cwd();
 
-    private static readonly dependencies: string[] = [
-        "npm:@minecraft/server",
-        "npm:@minecraft/server-ui",
-    ];
-
     public static async init(options: ProjectOptions): Promise<void> {
         Config.setOptions(options);
 
@@ -155,9 +150,36 @@ export class Project {
 
     private static async installDependencies(): Promise<void> {
         if (Config.Options.scripting === "deno") {
-            await new Deno.Command("deno", {args: ["install", ...this.dependencies]}).output();
+            const deps = [
+                "npm:@minecraft/server",
+                "npm:@minecraft/server-ui",
+                "jsr:@coldiron/netherite",
+            ];
+
+            await new Deno.Command("deno", {args: ["add", ...deps]}).output();
         } else {
-            await new Deno.Command("npm", {args: ["install", ...this.dependencies]}).output();
+            const deps = [
+                "@minecraft/server",
+                "@minecraft/server-ui",
+            ];
+
+            await new Deno.Command("npm", {args: ["install", ...deps]}).output();
+            await new Deno.Command("npx", {args: ["jsr", "add", "@coldiron/netherite"]}).output();
+        }
+
+        this.developmentPatch();
+    }
+
+    private static developmentPatch(): void {
+        const localPackage = Deno.env.get("LOCALAPI");
+        if (!localPackage) return;
+
+        if (Config.Options.scripting === "deno") {
+            const deno = JSON.parse(Deno.readTextFileSync("deno.json"));
+            deno.patch = [localPackage];
+            Deno.writeTextFileSync("deno.json", JSON.stringify(deno, null, "\t"));
+        } else {
+            // TODO: Add node development patch
         }
     }
 }
