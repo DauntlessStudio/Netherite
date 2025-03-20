@@ -95,6 +95,8 @@ export class Command<T extends CommandData> {
                 this.options.action(filteredArgs as T);
             }
 
+            // TODO: Check for latest version and notify user if outdated
+
             return true;
         }
 

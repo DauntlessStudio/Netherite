@@ -9,6 +9,7 @@
   },
   "license": "LGPL-3.0-or-later",
   "exports": {
+    "./install": "./src/cli/install.ts",
     "./cli": "./src/cli/cli.ts",
     "./api": "./src/api/api.ts"
   },
