@@ -48,6 +48,9 @@ export class WorkerManager {
         this.responses = [];
         this.options = options || {};
 
+        // TODO: Adjust this method to call an intermediate scrip that runs the imports, registering classes
+        // and sending the request to the server only after the whole file is processed, and avoid sending the
+        // request on constructor and re-sending it on modify
         const task = new Deno.Command("deno", {
             args: [
                 "run",

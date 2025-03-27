@@ -128,6 +128,7 @@ export class MinecraftServerEntity implements ModuleWriteable {
 
     public modify(entity: ServerEntityLoose): MinecraftServerEntity {
         this.entity = deepMerge(this.entity, entity);
+        WorkerWriter.broadcast(this);
         return this;
     }
 
