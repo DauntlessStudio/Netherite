@@ -172,12 +172,16 @@ export class Project {
     }
 
     private static developmentPatch(): void {
-        const localPackage = Deno.env.get("LOCALAPI");
-        if (!localPackage) return;
+        const localPackage: string|undefined = Deno.env.get("LOCALAPI");
+        const currentVersion: string|undefined = JSON.parse(Deno.readTextFileSync(path.join(this.processDir, "deno.json"))).version;
+        if (!localPackage || !currentVersion) return;
 
         if (Config.Options.scripting === "deno") {
             const deno = JSON.parse(Deno.readTextFileSync("deno.json"));
+
+            deno.imports["@coldiron/netherite"] = "jsr:@coldiron/netherite@^" + currentVersion;
             deno.patch = [localPackage];
+
             Deno.writeTextFileSync("deno.json", JSON.stringify(deno, null, "\t"));
         } else {
             // TODO: Add node development patch
