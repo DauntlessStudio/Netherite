@@ -95,8 +95,9 @@ export class Project {
         Skin.build();
         await Manifest.build();
 
-        WorkerManager.stopServer();
+        if (!options?.watch) WorkerManager.stopServer();
         if (options?.silent !== true) Logger.Spinner.succeed(`Project built in ${Date.now() - cachedTime}ms`);
+        if (options?.watch) Logger.log("Watching for changes...");
     }
 
     private static createDirectories(): void {
