@@ -14,7 +14,7 @@ interface ProjectOptionsBase {
     name: string;
     author: string;
     namespace: string;
-    formatVersion: string;
+    format_version: string;
     scripting: ScriptType;
     uuid: string;
     version: `${number}.${number}.${number}`;

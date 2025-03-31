@@ -8,7 +8,7 @@ interface InitCommandData extends CommandData {
         name?: string;
         author?: string;
         namespace?: string;
-        formatVersion?: string;
+        format_version?: string;
         type?: ProjectType;
         script?: ScriptType;
         skinpack?: boolean;
@@ -18,13 +18,13 @@ interface InitCommandData extends CommandData {
 new Command<InitCommandData>({
 	name: "init",
 	parse: {
-		string: ["name", "author", "namespace", "formatVersion", "type", "script"],
+		string: ["name", "author", "namespace", "format_version", "type", "script"],
         boolean: ["skinpack"],
         alias: {
             n: "name",
             a: "author",
             ns: "namespace",
-            f: "formatVersion",
+            f: "format_version",
             t: "type",
             s: "script",
             sp: "skinpack",
@@ -49,7 +49,7 @@ new Command<InitCommandData>({
 				description: "The namespace of the project, will prompt if missing",
 				optional: true,
 			},
-			formatVersion: {
+			format_version: {
 				type: "string",
 				description: "The format version of the project, will prompt if missing. Use 'latest' to get the latest version",
 				optional: true,
@@ -79,7 +79,7 @@ new Command<InitCommandData>({
         const validAuthor = _args.options.author === undefined || (typeof _args.options.author === "string" && _args.options.author.length > 0);
         // TODO: Add regex for namespace and format version validation
         const validNamespace = _args.options.namespace === undefined || (typeof _args.options.namespace === "string" && _args.options.namespace.length > 0);
-        const validFormatVersion = _args.options.formatVersion === undefined || (typeof _args.options.formatVersion === "string" && _args.options.formatVersion.length > 0);
+        const validFormatVersion = _args.options.format_version === undefined || (typeof _args.options.format_version === "string" && _args.options.format_version.length > 0);
         const validType = _args.options.type === undefined || (typeof _args.options.type === "string" && ["world", "add-on", "skin-pack"].includes(_args.options.type));
         const validScript = _args.options.script === undefined || (typeof _args.options.script === "string" && ["deno", "node"].includes(_args.options.script));
         const validSkinpack = _args.options.skinpack === undefined || (typeof _args.options.skinpack === "boolean");
@@ -123,17 +123,17 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectOption
         buildOptions.namespace = val;
     }
 
-    if (args.options.formatVersion) {
-        if (args.options.formatVersion === "latest") {
-            args.options.formatVersion = Package.LatestVanillaVersion;
+    if (args.options.format_version) {
+        if (args.options.format_version === "latest") {
+            args.options.format_version = Package.LatestVanillaVersion;
         }
 
-        buildOptions.formatVersion = args.options.formatVersion;
+        buildOptions.format_version = args.options.format_version;
     } else {
         let val = prompt(`Please enter the format version of the project [default: ${Package.LatestVanillaVersion}]:`);
         if (val === null || val === "") val = Package.LatestVanillaVersion;
 
-        buildOptions.formatVersion = val;
+        buildOptions.format_version = val;
     }
 
     if (args.options.type) {

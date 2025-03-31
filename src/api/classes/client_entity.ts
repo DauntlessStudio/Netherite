@@ -23,7 +23,7 @@ export class MinecraftClientEntity implements ModuleWriteable {
         }
 
         const baseline: ClientEntityStrict = {
-            format_version: options.formatVersion,
+            format_version: options.format_version,
             "minecraft:client_entity": {
                 description: {
                     identifier: "",

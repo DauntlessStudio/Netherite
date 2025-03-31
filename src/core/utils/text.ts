@@ -18,7 +18,7 @@ export function capitalize(text: string): string {
 
 export function keywordReplacer(content: string, options: ProjectOptions): string {
     const modifiedContent = content
-    .replace(/FORMATVERSION/g, options.formatVersion)
+    .replace(/FORMATVERSION/g, options.format_version)
     .replace(/NAMESPACE/g, options.namespace)
     .replace(/VERSION/g, options.version)
     .replace(/AUTHOR/g, options.author)

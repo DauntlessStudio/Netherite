@@ -11,7 +11,7 @@ netherite.config({
     type: "${Config.Options.type}",
     scripting: "${Config.Options.scripting}",
     version: "${Config.Options.version}",
-    formatVersion: "${Config.Options.formatVersion}",
+    format_version: "${Config.Options.format_version}",
     uuid: "${Config.Options.uuid}",
     include_skin_pack: ${Config.Options.type !== "skin-pack" ? Config.Options.include_skin_pack : undefined},
 });`;

@@ -15,7 +15,7 @@ export class Manifest {
                     uuid: await Config.getUUID("behavior"),
                     pack_scope: Config.Options.type === "add-on" ? "world" : undefined,
                     version: [1, 0, 0],
-                    min_engine_version: Config.Options.formatVersion.split(".").map(Number),
+                    min_engine_version: Config.Options.format_version.split(".").map(Number),
                 },
                 modules: [
                     {
@@ -65,7 +65,7 @@ export class Manifest {
                     uuid: await Config.getUUID("resource"),
                     pack_scope: Config.Options.type === "add-on" ? "world" : undefined,
                     version: [1, 0, 0],
-                    min_engine_version: Config.Options.formatVersion.split(".").map(Number),
+                    min_engine_version: Config.Options.format_version.split(".").map(Number),
                 },
                 modules: [
                     {
@@ -101,7 +101,7 @@ export class Manifest {
                     pack_scope: Config.Options.type === "add-on" ? "world" : undefined,
                     lock_template_options: true,
                     version: [1, 0, 0],
-                    base_game_version: Config.Options.formatVersion.split(".").map(Number),
+                    base_game_version: Config.Options.format_version.split(".").map(Number),
                 },
                 modules: [
                     {

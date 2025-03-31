@@ -25,7 +25,7 @@ export class MinecraftServerEntity implements ModuleWriteable {
         }
 
         const baseline: ServerEntityStrict = {
-            format_version: options.formatVersion,
+            format_version: options.format_version,
             "minecraft:entity": {
                 description: {
                     identifier: "",
