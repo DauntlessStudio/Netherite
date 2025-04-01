@@ -123,12 +123,11 @@ export class MinecraftServerEntity implements ModuleWriteable {
     
     constructor(entity: ServerEntityLoose) {
         this.entity = entity;
-        WorkerWriter.broadcast(this);
+        WorkerWriter.register(this);
     }
 
     public modify(entity: ServerEntityLoose): MinecraftServerEntity {
         this.entity = deepMerge(this.entity, entity);
-        WorkerWriter.broadcast(this);
         return this;
     }
 

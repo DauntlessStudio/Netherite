@@ -155,6 +155,10 @@ export class Module {
                             }
                             break;
                         }
+                        case "null": {
+                            // All content is empty, so don't write and delete any files registered to this source
+                            break;
+                        }
                         default:
                             Logger.error(`Unknown endpoint: ${endpoint}`);
                             break;

@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 export interface WorkerResponse<T> {
     endpoint: string;
     response: T;
@@ -48,20 +49,22 @@ export class WorkerManager {
         this.responses = [];
         this.options = options || {};
 
-        // TODO: Adjust this method to call an intermediate scrip that runs the imports, registering classes
-        // and sending the request to the server only after the whole file is processed, and avoid sending the
-        // request on constructor and re-sending it on modify
         const task = new Deno.Command("deno", {
             args: [
                 "run",
                 "--allow-read",
                 "--allow-env",
                 "--allow-net=localhost:3000",
-                script
+                "-",
             ],
+            stdin: "piped",
             stderr: "piped",
         }).spawn();
 
+        const writer = task.stdin.getWriter();
+        await writer.write(new TextEncoder().encode(WorkerWriter.toString() + `WorkerWriter.run("${script.replaceAll("\\", "/")}");`));
+        await writer.ready;
+        await writer.close();
         const result = await task.output();
 
         if (!result.success) {
@@ -72,28 +75,78 @@ export class WorkerManager {
     }
 }
 
+declare global {
+    interface WorkerGlobalScope {
+        workerRegistry: {
+            workers: WorkerWriteable<unknown, unknown>[];
+            register: <T, U>(worker: WorkerWriteable<T, U>) => void;
+        };
+    }
+}
+
+if (!('workerRegistry' in self)) {
+    (self as any).workerRegistry = {
+        workers: [],
+        register: function <T, U>(worker: WorkerWriteable<T, U>): void {
+            this.workers.push(worker as WorkerWriteable<unknown, unknown>);
+        }
+    };
+}
+
 export interface WorkerWriteable<T, U> {
     generate(options: T): WorkerResponse<U>;
 }
 
 export class WorkerWriter {
-    public static async broadcast<T, U>(worker: WorkerWriteable<T, U>): Promise<void> {
-        const response = await fetch('http://localhost:3000', {
-            method: 'GET',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-        });
+    public static register<T, U>(worker: WorkerWriteable<T, U>): void {
+        (self as any).workerRegistry.register(worker);
+    }
 
-        const options = (await response.json()).data;
-        const data = worker.generate(options);
+    public static async broadcast(): Promise<void> {
+        const registry = (self as any).workerRegistry;
+        if (!registry || !registry.workers || !registry.workers.length) {
+            await fetch('http://localhost:3000', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    endpoint: "null",
+                    response: {}
+                }),
+            });
 
-        fetch('http://localhost:3000', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
+            return;
+        };
+
+        const workers = registry.workers as WorkerWriteable<unknown, unknown>[];
+
+        for (const worker of workers) {
+            const response = await fetch('http://localhost:3000', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            const options = (await response.json()).data;
+            const data = worker.generate(options);
+    
+            await fetch('http://localhost:3000', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+        }
+
+        workers.length = 0; // Clear the registry after broadcasting
+    }
+
+    public static async run(script: string): Promise<void> {
+        const url = new URL("file://" + script);
+        await import(url.toString());
+        await this.broadcast();
     }
 }

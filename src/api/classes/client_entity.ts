@@ -67,12 +67,11 @@ export class MinecraftClientEntity implements ModuleWriteable {
     
     constructor(entity: ClientEntityLoose) {
         this.entity = entity as ClientEntityStrict;
-        WorkerWriter.broadcast(this);
+        WorkerWriter.register(this);
     }
 
     public modify(entity: ClientEntityLoose): MinecraftClientEntity {
         this.entity = deepMerge(this.entity, entity);
-        WorkerWriter.broadcast(this);
         return this;
     }
 
