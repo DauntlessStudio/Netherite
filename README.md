@@ -156,4 +156,161 @@ Your output also maintains source maps, meaning that you place breakpoints in yo
 ### Modules
 A strong focus of Netherite is to improve modularity and make efficient use of development time. Keywords allow for easy dragging and dropping of files between projects is one way this goal is realized. But the primary benefit is gained through the use of modules.
 
-A Netherite module is a self-contained miniature project that gets dynamically merged into the larger project. Allowing for custom blocks, entities, items, scripting systems, etc. to be modularly shared between different projects. Netherite even includes tools to store your modules online and version them.
+A Netherite module is a self-contained miniature project that gets dynamically merged into the larger project. Allowing for custom blocks, entities, items, scripting systems, etc. to be modularly shared between different projects. Netherite even includes tools to store your modules online and version them, semantically a module refers to one of these modular sub-projects and a package refers to a module stored online. Packages are stored online as Git repositories, which has the pros of being easy, free to use and simple to handle authentication needs for public or private packages. The tradeoff is that, although publishing and working with packages through Netherite will enforce version immutability, a manual change to a Git repo will not, so be conscientious.
+
+Let's get started with making a module of our own (Note that this demo will include publishing your package to GitHub, if you don't want to do that, you can ignore those steps). Let's start by running the command:
+
+```
+netherite package create
+```
+
+This will also take you through a simple guided process:
+
+```
+Please enter the name of the package: Blocky
+Please enter the description of the package: A blocky entity.
+Do you want to publish the package using the GitHub Command Line Tool?: [y/N] y
+```
+
+If you respond `y` to the GitHub question, the GitHub command line tool will take over and guide you through publishing your repo. If you don't have the GitHub command line tool, or don't want to bother with publishing a package right now, feel free to say `N`.
+
+After running those commands, your modules folder should now look like this:
+
+```
+modules/
+└── Blocky/
+    └── netherite.package.json
+```
+
+As mentioned, a module is basically a small project. So within the `Blocky/` directory you can create subdirectories called `BP/` and `RP/` and anything you make in those folders will be dynamically merged into the output of your final project. Including sound definitions, lang entries, terrain and item textures, etc. And since Netherite automatically converts keywords like `NAMESPACE`, if you download your new `Blocky` package into a different Netherite project, you wouldn't need to make any updates before seeing your package contents in-game. It's important to note that your **core project always takes priority** over modules, meaning if you make a lang entry in `Blocky/RP/texts/en_US.lang` saying `entity.NAMESPACE.blocky:name=Blocky` but your core project has an entry at `src/resource_pack/texts/en_US.lang` saying `entity.NAMESPACE:blocky.name=Blocko`, the output in your dist will be `Blocko`. This prioritization is important, since a module may get used in multiple projects and you want to be able to make minor changes to it without needing to update your module for each project.
+
+#### Minecraft Scripting in Modules
+You can create scripting libraries in modules too, which can be really convenient way to share useful functions between multiple projects. As an example, let's make a simple utility script at `Blocky/scripts/utility.ts`. Inside that script you can use the following code:
+
+```ts
+import * as mc from "@minecraft/server";
+
+export function sleep(ticks: number): Promise<void> {
+    return new Promise(resolve => {
+        mc.system.runTimeout(resolve, ticks);
+    });
+}
+```
+
+This is a simple sleep function that let's you use the `async/await` syntax to wait a few ticks before continuing. Now we can import this in `src/behavior_pack/scripts/main.ts` with some code like this:
+
+```ts
+import * as mc from "@minecraft/server";
+import { sleep } from "../../modules/Blocky/scripts/utility.ts";
+
+function main() {
+    console.log("Loaded [Test]!");
+}
+
+// Our event that uses the sleep function
+mc.world.afterEvents.itemUse.subscribe(async event => {
+    event.source.sendMessage(`Exploding in 10 seconds...`);
+    await sleep(200);
+    event.source.dimension.createExplosion(event.source.location, 3, {breaksBlocks: false});
+});
+
+mc.system.run(main);
+```
+
+If you run
+
+```
+netherite build
+```
+
+Then in game, when you use an item you should get a warning about an explosion, then ten seconds later you'll explode. This is pretty cool, but `import { sleep } from "../../modules/Blocky/scripts/utility.ts";` is a pretty awkward line to write, luckily we can simplify this with a simple change to our `deno.json` file:
+
+```json
+{
+	"exclude": [
+		"dist"
+	],
+	"imports": {
+		"@coldiron/netherite": "jsr:@coldiron/netherite@^0.0.1-beta.0",
+		"@minecraft/server": "npm:@minecraft/server@^1.18.0",
+		"@minecraft/server-ui": "npm:@minecraft/server-ui@^1.3.0",
+		"blocky": "./src/modules/Blocky/scripts/utility.ts" // Our new line
+	}
+}
+```
+
+By adding `blocky` as an imported module that points to our utility script, we can update our `main.ts` file as so:
+
+```ts
+import * as mc from "@minecraft/server";
+import { sleep } from "blocky";
+
+function main() {
+    console.log("Loaded [Test]!");
+}
+
+// Our event that uses the sleep function
+mc.world.afterEvents.itemUse.subscribe(async event => {
+    event.source.sendMessage(`Exploding in 10 seconds...`);
+    await sleep(200);
+    event.source.dimension.createExplosion(event.source.location, 3, {breaksBlocks: false});
+});
+
+mc.system.run(main);
+```
+
+`import { sleep } from "blocky";` is a much nicer looking import, and it lets us use it in other files easily without needing to update our relative import path.
+
+#### Netherite Scripting in Modules
+One more powerful use of modules in Netherite is the ability to write code that output Minecraft files for us. If you have 20 entities that all share the same behavior base but just need some minor variations between them, or you create an entity that needs 1000 `minecraft:variant` component groups, these are really easily accomplished with Module Scripts. Let's demonstrate both of these, let's make the file `Blocky/blocky.mod.ts` (note the `.mod.ts` extension is what tells Netherite that this file runs code for your module):
+
+```ts
+import * as netherite from "@coldiron/netherite/api";
+
+new netherite.MinecraftServerEntity({
+    "minecraft:entity": {
+        description: {
+            identifier: "NAMESPACE:blocky"
+        }
+    }
+});
+```
+
+If you run `netherite build` now, you'll get an output entity in your behavior pack called `blocky.json`. These API classes are meant to be as close to working on vanilla files as possible, so all your existing Bedrock development knowledge is directly transferrable to working with Module Scripts. But because this is executable TypeScript code, we can do some cool stuff, like:
+
+```ts
+import * as netherite from "@coldiron/netherite/api";
+
+const blocky = new netherite.MinecraftServerEntity({
+    "minecraft:entity": {
+        description: {
+            identifier: "NAMESPACE:blocky"
+        }
+    }
+});
+
+for (let index = 0; index < 1000; index++) {
+    blocky.modify({
+        "minecraft:entity": {
+            component_groups: {
+                [`variant_${index}`]: {
+                    "minecraft:variant": {
+                        value: index
+                    }
+                }
+            },
+            events: {
+                [`set_variant_${index}`]: {
+                    add: {
+                        component_groups: [
+                            `variant_${index}`
+                        ]
+                    }
+                }
+            }
+        }
+    });
+}
+```
+
+And after running `netherite build`, just like that you've got an entity with 1000 variants!
