@@ -1,6 +1,7 @@
 import "./images/marketing.ts";
 import "./images/pack_icon.ts";
 import "./images/store.ts";
+import "./misc/level.dat.ts";
 import "./texts/.gitignore.ts";
 import "./texts/deno.json.ts";
 import "./texts/en_US.lang.ts";

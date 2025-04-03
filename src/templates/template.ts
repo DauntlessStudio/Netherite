@@ -1,5 +1,4 @@
 import * as path from "@std/path";
-import { Config } from "../core/classes/index.ts";
 
 interface Template {
     type: "text"|"buffer";
@@ -39,8 +38,8 @@ export class TemplateFile {
         });
     }
 
-    private writeBuffer(): void {
-        const contents = Deno.readFileSync(Config.getTemplateFile(this.template.contents() as string));
+    private async writeBuffer(): Promise<void> {
+        const contents = Uint8Array.from(atob(await this.template.contents()), c => c.charCodeAt(0));
 
         this.template.out.forEach(file => {
             const out = typeof file === "function" ? file() : file;
