@@ -1,6 +1,6 @@
 {
   "name": "@coldiron/netherite",
-  "version": "0.0.1-beta.1",
+  "version": "0.0.1",
   "tasks": {
     "dev": "deno run --allow-read --allow-write --allow-run --allow-env src/cli/cli.ts",
     "init": "netherite init --name 'Test' --author 'Caleb Coldiron' --namespace 'cld_test' --formatVersion 'latest' --type 'world' --script 'deno' --skinpack",
