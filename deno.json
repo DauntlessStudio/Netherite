@@ -7,6 +7,7 @@
     "install": "deno install -f -g --name netherite --allow-import --allow-read --allow-write --allow-run --allow-env --unstable-worker-options src/cli/cli.ts",
     "test": "rm -rf Test && deno task install && deno task init"
   },
+  "license": "MIT",
   "exports": {
     "./cli": "./src/cli/cli.ts",
     "./api": "./src/api/api.ts"
