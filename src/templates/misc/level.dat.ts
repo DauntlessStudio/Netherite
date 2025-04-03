@@ -4,7 +4,7 @@ import encoded from "../encoded.ts";
 
 new TemplateFile({
     type: "buffer",
-    out: ["dist/world/level.dat"],
+    out: ["src/world/level.dat"],
     conditions: [() => Config.Options.type === "world"],
     contents: () => encoded["level.dat"],
 });
