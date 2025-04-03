@@ -1,4 +1,4 @@
-import * as path from "jsr:@std/path";
+import * as path from "@std/path";
 import { deepMerge, writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
 import type { Skins } from "../../api/api.ts";

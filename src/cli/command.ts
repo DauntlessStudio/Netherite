@@ -1,5 +1,5 @@
-import type { ParseOptions } from "jsr:@std/cli/parse-args";
-import { parseArgs } from "jsr:@std/cli/parse-args";
+import type { ParseOptions } from "@std/cli/parse-args";
+import { parseArgs } from "@std/cli/parse-args";
 
 export interface CommandData {
     arguments: (number|string|boolean)[];
@@ -33,13 +33,19 @@ export class Command<T extends CommandData> {
         if (this.registry.some((command) => command.parse(args))) {
             return true;
         } else {
-            this.registry.forEach((command) => command.printHelp());
+            this.registry.forEach((command) => {
+                if (!command.isSubcommand) command.printHelp();
+            });
             return false;
         }
     }
 
     private readonly subcommands: Command<CommandData>[] = [];
-
+    
+    public get isSubcommand() : boolean {
+        return this.options.parent !== undefined;
+    }
+    
     constructor(private readonly options: CommandOptions<T>) {
         if (this.options.parent) {
             this.options.parent.addSubCommand(this as unknown as Command<CommandData>);
@@ -49,6 +55,7 @@ export class Command<T extends CommandData> {
     }
 
     public addSubCommand(command: Command<CommandData>): Command<T> {
+        command.options.parent = this as unknown as Command<CommandData>;
         this.subcommands.push(command);
         return this;
     }
@@ -94,6 +101,8 @@ export class Command<T extends CommandData> {
             if (this.options.action) {
                 this.options.action(filteredArgs as T);
             }
+
+            // TODO: Check for latest version and notify user if outdated
 
             return true;
         }

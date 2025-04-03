@@ -1,4 +1,4 @@
-import * as path from "jsr:@std/path";
+import * as path from "@std/path";
 import { Config } from "../core/classes/index.ts";
 
 interface Template {

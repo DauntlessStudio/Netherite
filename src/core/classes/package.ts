@@ -1,4 +1,4 @@
-import * as path from "jsr:@std/path";
+import * as path from "@std/path";
 import { Config } from "./config.ts";
 import { copyDirSync, Logger } from "../utils/index.ts";
 
@@ -21,15 +21,16 @@ interface NetheriteManifest {
 }
 
 export class Package {
-    private static latestVanillaVersion: string = "1.21.62";
+    private static latestVanillaVersion: string = "1.21.70";
 
     public static get LatestVanillaVersion() : string {
         try {
             const version = JSON.parse(Deno.readTextFileSync(path.join(Config.NetheriteDirectory, "bedrock-samples", "version.json")));
-            const latest = (version.latest as string).split(".");
+            const latest = (version.latest.version as string).split(".");
             latest.length = 3;
             return latest.join(".");
         } catch (_error) {
+            Logger.error(`Failed to get latest vanilla version, defaulting to ${this.latestVanillaVersion}`);
             return this.latestVanillaVersion;
         }
     }

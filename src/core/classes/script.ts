@@ -1,9 +1,14 @@
-import * as path from "jsr:@std/path";
-import * as esbuild from "npm:esbuild";
-import {denoPlugins} from "jsr:@luca/esbuild-deno-loader";
+import * as path from "@std/path";
+import * as esbuild from "esbuild";
+import {denoPlugins} from "@luca/esbuild-deno-loader";
 import { Config } from "./config.ts";
+import { writeTextToDist } from "../utils/index.ts";
+import { Logger } from "../utils/logger.ts";
 
 export class Script {
+    private static buildOptions?: esbuild.BuildOptions;
+    private static context?: esbuild.BuildContext<esbuild.BuildOptions>;
+
     public static async build(watch?: boolean): Promise<void> {
         if (Config.Options.type === "skin-pack") return;
         
@@ -14,7 +19,7 @@ export class Script {
             return;
         }
     
-        const buildOptions: esbuild.BuildOptions = {
+        this.buildOptions = {
             plugins: Config.Options.scripting === "deno" ? [...denoPlugins()] : undefined,
             entryPoints: ["./src/behavior_pack/scripts/main.ts"],
             external: ["@minecraft/server", "@minecraft/server-ui"],
@@ -23,17 +28,37 @@ export class Script {
             sourcemap: "inline",
             format: "esm",
             logLevel: watch ? "info" : undefined,
+            write: false,
         };
     
         if (watch) {
-            this.watch(buildOptions);
+            this.watch();
         } else {
-            await esbuild.build(buildOptions);
+            const result = await esbuild.build(this.buildOptions);
+            for (const out of result.outputFiles ?? []) {
+                writeTextToDist(out.path, out.text);
+            }
         }
     }
 
-    public static async watch(buildOptions: esbuild.BuildOptions): Promise<void> {
-        const context = await esbuild.context(buildOptions);
-        context.watch();
+    public static async watch(): Promise<void> {
+        if (!this.buildOptions) {
+            throw new Error("Build options are not set. Please run build() first.");
+        }
+
+        let firstRun = false;
+
+        if (!this.context) {
+            firstRun = true;
+            this.context = await esbuild.context(this.buildOptions);
+        }
+
+        const result = await this.context.rebuild();
+        
+        for (const out of result.outputFiles ?? []) {
+            writeTextToDist(out.path, out.text);
+        }
+
+        if (!firstRun) Logger.log("Rebuilt Scripts...");
     }
 }

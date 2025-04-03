@@ -1,5 +1,5 @@
-import { zipDir } from "https://deno.land/x/jszip@0.11.0/mod.ts";
-import * as path from "jsr:@std/path";
+import { zip } from "@deno-library/compress";
+import * as path from "@std/path";
 import { Project } from "./project.ts";
 import { Config, World } from "./index.ts";
 import { sendToDist } from "../utils/index.ts";
@@ -27,8 +27,7 @@ export class Exporter {
 
         const filename = `${Config.Options.name}_v${Config.Options.version}.mc${type}`;
 
-        const zip = await zipDir(Config.Paths.root, {includeDirs: true, includeFiles: true});
-        await zip.writeZip(path.join(out, filename));
+        await zip.compress(Config.Paths.root, path.join(out, filename), {excludeSrc: true});
 
         Logger.Spinner.succeed("Exported project to " + path.join(out, filename));
     }
@@ -50,8 +49,7 @@ export class Exporter {
 
         const filename = `${Config.Options.name}_v${Config.Options.version}.zip`;
 
-        const zip = await zipDir(path.join(Deno.cwd(), "dist"), {followSymlinks: true, includeDirs: true, includeFiles: true})
-        await zip.writeZip(path.join(out, filename));
+        await zip.compress(path.join(Deno.cwd(), "dist"), path.join(out, filename), {excludeSrc: true})
 
         Logger.Spinner.succeed("Exported project to " + path.join(out, filename));
 

@@ -1,9 +1,10 @@
-import * as path from "jsr:@std/path";
-import { Config, Language } from "./index.ts";
+import * as path from "@std/path";
 import { Logger, sendToDist, sleep } from "../utils/index.ts";
-import { Module } from "./module.ts";
-import { Sound } from "./sound.ts";
+import { Config, Language } from "./index.ts";
 import { Texture } from "./texture.ts";
+import { Module } from "./module.ts";
+import { Script } from "./script.ts";
+import { Sound } from "./sound.ts";
 import { Block } from "./block.ts";
 import { Skin } from "./skin.ts";
 
@@ -20,6 +21,7 @@ export class Static {
         ["**/sounds.json", Sound.watch.bind(Sound)],
         ["**/blocks.json", Block.watch.bind(Block)],
         ["**/*.lang", Language.watch.bind(Language)],
+        ["**/scripts/**/*.ts", Script.watch.bind(Script)],
         ["**/textures/*.json", Texture.watch.bind(Texture)],
         ["**/sound/sound_definitions.json", Sound.watch.bind(Sound)],
     ]);
@@ -130,7 +132,7 @@ export class Static {
         const sync = (event: Deno.FsEvent) => {
             const src = event.paths[0];
             
-            if (src.endsWith(".ts") || !this.canWrite(src)) return;
+            if (!this.canWrite(src)) return;
 
             try {
                 const stat = Deno.statSync(src);

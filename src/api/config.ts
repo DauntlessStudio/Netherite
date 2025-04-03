@@ -5,8 +5,8 @@ class OptionsGenerator implements WorkerWriteable<void, ProjectOptions> {
     private options: ProjectOptions;
 
     constructor(options: ProjectOptions) {
-        WorkerWriter.register(this);
         this.options = options;
+        WorkerWriter.register(this);
     }
 
     public generate(): WorkerResponse<ProjectOptions> {

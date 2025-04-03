@@ -1,5 +1,5 @@
-import * as path from "jsr:@std/path";
-import { debounce } from "jsr:@std/async/debounce";
+import * as path from "@std/path";
+import { debounce } from "@std/async/debounce";
 import { writeBufferToDist } from "../utils/fileIO.ts";
 import { WorkerManager, type WorkerWriteable, type ProjectOptions } from "./index.ts";
 import { Config } from "./config.ts";
@@ -7,20 +7,20 @@ import { Logger } from "../utils/index.ts";
 
 export interface ModuleResponse {
     name: string;
-    data: Uint8Array;
+    data: number[];
 }
 export interface ModuleWriteable extends WorkerWriteable<ProjectOptions, ModuleResponse> {}
 
 interface WriteData {
     outputPath: string;
-    content: Uint8Array;
+    content: number[];
 }
 
 type ModuleSubdirectory = "bp"|"rp"|"skin_pack"|"root";
 
 export class Module {
     private static readonly moduleDir: string = path.join(Deno.cwd(), "src/modules");
-    private static readonly queue: Map<string, Map<string, Uint8Array>> = new Map();
+    private static readonly queue: Map<string, Map<string, number[]>> = new Map();
 
     public static async build(watch?: boolean): Promise<void> {
         try {
@@ -155,6 +155,10 @@ export class Module {
                             }
                             break;
                         }
+                        case "null": {
+                            // All content is empty, so don't write and delete any files registered to this source
+                            break;
+                        }
                         default:
                             Logger.error(`Unknown endpoint: ${endpoint}`);
                             break;
@@ -182,7 +186,7 @@ export class Module {
 
         for (const module of this.queue.values()) {
             for (const [key, data] of module) {
-                writeBufferToDist(key, data);
+                writeBufferToDist(key, new Uint8Array(data));
                 if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(key)}`);
             }
         }

@@ -1,11 +1,8 @@
-import "jsr:@std/dotenv/load";
 import { TemplateFile } from "../template.ts";
 import { Config } from "../../core/classes/index.ts";
 
-const importPackage: string = Deno.env.get("LOCALAPI") !== undefined ? Deno.env.get("LOCALAPI")! : "@coldiron/netherite";
-
 const contents = () =>
-`import * as netherite from "${importPackage}";
+`import * as netherite from "@coldiron/netherite/api";
 
 netherite.config({
     name: "${Config.Options.name}",
@@ -14,7 +11,7 @@ netherite.config({
     type: "${Config.Options.type}",
     scripting: "${Config.Options.scripting}",
     version: "${Config.Options.version}",
-    formatVersion: "${Config.Options.formatVersion}",
+    format_version: "${Config.Options.format_version}",
     uuid: "${Config.Options.uuid}",
     include_skin_pack: ${Config.Options.type !== "skin-pack" ? Config.Options.include_skin_pack : undefined},
 });`;
