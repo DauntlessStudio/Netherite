@@ -1,5 +1,7 @@
 import type { ParseOptions } from "@std/cli/parse-args";
 import { parseArgs } from "@std/cli/parse-args";
+import { Config } from "../core/classes/index.ts";
+import { Logger } from "../core/utils/logger.ts";
 
 export interface CommandData {
     arguments: (number|string|boolean)[];
@@ -31,12 +33,36 @@ export class Command<T extends CommandData> {
 
     public static parseCommands(args: string[]): boolean {
         if (this.registry.some((command) => command.parse(args))) {
+
+            this.checkVersion();
             return true;
         } else {
             this.registry.forEach((command) => {
                 if (!command.isSubcommand) command.printHelp();
             });
+
+            this.checkVersion();
             return false;
+        }
+    }
+
+    private static async checkVersion(): Promise<void> {
+        const version = Config.InstalledNetheriteVersion;
+
+        try {
+            if (version.includes("beta")) {
+                const compareVersion = await Config.BetaNetheriteVersion;
+                if (compareVersion !== version) {
+                    Logger.log(Logger.Colors.yellow(`You are using version ${version}, but version ${Logger.Colors.green(compareVersion)} is available. Upgrade to latest beta with ${Logger.Colors.cyan(`deno run -A jsr:@coldiron/netherite/install beta`)}`));
+                }
+            } else {
+                const compareVersion = await Config.LatestNetheriteVersion;
+                if (compareVersion !== version) {
+                    Logger.log(Logger.Colors.yellow(`You are using version ${version}, but version ${Logger.Colors.green(compareVersion)} is available. Upgrade to latest with ${Logger.Colors.cyan(`deno run -A jsr:@coldiron/netherite/install`)}`));
+                }
+            }
+        } catch (_error) {
+            // If the fetch fails, we don't want to crash the program.
         }
     }
 
@@ -101,8 +127,6 @@ export class Command<T extends CommandData> {
             if (this.options.action) {
                 this.options.action(filteredArgs as T);
             }
-
-            // TODO: Check for latest version and notify user if outdated
 
             return true;
         }

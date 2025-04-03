@@ -6,6 +6,7 @@ import type { ProjectOptions } from "./project.ts";
 import { Buffer } from "node:buffer";
 import { Logger } from "../utils/index.ts";
 import { WorkerManager } from "./index.ts";
+import deno from "../../../deno.json" with {type: "json" };
 
 interface ConfigPaths {
     root: string;
@@ -21,10 +22,20 @@ interface ConfigPaths {
     }
 }
 
+interface JSRMeta {
+    scope: string;
+    name: string;
+    latest: string;
+    versions: {
+        [key: string]: unknown
+    }
+}
+
 export class Config {
     private static options: ProjectOptions;
     private static studioName: string;
     private static packName: string;
+    private static meta?: JSRMeta;
     
     public static get Options() : ProjectOptions {
         if (!this.options) {
@@ -51,6 +62,48 @@ export class Config {
         }
 
         return this.packName;
+    }
+    
+    public static get InstalledNetheriteVersion() : string {
+        return deno.version;
+    }
+    
+    public static get LatestNetheriteVersion() : Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            if (this.meta) {
+                resolve(this.meta.latest);
+            } else {
+                fetch("https://jsr.io/@coldiron/netherite/meta.json").then(response => {
+                    response.json().then((data: JSRMeta) => {
+                        this.meta = data;
+                        resolve(data.latest);
+                    });
+                }).catch(reject);
+            }
+        });
+    }
+    
+    public static get BetaNetheriteVersion() : Promise<string> {
+        function getBeta(meta: JSRMeta): string {
+            const versions = Object.keys(meta.versions).filter((version) => version.includes("beta"));
+            if (versions.length === 0) {
+                throw new Error("No beta version found in meta.json");
+            }
+            return versions[0];
+        }
+
+        return new Promise<string>((resolve, reject) => {
+            if (this.meta) {
+                resolve(getBeta(this.meta));
+            } else {
+                fetch("https://jsr.io/@coldiron/netherite/meta.json").then(response => {
+                    response.json().then((data: JSRMeta) => {
+                        this.meta = data;
+                        resolve(getBeta(this.meta));
+                    });
+                }).catch(reject);
+            }
+        });
     }
     
     public static get MojangDirectory() : string {
