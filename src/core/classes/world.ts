@@ -1,6 +1,7 @@
 import * as path from "@std/path";
 import { writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
+import { Logger } from "../utils/logger.ts";
 
 export class World {
     public static get BehaviorPacks() : Promise<[object]> {
@@ -42,7 +43,7 @@ export class World {
             try {
                 Deno.copyFileSync(path.join(Deno.cwd(), "src/world/level.dat"), path.join(Config.Paths.root, "level.dat"));
             } catch (_error) {
-                Deno.copyFileSync(Config.getTemplateFile("misc/level.dat"), path.join(Config.Paths.root, "level.dat"));
+                Logger.warn("No level.dat found.");
             }
 
             try {
