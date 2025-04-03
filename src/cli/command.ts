@@ -33,20 +33,42 @@ export class Command<T extends CommandData> {
 
     public static parseCommands(args: string[]): boolean {
         if (this.registry.some((command) => command.parse(args))) {
-
-            this.checkVersion();
+            this.checkVersion(false);
             return true;
         } else {
+            if (this.versionCommand(args)) {
+                this.checkVersion(true);
+                return true;
+            }
+
             this.registry.forEach((command) => {
                 if (!command.isSubcommand) command.printHelp();
             });
 
-            this.checkVersion();
+            this.checkVersion(false);
             return false;
         }
     }
 
-    private static async checkVersion(): Promise<void> {
+    private static versionCommand(args: string[]): boolean {
+        const parseOptions: ParseOptions = {
+            boolean: ["version"],
+            alias: {
+                v: "version",
+            },
+        }
+
+        const parsedArgs = parseArgs(args, parseOptions);
+        if (parsedArgs.version) {
+            const version = Config.InstalledNetheriteVersion;
+            Logger.log(`Netherite version: ${Logger.Colors.green(version)}`);
+            return true;
+        }
+
+        return false;
+    }
+
+    private static async checkVersion(verbose: boolean): Promise<void> {
         const version = Config.InstalledNetheriteVersion;
 
         try {
@@ -54,16 +76,20 @@ export class Command<T extends CommandData> {
                 const compareVersion = await Config.BetaNetheriteVersion;
                 if (compareVersion !== version) {
                     Logger.log(Logger.Colors.yellow(`You are using version ${version}, but version ${Logger.Colors.green(compareVersion)} is available. Upgrade to latest beta with ${Logger.Colors.cyan(`deno run -A jsr:@coldiron/netherite/install beta`)}`));
+                    return;
                 }
             } else {
                 const compareVersion = await Config.LatestNetheriteVersion;
                 if (compareVersion !== version) {
                     Logger.log(Logger.Colors.yellow(`You are using version ${version}, but version ${Logger.Colors.green(compareVersion)} is available. Upgrade to latest with ${Logger.Colors.cyan(`deno run -A jsr:@coldiron/netherite/install`)}`));
+                    return;
                 }
             }
         } catch (_error) {
-            // If the fetch fails, we don't want to crash the program.
+            if (verbose) Logger.log("Could not fetch latest version, please check your internet connection.");
         }
+
+        if (verbose) Logger.log(Logger.Colors.green("You are using the latest version of Netherite."));
     }
 
     private readonly subcommands: Command<CommandData>[] = [];
