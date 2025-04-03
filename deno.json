@@ -7,7 +7,7 @@
     "install": "deno install -f -g -c deno.json --name netherite --allow-import --allow-read --allow-write --allow-run --allow-env --allow-net=localhost:3000 src/cli/cli.ts",
     "test": "rm -rf Test && deno task install && deno task init"
   },
-  "license": "LGPL-3.0-or-later",
+  "license": "MIT",
   "exports": {
     "./install": "./src/cli/install.ts",
     "./cli": "./src/cli/cli.ts",
