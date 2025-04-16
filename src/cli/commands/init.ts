@@ -157,7 +157,7 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectOption
     if (args.options.script) {
         buildOptions.scripting = args.options.script;
     } else {
-        let val = prompt("Please enter the TypeScript framework of the project. Deno is highly recommended unless you are converting a node project (deno, node) [default: deno]:");
+        let val = prompt("Please enter the TypeScript framework for scripting (deno, node) [default: deno]:");
         if (val === null || !["deno", "node"].includes(val)) val = "deno";
 
         buildOptions.scripting = val as ScriptType;
