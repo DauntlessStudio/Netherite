@@ -1,4 +1,3 @@
-import { Config } from "../../core/classes/index.ts";
 import { TemplateFile } from "../template.ts";
 
 const contents = () => JSON.stringify({
@@ -6,7 +5,7 @@ const contents = () => JSON.stringify({
         "*.json": "jsonc",
     },
     "git.autofetch": true,
-    "deno.enable": Config.Options.scripting === "deno" ? true : undefined,
+    "deno.enable": true,
 }, null, "\t")
 
 new TemplateFile({

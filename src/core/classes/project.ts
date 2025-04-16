@@ -165,7 +165,7 @@ export class Project {
             ];
 
             await new Deno.Command("npm", {args: ["install", ...deps]}).output();
-            await new Deno.Command("npx", {args: ["jsr", "add", "@coldiron/netherite"]}).output();
+            await new Deno.Command("deno", {args: ["add", "jsr:@coldiron/netherite"]}).output();
         }
 
         this.developmentPatch();
