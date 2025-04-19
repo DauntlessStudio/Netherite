@@ -2,12 +2,14 @@ import * as path from "@std/path";
 import { Command, type CommandData } from "../command.ts";
 import { Project } from "../../core/classes/project.ts";
 import { abortOnKeypress, Logger } from "../../core/utils/index.ts";
+import { Config } from "../../core/classes/config.ts";
 
 interface BuildCommandData extends CommandData {
     options: {
         watch?: boolean;
         silent?: boolean;
         all?: string;
+        local?: string;
     }
 }
 
@@ -35,7 +37,7 @@ export default new Command<BuildCommandData>({
         },
     },
     parse: {
-        boolean: ["watch", "silent"],
+        boolean: ["watch", "silent", "local"],
         string: ["all"],
         alias: {
             watch: "w",
@@ -47,9 +49,28 @@ export default new Command<BuildCommandData>({
         const watchValid = _args.options.watch === undefined || typeof _args.options.watch === "boolean";
         const silentValid = _args.options.silent === undefined || typeof _args.options.silent === "boolean";
         const allValid = _args.options.all === undefined || typeof _args.options.all === "string";
-        return watchValid && silentValid && allValid;
+        const localValid = _args.options.local === undefined || typeof _args.options.local === "boolean";
+        return watchValid && silentValid && allValid && localValid;
     },
     async action(_args) {
+        // The build command delegates to the installed version of Netherite, passing the hidden --local flag.
+        if (!_args.options.local) {
+            new Deno.Command("deno", {
+                args: [
+                    "run",
+                    "-A",
+                    `jsr:@coldiron/netherite@${Config.LocalNetheriteVersion}/cli`,
+                    ...Deno.args,
+                    "--local",
+                ],
+                stdin: "inherit",
+                stdout: "inherit",
+                stderr: "inherit",
+            }).outputSync();
+
+            return;
+        }
+
         if (!_args.options.all) {
             await Project.build(_args.options);
         } else {

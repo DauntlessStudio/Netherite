@@ -64,10 +64,30 @@ export class Config {
         return this.packName;
     }
     
+    /**
+     * @remarks The version of netherite that is currently installed globally on the system.
+     */
     public static get InstalledNetheriteVersion() : string {
         return deno.version;
     }
     
+    /**
+     * @remarks The version of netherite that is installed in the local project as a dependency.
+     */
+    public static get LocalNetheriteVersion() : string {
+        try {
+            const deno = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
+            const version: string = deno.imports["@coldiron/netherite"].split("^")[1];
+            return version;
+        } catch (_error) {
+            Logger.warn("No local version of netherite found, using global version instead.");
+            return this.InstalledNetheriteVersion;
+        }
+    }
+    
+    /**
+     * @remarks The latest version of netherite that is available on JSR.
+     */
     public static get LatestNetheriteVersion() : Promise<string> {
         return new Promise<string>((resolve, reject) => {
             if (this.meta) {
@@ -83,6 +103,9 @@ export class Config {
         });
     }
     
+    /**
+     * @remarks The beta version of netherite that is available on JSR.
+     */
     public static get BetaNetheriteVersion() : Promise<string> {
         function getBeta(meta: JSRMeta): string {
             const versions = Object.keys(meta.versions).filter((version) => version.includes("beta"));
