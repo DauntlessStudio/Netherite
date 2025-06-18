@@ -173,7 +173,7 @@ export class Project {
 
     private static developmentPatch(): void {
         const localPackage: string|undefined = Deno.env.get("LOCALAPI");
-        const currentVersion: string|undefined = JSON.parse(Deno.readTextFileSync(path.join(this.processDir, "deno.json"))).version;
+        const currentVersion: string|undefined = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json"))).version;
         if (!localPackage || !currentVersion) return;
 
         if (Config.Options.scripting === "deno") {
