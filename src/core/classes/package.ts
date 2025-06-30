@@ -3,10 +3,35 @@ import { Config } from "./config.ts";
 import { copyDirSync, Logger } from "../utils/index.ts";
 
 interface NetheritePackage {
+    /**
+     * The name of the Netherite package.
+     */
     name: string;
+    /**
+     * The UUID of the Netherite package.
+     */
     uuid: string;
+    /**
+     * The version of the Netherite package.
+     */
     version: string;
+    /**
+     * A description of the Netherite package.
+     */
     description: string;
+    /**
+     * An optional deno import map for the package's scripts.
+     */
+    import?: {
+        /**
+         * The name of the import map.
+         */
+        name: string;
+        /**
+         * The path to the import map. Relative to the package root.
+         */
+        path: string;
+    };
 }
 
 interface NetheriteManifest {
@@ -189,7 +214,28 @@ export class Package {
             Deno.exit(1);
         }
 
-        copyDirSync(path.join(nPackage.dir, useVersion), path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name));
+        const outPath = path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name);
+        copyDirSync(path.join(nPackage.dir, useVersion), outPath);
+
+        // Get imported package information
+        const packageInfo: NetheritePackage = JSON.parse(Deno.readTextFileSync(path.join(outPath, "netherite.package.json")));
+        if (!packageInfo) {
+            Logger.Spinner.fail(`Failed to load ${nPackage.manifest.name} package, missing netherite.package.json`);
+            Deno.exit(1);
+        }
+
+        // If the package has an import, add it to the deno.json imports
+        if (packageInfo.import) {
+            const deno = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
+
+            if (!deno.imports) {
+                deno.imports = {};
+            }
+
+            deno.imports[packageInfo.import.name] = `./src/modules/${packageInfo.name}/${packageInfo.import.path}`;
+            Deno.writeTextFileSync(path.join(Deno.cwd(), "deno.json"), JSON.stringify(deno, null, "\t"));
+        }
+
         Logger.Spinner.succeed(`Loaded ${Logger.Colors.green(nPackage.manifest.name)}!`);
     }
 
@@ -225,6 +271,9 @@ export class Package {
 
         await new Deno.Command("git", {args: ["pull"]}).output();
         installedPackage.manifest = JSON.parse(Deno.readTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json")));
+        const url = Deno.readTextFileSync(path.join(installedPackage.dir, ".git", "config"))
+        .split("\n")
+        .find(line => line.includes("url = "))?.split(" = ")[1].trim().replace(/\.git$/, "");
 
         const loadedVersion = parseInt(loadedPackage.package.version.replace(/\./g, ""));
         const lastestVersion = parseInt(installedPackage.manifest.versions.latest.replace(/\./g, ""));
@@ -261,8 +310,8 @@ export class Package {
 
         Deno.chdir(cwd);
 
-        if (force) Logger.Spinner.succeed(`Published ${Logger.Colors.green(loadedPackage.package.name)} version ${Logger.Colors.green(loadedPackage.package.version)}!`);
-        else Logger.Spinner.succeed(`Created Pull Request ${Logger.Colors.green(loadedPackage.package.version)} for ${Logger.Colors.green(loadedPackage.package.name)}!`);
+        if (force) Logger.Spinner.succeed(`Published at ${url} ${Logger.Colors.green(loadedPackage.package.name)} version ${Logger.Colors.green(loadedPackage.package.version)}!`);
+        else Logger.Spinner.succeed(`Created Pull Request at ${url} ${Logger.Colors.green(loadedPackage.package.version)} for ${Logger.Colors.green(loadedPackage.package.name)}!`);
     }
 
     // Creates a new package in the current project, allows for publishing to a git repository on creation
