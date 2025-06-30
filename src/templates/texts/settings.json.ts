@@ -4,6 +4,14 @@ const contents = () => JSON.stringify({
     "files.associations": {
         "*.json": "jsonc",
     },
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "netherite.package.json"
+            ],
+            "url": "./.vscode/netherite_package.schema.json"
+        }
+    ],
     "git.autofetch": true,
     "deno.enable": true,
 }, null, "\t")

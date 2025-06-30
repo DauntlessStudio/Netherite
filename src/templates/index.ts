@@ -14,5 +14,6 @@ import "./texts/settings.json.ts";
 import "./texts/skins.json.ts";
 import "./texts/tsconfig.json.ts";
 import "./texts/workspace.ts";
+import "./texts/schemas.ts";
 
 export * from "./template.ts"

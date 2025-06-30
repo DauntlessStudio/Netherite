@@ -1,3 +1,11 @@
 {
-    "deno.enable": true
+    "deno.enable": true,
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "netherite.package.json"
+            ],
+            "url": "./.vscode/netherite_package.schema.json"
+        }
+    ]
 }

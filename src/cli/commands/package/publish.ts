@@ -56,13 +56,13 @@ export default new Command<PublishCommandData>({
 });
 
 async function getPromptData(): Promise<string|number> {
-    const packages = await Package.list();
+    const packages = await Package.listLoaded();
 
     for (let i = 0; i < packages.length; i++) {
-        Logger.log(`[${Logger.Colors.green(i.toString())}]: ${Logger.Colors.green(packages[i].manifest.name)}`);
+        Logger.log(`[${Logger.Colors.green(i.toString())}]: ${Logger.Colors.green(packages[i].package.name)}`);
     }
     
-    const val = prompt("Enter the name or index of the package to uninstall:");
+    const val = prompt("Enter the name or index of the package to publish:");
 
     if (val === null) {
         Logger.error("No package specified.");
