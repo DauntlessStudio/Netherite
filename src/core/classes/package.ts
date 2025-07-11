@@ -75,8 +75,8 @@ const action = "name: Publish\n" +
 	"\n" +
 	"      - name: Add changelog entry\n" +
 	"        run: |\n" +
-	"          echo \"## ${{ github.event.pull_request.title }}\" >> CHANGELOG.md\n" +
-	"          echo \"${{ github.event.pull_request.body }}\" >> CHANGELOG.md\n" +
+	"          echo '## ${{ github.event.pull_request.title }}' >> CHANGELOG.md\n" +
+	"          echo '${{ github.event.pull_request.body }}' >> CHANGELOG.md\n" +
 	"\n" +
 	"      - name: Commit and push changelog\n" +
 	"        run: |\n" +

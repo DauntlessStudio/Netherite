@@ -1,4 +1,8 @@
 # Changelog
+## [0.2.2] - 7/11/2025
+### Changes
+- Fixed issue where `backticked` markdown strings where not included in the changelog when publishing Netherite packages.
+---
 ## [0.2.1] - 7/11/2025
 ### Changes
 - Added improved feedback to `netherite package publish`, which will now link to the actual pull request rather than the repo.
