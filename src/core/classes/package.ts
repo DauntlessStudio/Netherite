@@ -45,6 +45,56 @@ interface NetheriteManifest {
     };
 }
 
+interface PublishOptions {
+    owner: string;
+}
+
+const action = "name: Publish\n" +
+	"\n" +
+	"permissions:\n" +
+	"  contents: write\n" +
+	"\n" +
+	"on:\n" +
+	"  pull_request:\n" +
+	"    types:\n" +
+	"      - closed\n" +
+	"    branches:\n" +
+	"      - main\n" +
+	"    paths:\n" +
+	"      - 'netherite.manifest.json'\n" +
+	"\n" +
+	"jobs:\n" +
+	"  update-wiki-changelog:\n" +
+	"    runs-on: ubuntu-latest\n" +
+	"    if: github.event.pull_request.merged == true\n" +
+	"    steps:\n" +
+	"      - name: Checkout base repo\n" +
+	"        uses: actions/checkout@v3\n" +
+	"        with:\n" +
+	"          token: ${{ secrets.GITHUB_TOKEN }}\n" +
+	"\n" +
+	"      - name: Add changelog entry\n" +
+	"        run: |\n" +
+	"          echo \"## ${{ github.event.pull_request.title }}\" >> CHANGELOG.md\n" +
+	"          echo \"${{ github.event.pull_request.body }}\" >> CHANGELOG.md\n" +
+	"\n" +
+	"      - name: Commit and push changelog\n" +
+	"        run: |\n" +
+	"          git config user.name \"github-actions\"\n" +
+	"          git config user.email \"github-actions@github.com\"\n" +
+	"          git add CHANGELOG.md\n" +
+	"          git commit -m \"${{ github.event.pull_request.title }}\"\n" +
+	"          git push\n";
+
+const prTemplate = "### Fixes\n" +
+	"- Add fixes here or delete section.\n" +
+	"### Changes\n" +
+	"- Add new features and changes here or delete section.\n";
+
+const changelog = "## 0.0.1\n" +
+	"### Changes\n" +
+	"- Published initial version!\n";
+
 export class Package {
     private static latestVanillaVersion: string = "1.21.70";
 
@@ -208,14 +258,14 @@ export class Package {
         const useVersion = version ? version : nPackage.manifest.versions.latest;
 
         try {
-            Deno.statSync(path.join(nPackage.dir, useVersion));
+            Deno.statSync(path.join(nPackage.dir, "versions", useVersion));
         } catch (_error) {
             Logger.Spinner.fail(`Failed to load ${nPackage.manifest.name} package, missing version ${useVersion}`);
             Deno.exit(1);
         }
 
         const outPath = path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name);
-        copyDirSync(path.join(nPackage.dir, useVersion), outPath);
+        copyDirSync(path.join(nPackage.dir, "versions", useVersion), outPath);
 
         // Get imported package information
         const packageInfo: NetheritePackage = JSON.parse(Deno.readTextFileSync(path.join(outPath, "netherite.package.json")));
@@ -271,7 +321,7 @@ export class Package {
 
         await new Deno.Command("git", {args: ["pull"]}).output();
         installedPackage.manifest = JSON.parse(Deno.readTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json")));
-        const url = Deno.readTextFileSync(path.join(installedPackage.dir, ".git", "config"))
+        let url = Deno.readTextFileSync(path.join(installedPackage.dir, ".git", "config"))
         .split("\n")
         .find(line => line.includes("url = "))?.split(" = ")[1].trim().replace(/\.git$/, "");
 
@@ -283,7 +333,7 @@ export class Package {
             Deno.exit(1);
         }
 
-        copyDirSync(loadedPackage.dir, path.join(installedPackage.dir, loadedPackage.package.version));
+        copyDirSync(loadedPackage.dir, path.join(installedPackage.dir, "versions", loadedPackage.package.version));
 
         installedPackage.manifest.versions[loadedPackage.package.version] = loadedPackage.package.version;
         installedPackage.manifest.versions.latest = loadedPackage.package.version;
@@ -303,9 +353,12 @@ export class Package {
 
         if (!force) {
             Logger.Spinner.update(`Creating pull request for ${Logger.Colors.green(loadedPackage.package.version)}...`);
-            await new Deno.Command("gh", {args: ["pr", "create", "--assignee=@me", "--fill", `--title=${loadedPackage.package.version}`]}).output();
+            const result = await new Deno.Command("gh", {args: ["pr", "create", "--assignee=@me", `--title=${loadedPackage.package.version}`, `--body=${prTemplate}`], stdout: "piped"}).output();
             await new Deno.Command("git", {args: ["checkout", "main"]}).output();
-            new TextDecoder().decode
+
+            if (result.success) {
+                url = new TextDecoder().decode(result.stdout);
+            }
         }
 
         Deno.chdir(cwd);
@@ -315,7 +368,7 @@ export class Package {
     }
 
     // Creates a new package in the current project, allows for publishing to a git repository on creation
-    public static async create(name: string, description: string, publish?: boolean): Promise<void> {
+    public static async create(name: string, description: string, publish?: PublishOptions): Promise<void> {
         name = name.replace(/\s/g, "-");
         
         const dir = path.join(Deno.cwd(), "src", "modules", name);
@@ -339,10 +392,7 @@ export class Package {
 
             await new Deno.Command("git", {args: ["init"]}).output();
 
-            Logger.log(`\nSelect ${Logger.Colors.green('Push an existing local repository to GitHub')} when prompted and use ${Logger.Colors.green('.')} as the 'Path to local repository'`);
-            Logger.log(`Ensure the Repository name is ${Logger.Colors.green(name)}\n`);
-
-            const repo = await new Deno.Command("gh", {args: ["repo", "create"]}).spawn().output();
+            const repo = await new Deno.Command("gh", {args: ["repo", "create", `${publish.owner}/${name}`, "--private", "--description", description, "--source", ".", "--remote",  "origin"]}).spawn().output();
 
             if (repo.success) {
                 Logger.log(`Repository created, preparing for initial version publish`);
@@ -360,12 +410,16 @@ export class Package {
                     versions: {latest: "0.0.0"}
                 }, null, "\t"));
 
+                Deno.mkdirSync(path.join(installDir, ".github/workflows"), {recursive: true});
+                Deno.writeTextFileSync(path.join(installDir, ".github/workflows/pull_request.yml"), action);
+                Deno.writeTextFileSync(path.join(installDir, "CHANGELOG.md"), changelog);
+
                 await new Deno.Command("git", {args: ["remote", "add", "origin", repository!]}).output();
                 await new Deno.Command("git", {args: ["add", "."]}).output();
                 await new Deno.Command("git", {args: ["commit", "-m", "Initial Commit"]}).output();
                 await new Deno.Command("git", {args: ["push", "-u", "origin", "main"]}).output();
     
-                copyDirSync(dir, path.join(installDir, nPackage.version));
+                copyDirSync(dir, path.join(installDir, "versions", nPackage.version));
                 await this.publish({dir, package: nPackage}, true);
             } else {
                 Logger.error("Failed to create repository, is gh installed and are you connected to the internet?");
