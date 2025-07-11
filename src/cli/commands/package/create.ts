@@ -1,25 +1,31 @@
 import { Command, type CommandData } from "../../command.ts";
 import { Package } from "../../../core/classes/index.ts";
+import { Logger } from "../../../core/utils/index.ts";
 
 interface CreateCommandData extends CommandData {
     options: {
         name?: string;
         description?: string;
         publish?: boolean;
+        owner?: string;
     }
 }
 
 interface CreateData {
     name: string;
     description: string;
-    publish: boolean;
+    owner?: string;
+}
+
+interface GitHubAPIResponse {
+    login: string;
 }
 
 export default new Command<CreateCommandData>({
     name: "create",
     usage: {
         description: "Creates a new package in the current project",
-        usage: "[--name <name> --description <description> --publish]",
+        usage: "[--name <name> --description <description> --owner <org name> --publish]",
         flags: {
             "publish": {
                 type: "boolean",
@@ -34,6 +40,11 @@ export default new Command<CreateCommandData>({
             "description": {
                 type: "string",
                 description: "The description of the package",
+                optional: true,
+            },
+            "owner": {
+                type: "string",
+                description: "If publishing, who should the code owner be",
                 optional: true,
             },
         },
@@ -54,12 +65,12 @@ export default new Command<CreateCommandData>({
         return publish && name && description;
     },
     async action(_args) {
-        const data = getData(_args);
-        await Package.create(data.name, data.description, data.publish);
+        const data = await getData(_args);
+        await Package.create(data.name, data.description, data.owner ? {owner: data.owner} : undefined);
     },
 });
 
-function getData(args: CreateCommandData): CreateData {
+async function getData(args: CreateCommandData): Promise<CreateData> {
     const options: Partial<CreateData> = {};
 
     if (args.options.name) {
@@ -80,12 +91,52 @@ function getData(args: CreateCommandData): CreateData {
         options.description = val;
     }
 
+    let publishing: boolean = false;
     if (args.options.publish) {
-        options.publish = args.options.publish;
+        publishing = args.options.publish;
     } else {
         const val = confirm("Do you want to publish the package using the GitHub Command Line Tool?:");
 
-        options.publish = val;
+        publishing = val;
+    }
+
+    if (publishing) {
+        if (args.options.owner) {
+            options.owner = args.options.owner;
+        } else {
+            const owners: string[] = [];
+
+            const userResult = await new Deno.Command("gh", {args: ["api", "user"], stdout: "piped"}).output();
+
+            if (userResult.success) {
+                const response = JSON.parse(new TextDecoder().decode(userResult.stdout)) as GitHubAPIResponse;
+                owners.push(response.login);
+            }
+
+            const orgsResult = await new Deno.Command("gh", {args: ["api", "user/orgs"], stdout: "piped"}).output();
+
+            if (orgsResult.success) {
+                const response = JSON.parse(new TextDecoder().decode(orgsResult.stdout)) as GitHubAPIResponse[];
+                response.forEach(r => owners.push(r.login));
+            }
+
+            let index: number = NaN;
+
+            while (Number.isNaN(index)) {
+                for (let i = 0; i < owners.length; i++) {
+                    Logger.log(`[${Logger.Colors.green(i.toString())}]: ${Logger.Colors.green(owners[i])}`);
+                }
+
+                index = Number(prompt("Enter the index of the code owner:"));
+
+                if (index < 0 || index >= owners.length) {
+                    Logger.warn(`Invalid response, must be a number between 0 and ${owners.length - 1}`);
+                    index = NaN;
+                }
+            }
+
+            options.owner = owners[index];
+        }
     }
 
     return options as CreateData;
