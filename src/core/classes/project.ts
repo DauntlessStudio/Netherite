@@ -7,7 +7,6 @@ import { Logger } from "../utils/logger.ts";
 // TODO: Possibly remove skin-pack as an option and instead build a skin pack with the world or add-on
 // TODO: Generate level.dat and world_icon.jpeg for world projects
 export type ProjectType = "world"|"add-on"|"skin-pack";
-export type ScriptType = "deno" | "node";
 
 interface ProjectOptionsBase {
     type: ProjectType;
@@ -15,7 +14,6 @@ interface ProjectOptionsBase {
     author: string;
     namespace: string;
     format_version: string;
-    scripting: ScriptType;
     uuid: string;
     version: `${number}.${number}.${number}`;
 };
@@ -150,41 +148,12 @@ export class Project {
     }
 
     private static async installDependencies(): Promise<void> {
-        if (Config.Options.scripting === "deno") {
-            const deps = [
-                "npm:@minecraft/server",
-                "npm:@minecraft/server-ui",
-                "jsr:@coldiron/netherite",
-            ];
+        const deps = [
+            "npm:@minecraft/server",
+            "npm:@minecraft/server-ui",
+            "jsr:@coldiron/netherite",
+        ];
 
-            await new Deno.Command("deno", {args: ["add", ...deps]}).output();
-        } else {
-            const deps = [
-                "@minecraft/server",
-                "@minecraft/server-ui",
-            ];
-
-            await new Deno.Command("npm", {args: ["install", ...deps]}).output();
-            await new Deno.Command("deno", {args: ["add", "jsr:@coldiron/netherite"]}).output();
-        }
-
-        this.developmentPatch();
-    }
-
-    private static developmentPatch(): void {
-        const localPackage: string|undefined = Deno.env.get("LOCALAPI");
-        const currentVersion: string|undefined = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json"))).version;
-        if (!localPackage || !currentVersion) return;
-
-        if (Config.Options.scripting === "deno") {
-            const deno = JSON.parse(Deno.readTextFileSync("deno.json"));
-
-            deno.imports["@coldiron/netherite"] = "jsr:@coldiron/netherite@^" + currentVersion;
-            deno.patch = [localPackage];
-
-            Deno.writeTextFileSync("deno.json", JSON.stringify(deno, null, "\t"));
-        } else {
-            // TODO: Add node development patch
-        }
+        await new Deno.Command("deno", {args: ["add", ...deps]}).output();
     }
 }
