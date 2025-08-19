@@ -3,7 +3,7 @@ import { Logger, sleep } from "./index.ts";
 export async function attemptRepeater(func: () => unknown, attempts: number = 5): Promise<void> {
     let lastError: string = "";
 
-    for (let attempt = 0; attempt < attempts; attempt++) {
+    for (let attempt = 1; attempt <= attempts; attempt++) {
         try {
             func();
             return;

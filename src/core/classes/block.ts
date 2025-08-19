@@ -2,6 +2,7 @@ import * as path from "@std/path";
 import { deepMerge, JSONCParse, writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
 import type { ClientBlocks} from "../../api/api.ts";
+import { attemptRepeater } from "../utils/error.ts";
 
 export class Block {
     private static blocks: ClientBlocks = {};
@@ -26,11 +27,13 @@ export class Block {
     }
 
     public static watch(filePath: string): void {
-        if (filePath.endsWith("blocks.json")) {
-            const fileContent: ClientBlocks = JSONCParse(Deno.readTextFileSync(filePath));
-            this.blocks = deepMerge(this.blocks, fileContent);
-        }
+        attemptRepeater(() => {
+            if (filePath.endsWith("blocks.json")) {
+                const fileContent: ClientBlocks = JSONCParse(Deno.readTextFileSync(filePath));
+                this.blocks = deepMerge(this.blocks, fileContent);
+            }
 
-        this.build();
+            this.build();
+        });
     }
 }

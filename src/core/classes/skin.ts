@@ -2,6 +2,7 @@ import * as path from "@std/path";
 import { deepMerge, JSONCParse, writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
 import type { Skins } from "../../api/api.ts";
+import { attemptRepeater } from "../utils/error.ts";
 
 export class Skin {
     private static skins: Partial<Skins> = {};
@@ -26,11 +27,13 @@ export class Skin {
     }
 
     public static watch(filePath: string): void {
-        if (filePath.endsWith("skins.json")) {
-            const fileContent: Skins = JSONCParse(Deno.readTextFileSync(filePath));
-            this.skins = deepMerge(this.skins, fileContent);
-        }
+        attemptRepeater(() => {
+            if (filePath.endsWith("skins.json")) {
+                const fileContent: Skins = JSONCParse(Deno.readTextFileSync(filePath));
+                this.skins = deepMerge(this.skins, fileContent);
+            }
 
-        this.build();
+            this.build();
+        });
     }
 }

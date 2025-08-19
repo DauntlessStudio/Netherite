@@ -2,6 +2,7 @@ import * as path from "@std/path";
 import { deepMerge, JSONCParse, writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
 import type { ClientSoundDefinitions, ClientSounds } from "../../api/api.ts";
+import { attemptRepeater } from "../utils/error.ts";
 
 export class Sound {
     private static soundDefinitions: ClientSoundDefinitions = {
@@ -38,14 +39,16 @@ export class Sound {
     }
 
     public static watch(filePath: string): void {
-        if (filePath.endsWith("sound_definitions.json")) {
-            const fileContent: ClientSoundDefinitions = JSONCParse(Deno.readTextFileSync(filePath));
-            this.soundDefinitions = deepMerge(this.soundDefinitions, fileContent);
-        } else if (filePath.endsWith("sounds.json")) {
-            const fileContent: ClientSounds = JSONCParse(Deno.readTextFileSync(filePath));
-            this.sounds = deepMerge(this.sounds, fileContent);
-        }
+        attemptRepeater(() => {
+            if (filePath.endsWith("sound_definitions.json")) {
+                const fileContent: ClientSoundDefinitions = JSONCParse(Deno.readTextFileSync(filePath));
+                this.soundDefinitions = deepMerge(this.soundDefinitions, fileContent);
+            } else if (filePath.endsWith("sounds.json")) {
+                const fileContent: ClientSounds = JSONCParse(Deno.readTextFileSync(filePath));
+                this.sounds = deepMerge(this.sounds, fileContent);
+            }
 
-        this.build();
+            this.build();
+        });
     }
 }

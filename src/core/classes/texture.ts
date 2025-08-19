@@ -2,6 +2,7 @@ import * as path from "@std/path";
 import { deepMerge, JSONCParse, writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
 import type { ClientItemTexture, ClientTerrainTexture } from "../../api/api.ts";
+import { attemptRepeater } from "../utils/error.ts";
 
 export class Texture {
     private static terrainTexture: ClientTerrainTexture = {
@@ -45,14 +46,16 @@ export class Texture {
     }
 
     public static watch(filePath: string): void {
-        if (filePath.endsWith("terrain_texture.json")) {
-            const fileContent: ClientTerrainTexture = JSONCParse(Deno.readTextFileSync(filePath));
-            this.terrainTexture = deepMerge(this.terrainTexture, fileContent);
-        } else if (filePath.endsWith("item_texture.json")) {
-            const fileContent: ClientItemTexture = JSONCParse(Deno.readTextFileSync(filePath));
-            this.itemTexture = deepMerge(this.itemTexture, fileContent);
-        }
+        attemptRepeater(() => {
+            if (filePath.endsWith("terrain_texture.json")) {
+                const fileContent: ClientTerrainTexture = JSONCParse(Deno.readTextFileSync(filePath));
+                this.terrainTexture = deepMerge(this.terrainTexture, fileContent);
+            } else if (filePath.endsWith("item_texture.json")) {
+                const fileContent: ClientItemTexture = JSONCParse(Deno.readTextFileSync(filePath));
+                this.itemTexture = deepMerge(this.itemTexture, fileContent);
+            }
 
-        this.build();
+            this.build();
+        });
     }
 }
