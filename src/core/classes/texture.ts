@@ -1,5 +1,5 @@
 import * as path from "@std/path";
-import { deepMerge, writeTextToDist } from "../utils/index.ts";
+import { deepMerge, JSONCParse, writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
 import type { ClientItemTexture, ClientTerrainTexture } from "../../api/api.ts";
 
@@ -27,10 +27,10 @@ export class Texture {
 
         for (const entry of Deno.readDirSync(dirPath)) {
             if (entry.name === "terrain_texture.json") {
-                const fileContent: ClientTerrainTexture = JSON.parse(Deno.readTextFileSync(path.join(dirPath, entry.name)));
+                const fileContent: ClientTerrainTexture = JSONCParse(Deno.readTextFileSync(path.join(dirPath, entry.name)));
                 this.terrainTexture = deepMerge(this.terrainTexture, fileContent);
             } else if (entry.name === "item_texture.json") {
-                const fileContent: ClientItemTexture = JSON.parse(Deno.readTextFileSync(path.join(dirPath, entry.name)));
+                const fileContent: ClientItemTexture = JSONCParse(Deno.readTextFileSync(path.join(dirPath, entry.name)));
                 this.itemTexture = deepMerge(this.itemTexture, fileContent);
             }
         }
@@ -46,10 +46,10 @@ export class Texture {
 
     public static watch(filePath: string): void {
         if (filePath.endsWith("terrain_texture.json")) {
-            const fileContent: ClientTerrainTexture = JSON.parse(Deno.readTextFileSync(filePath));
+            const fileContent: ClientTerrainTexture = JSONCParse(Deno.readTextFileSync(filePath));
             this.terrainTexture = deepMerge(this.terrainTexture, fileContent);
         } else if (filePath.endsWith("item_texture.json")) {
-            const fileContent: ClientItemTexture = JSON.parse(Deno.readTextFileSync(filePath));
+            const fileContent: ClientItemTexture = JSONCParse(Deno.readTextFileSync(filePath));
             this.itemTexture = deepMerge(this.itemTexture, fileContent);
         }
 

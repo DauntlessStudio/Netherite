@@ -1,5 +1,5 @@
 import * as path from "@std/path";
-import { deepMerge, writeTextToDist } from "../utils/index.ts";
+import { deepMerge, JSONCParse, writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
 import type { ClientSoundDefinitions, ClientSounds } from "../../api/api.ts";
 
@@ -20,10 +20,10 @@ export class Sound {
 
         for (const entry of Deno.readDirSync(dirPath)) {
             if (entry.name === "sound_definitions.json") {
-                const fileContent: ClientSoundDefinitions = JSON.parse(Deno.readTextFileSync(path.join(dirPath, entry.name)));
+                const fileContent: ClientSoundDefinitions = JSONCParse(Deno.readTextFileSync(path.join(dirPath, entry.name)));
                 this.soundDefinitions = deepMerge(this.soundDefinitions, fileContent);
             } else if (entry.name === "sounds.json") {
-                const fileContent: ClientSounds = JSON.parse(Deno.readTextFileSync(path.join(dirPath, entry.name)));
+                const fileContent: ClientSounds = JSONCParse(Deno.readTextFileSync(path.join(dirPath, entry.name)));
                 this.sounds = deepMerge(this.sounds, fileContent);
             }
         }
@@ -39,10 +39,10 @@ export class Sound {
 
     public static watch(filePath: string): void {
         if (filePath.endsWith("sound_definitions.json")) {
-            const fileContent: ClientSoundDefinitions = JSON.parse(Deno.readTextFileSync(filePath));
+            const fileContent: ClientSoundDefinitions = JSONCParse(Deno.readTextFileSync(filePath));
             this.soundDefinitions = deepMerge(this.soundDefinitions, fileContent);
         } else if (filePath.endsWith("sounds.json")) {
-            const fileContent: ClientSounds = JSON.parse(Deno.readTextFileSync(filePath));
+            const fileContent: ClientSounds = JSONCParse(Deno.readTextFileSync(filePath));
             this.sounds = deepMerge(this.sounds, fileContent);
         }
 

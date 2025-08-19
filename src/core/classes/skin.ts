@@ -1,5 +1,5 @@
 import * as path from "@std/path";
-import { deepMerge, writeTextToDist } from "../utils/index.ts";
+import { deepMerge, JSONCParse, writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
 import type { Skins } from "../../api/api.ts";
 
@@ -15,7 +15,7 @@ export class Skin {
 
         for (const entry of Deno.readDirSync(dirPath)) {
             if (entry.name === "skins.json") {
-                const fileContent: Skins = JSON.parse(Deno.readTextFileSync(path.join(dirPath, entry.name)));
+                const fileContent: Skins = JSONCParse(Deno.readTextFileSync(path.join(dirPath, entry.name)));
                 this.skins = deepMerge(this.skins, fileContent);
             }
         }
@@ -27,7 +27,7 @@ export class Skin {
 
     public static watch(filePath: string): void {
         if (filePath.endsWith("skins.json")) {
-            const fileContent: Skins = JSON.parse(Deno.readTextFileSync(filePath));
+            const fileContent: Skins = JSONCParse(Deno.readTextFileSync(filePath));
             this.skins = deepMerge(this.skins, fileContent);
         }
 

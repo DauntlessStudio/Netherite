@@ -1,6 +1,7 @@
 import * as path from "@std/path";
 import { Config } from "../classes/config.ts";
-import { keywordReplacer } from "./index.ts";
+import { keywordReplacer, Logger } from "./index.ts";
+import { attemptRepeater } from "./error.ts";
 
 interface DistDirectoryMapEntry {
     destDirGlob: RegExp;
@@ -21,12 +22,6 @@ const distDirectoryMap: DistDirectoryMapEntry[] = [
         vanillaGlob: path.globToRegExp("**/behavior_packs/**/loot_tables/vanilla/**"),
         replaceGlob: /dist.+loot_tables/,
         destDir: () => path.join(Config.Paths.bp.root, "loot_tables"),
-    },
-    {
-        destDirGlob: path.globToRegExp("**/behavior_packs/**/trading/**/"),
-        vanillaGlob: path.globToRegExp("**/behavior_packs/**/trading/vanilla/**"),
-        replaceGlob: /dist.+trading/,
-        destDir: () => path.join(Config.Paths.bp.root, "trading"),
     },
     {
         destDirGlob: path.globToRegExp("**/behavior_packs/**/trading/**/"),
@@ -80,6 +75,7 @@ export function sendToDist(src: string, dest: string, excludeGlob: string[] = []
     
     if (stat.isDirectory) {
         Deno.mkdirSync(dest, {recursive: true});
+
         for (const entry of Deno.readDirSync(src)) {
             sendToDist(path.join(src, entry.name), path.join(dest, entry.name), excludeGlob);
 
@@ -102,12 +98,15 @@ export function sendToDist(src: string, dest: string, excludeGlob: string[] = []
             }
         }
 
-        if (isTextFile(src)) {
-            const content = Deno.readTextFileSync(src);
-            writeTextToDist(dest, content);
-        } else {
-            Deno.copyFileSync(src, dest);
-        }
+        attemptRepeater(() => {
+            if (isTextFile(src)) {
+                const content = Deno.readTextFileSync(src);
+                writeTextToDist(dest, content);
+            } else {
+                const content = Deno.readFileSync(src);
+                writeBufferToDist(dest, content);
+            }
+        });
     }
 }
 
@@ -150,4 +149,12 @@ export function replaceTextInFile(filepath: string, replacements: Record<string,
     } catch (error) {
         console.error(`Error replacing text in file: ${error}`);
     }
+}
+
+// deno-lint-ignore no-explicit-any
+export function JSONCParse(...args: Parameters<JSON["parse"]>): any {
+    args[0] = args[0]
+        .replace(/\/\/.*(?=[\n\r])/g, "")
+        .replace(/\/\*[\s\S]*?\*\//g, "");
+    return JSON.parse.apply(JSON, args);
 }

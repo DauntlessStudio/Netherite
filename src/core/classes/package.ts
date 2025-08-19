@@ -1,6 +1,6 @@
 import * as path from "@std/path";
 import { Config } from "./config.ts";
-import { copyDirSync, Logger } from "../utils/index.ts";
+import { copyDirSync, JSONCParse, Logger } from "../utils/index.ts";
 
 interface NetheritePackage {
     /**
@@ -100,7 +100,7 @@ export class Package {
 
     public static get LatestVanillaVersion() : string {
         try {
-            const version = JSON.parse(Deno.readTextFileSync(path.join(Config.NetheriteDirectory, "bedrock-samples", "version.json")));
+            const version = JSONCParse(Deno.readTextFileSync(path.join(Config.NetheriteDirectory, "bedrock-samples", "version.json")));
             const latest = (version.latest.version as string).split(".");
             latest.length = 3;
             return latest.join(".");
@@ -225,7 +225,7 @@ export class Package {
         const packages: {dir: string, manifest: NetheriteManifest}[] = [];
 
         await this.iterateInstalledPackages((dir) => {
-            const manifest: NetheriteManifest = JSON.parse(Deno.readTextFileSync(path.join(dir, "netherite.manifest.json")));
+            const manifest: NetheriteManifest = JSONCParse(Deno.readTextFileSync(path.join(dir, "netherite.manifest.json")));
             packages.push({dir, manifest});
         });
 
@@ -237,7 +237,7 @@ export class Package {
         const packages: {dir: string, package: NetheritePackage}[] = [];
 
         await this.iterateLoadedPackages((dir) => {
-            const nPackage: NetheritePackage = JSON.parse(Deno.readTextFileSync(path.join(dir, "netherite.package.json")));
+            const nPackage: NetheritePackage = JSONCParse(Deno.readTextFileSync(path.join(dir, "netherite.package.json")));
             packages.push({dir, package: nPackage});
         });
 
@@ -268,7 +268,7 @@ export class Package {
         copyDirSync(path.join(nPackage.dir, "versions", useVersion), outPath);
 
         // Get imported package information
-        const packageInfo: NetheritePackage = JSON.parse(Deno.readTextFileSync(path.join(outPath, "netherite.package.json")));
+        const packageInfo: NetheritePackage = JSONCParse(Deno.readTextFileSync(path.join(outPath, "netherite.package.json")));
         if (!packageInfo) {
             Logger.Spinner.fail(`Failed to load ${nPackage.manifest.name} package, missing netherite.package.json`);
             Deno.exit(1);
@@ -276,7 +276,7 @@ export class Package {
 
         // If the package has an import, add it to the deno.json imports
         if (packageInfo.import) {
-            const deno = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
+            const deno = JSONCParse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
 
             if (!deno.imports) {
                 deno.imports = {};
@@ -320,7 +320,7 @@ export class Package {
         }
 
         await new Deno.Command("git", {args: ["pull"]}).output();
-        installedPackage.manifest = JSON.parse(Deno.readTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json")));
+        installedPackage.manifest = JSONCParse(Deno.readTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json")));
         let url = Deno.readTextFileSync(path.join(installedPackage.dir, ".git", "config"))
         .split("\n")
         .find(line => line.includes("url = "))?.split(" = ")[1].trim().replace(/\.git$/, "");
