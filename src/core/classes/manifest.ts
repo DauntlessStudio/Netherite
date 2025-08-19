@@ -2,6 +2,7 @@ import * as path from "@std/path";
 import type * as types from "../../api/types/index.d.ts";
 import { Config } from "./config.ts";
 import { writeTextToDist } from "../utils/fileIO.ts";
+import { JSONCParse } from "../utils/index.ts";
 
 export class Manifest {
     public static get BehaviorManifest() : Promise<types.Manifest> {
@@ -148,7 +149,7 @@ export class Manifest {
     private static getVersionNumber(module: string): string {
         if (Config.Options.scripting === "deno") {
             try {
-                const file = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
+                const file = JSONCParse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
                 const value = file.imports[module] as string|undefined;
         
                 if (!value) throw new Error(`Could not find module ${module} in deno.json`);
@@ -158,7 +159,7 @@ export class Manifest {
             }
         } else {
             try {
-                const file = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "package.json")));
+                const file = JSONCParse(Deno.readTextFileSync(path.join(Deno.cwd(), "package.json")));
                 const value = file.dependencies[module] as string|undefined;
         
                 if (!value) throw new Error(`Could not find module ${module} in package.json`);

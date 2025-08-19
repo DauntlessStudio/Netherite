@@ -4,7 +4,7 @@ import { v4 } from "uuid";
 import * as path from "@std/path";
 import type { ProjectOptions } from "./project.ts";
 import { Buffer } from "node:buffer";
-import { Logger } from "../utils/index.ts";
+import { JSONCParse, Logger } from "../utils/index.ts";
 import { WorkerManager } from "./index.ts";
 import deno from "../../../deno.json" with {type: "json" };
 
@@ -76,7 +76,7 @@ export class Config {
      */
     public static get LocalNetheriteVersion() : string {
         try {
-            const deno = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
+            const deno = JSONCParse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
             const version: string = deno.imports["@coldiron/netherite"].split("^")[1];
             return version;
         } catch (_error) {

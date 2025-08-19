@@ -1,4 +1,11 @@
 # Changelog
+## [0.2.3] - 8/19/2025
+### Changes
+- Fixed issue where log messages generated while a spinner was active would be dropped instead of cached until the spinner completed.
+- General logging improvements
+- Fixed issue where JSON files with comments could break the build process.
+- Fixed issue where `netherite build --watch` could fail when the resources it attempts to copy are busy (i.e. when pasting folders into a project).
+---
 ## [0.2.2] - 7/11/2025
 ### Changes
 - Fixed issue where `backticked` markdown strings where not included in the changelog when publishing Netherite packages.
