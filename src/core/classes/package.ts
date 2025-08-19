@@ -1,6 +1,7 @@
 import * as path from "@std/path";
 import { Config } from "./config.ts";
 import { copyDirSync, JSONCParse, Logger } from "../utils/index.ts";
+import { publishToGitHub } from "../../cli/utils/github.ts";
 
 interface NetheritePackage {
     /**
@@ -390,39 +391,25 @@ export class Package {
             Deno.mkdirSync(installDir, {recursive: true});
             Deno.chdir(installDir);
 
-            await new Deno.Command("git", {args: ["init"]}).output();
+            try {
+                await publishToGitHub({owner: publish.owner, name, description}, (repository) => {
+                    Deno.writeTextFileSync(path.join(installDir, "netherite.manifest.json"), JSON.stringify({
+                        name,
+                        description,
+                        repository,
+                        uuid: nPackage.uuid,
+                        versions: {latest: "0.0.0"}
+                    }, null, "\t"));
 
-            const repo = await new Deno.Command("gh", {args: ["repo", "create", `${publish.owner}/${name}`, "--private", "--description", description, "--source", ".", "--remote",  "origin"]}).spawn().output();
-
-            if (repo.success) {
-                Logger.log(`Repository created, preparing for initial version publish`);
-
-                const gitConfig = Deno.readTextFileSync(path.join(installDir, ".git", "config"));
-                const gitConfigLines = gitConfig.split("\n");
-                const urlLine = gitConfigLines.find(line => line.includes("url = "));
-                const repository = urlLine?.split(" = ")[1].trim();
-
-                Deno.writeTextFileSync(path.join(installDir, "netherite.manifest.json"), JSON.stringify({
-                    name,
-                    description,
-                    repository,
-                    uuid: nPackage.uuid,
-                    versions: {latest: "0.0.0"}
-                }, null, "\t"));
-
-                Deno.mkdirSync(path.join(installDir, ".github/workflows"), {recursive: true});
-                Deno.writeTextFileSync(path.join(installDir, ".github/workflows/pull_request.yml"), action);
-                Deno.writeTextFileSync(path.join(installDir, "CHANGELOG.md"), changelog);
-
-                await new Deno.Command("git", {args: ["remote", "add", "origin", repository!]}).output();
-                await new Deno.Command("git", {args: ["add", "."]}).output();
-                await new Deno.Command("git", {args: ["commit", "-m", "Initial Commit"]}).output();
-                await new Deno.Command("git", {args: ["push", "-u", "origin", "main"]}).output();
+                    Deno.mkdirSync(path.join(installDir, ".github/workflows"), {recursive: true});
+                    Deno.writeTextFileSync(path.join(installDir, ".github/workflows/pull_request.yml"), action);
+                    Deno.writeTextFileSync(path.join(installDir, "CHANGELOG.md"), changelog);
+                });
     
                 copyDirSync(dir, path.join(installDir, "versions", nPackage.version));
                 await this.publish({dir, package: nPackage}, true);
-            } else {
-                Logger.error("Failed to create repository, is gh installed and are you connected to the internet?");
+            } catch (error) {
+                Logger.error(String(error));
                 Deno.exit(1);
             }
 
