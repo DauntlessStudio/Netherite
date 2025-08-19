@@ -1,7 +1,9 @@
 import { Package } from "../../core/classes/index.ts";
-import { Project, type ProjectType, type ProjectOptions, type ScriptType } from "../../core/classes/project.ts";
+import { Project, type ProjectType, type ProjectOptions } from "../../core/classes/project.ts";
+import { Logger } from "../../core/utils/logger.ts";
 import { Command } from "../command.ts";
 import type { CommandData } from "../command.ts";
+import { addLabelsToRepo, getNewRepoOwner, publishToGitHub, type GitHubPublishData } from "../utils/github.ts";
 
 interface InitCommandData extends CommandData {
     options: {
@@ -10,23 +12,23 @@ interface InitCommandData extends CommandData {
         namespace?: string;
         format_version?: string;
         type?: ProjectType;
-        script?: ScriptType;
         skinpack?: boolean;
+        publish?: boolean;
     }
 }
 
 new Command<InitCommandData>({
 	name: "init",
 	parse: {
-		string: ["name", "author", "namespace", "format_version", "type", "script"],
+		string: ["name", "author", "namespace", "format_version", "type"],
         boolean: ["skinpack"],
+        negatable: ["publish"],
         alias: {
             n: "name",
             a: "author",
             ns: "namespace",
             f: "format_version",
             t: "type",
-            s: "script",
             sp: "skinpack",
         },
 	},
@@ -59,20 +61,35 @@ new Command<InitCommandData>({
 				description: "The type of the project, will prompt if missing",
 				optional: true,
 			},
-			script: {
-				type: "string",
-				description: "The script compiler of the project, will prompt if missing",
-				optional: true,
-			},
 			skinpack: {
 				type: "boolean",
 				description: "When the type is a world or add-on, should a skin pack be included? will prompt if missing",
 				optional: true,
 			},
+            publish: {
+                type: "boolean",
+                description: "Use --no-publish if you don't want a prompt to publish to GitHub",
+                optional: true,
+            }
 		},
 	},
 	async action(_args) {
-		Project.init(await getProjectBuildData(_args));
+        const projectOptions = await getProjectBuildData(_args);
+
+		await Project.init(projectOptions);
+
+        // If user didn't explicitly use --no-publish
+        if (_args.options.publish || _args.options.publish === undefined) {
+            try {
+                const url = await publishToGitHub(await getProjectPublishData(projectOptions));
+                Logger.log(`Successfully published ${projectOptions.name} to ${url}`);
+            } catch (error) {
+                Logger.error(String(error));
+                Deno.exit(1);
+            }
+
+            await addLabelsToRepo(true);
+        }
 	},
 	validateArgs(_args) {
         const validName = _args.options.name === undefined || (typeof _args.options.name === "string" && _args.options.name.length > 0);
@@ -81,10 +98,10 @@ new Command<InitCommandData>({
         const validNamespace = _args.options.namespace === undefined || (typeof _args.options.namespace === "string" && _args.options.namespace.length > 0);
         const validFormatVersion = _args.options.format_version === undefined || (typeof _args.options.format_version === "string" && _args.options.format_version.length > 0);
         const validType = _args.options.type === undefined || (typeof _args.options.type === "string" && ["world", "add-on", "skin-pack"].includes(_args.options.type));
-        const validScript = _args.options.script === undefined || (typeof _args.options.script === "string" && ["deno", "node"].includes(_args.options.script));
         const validSkinpack = _args.options.skinpack === undefined || (typeof _args.options.skinpack === "boolean");
+        const validPublish = _args.options.publish === undefined || (typeof _args.options.publish === "boolean");
 
-		return validName && validAuthor && validNamespace && validFormatVersion && validType && validScript && validSkinpack;
+		return validName && validAuthor && validNamespace && validFormatVersion && validType && validSkinpack && validPublish;
 	},
 });
 
@@ -154,14 +171,23 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectOption
         }
     }
 
-    if (args.options.script) {
-        buildOptions.scripting = args.options.script;
-    } else {
-        let val = prompt("Please enter the TypeScript framework for scripting (deno, node) [default: deno]:");
-        if (val === null || !["deno", "node"].includes(val)) val = "deno";
+    return buildOptions as ProjectOptions;
+}
 
-        buildOptions.scripting = val as ScriptType;
+async function getProjectPublishData(project: ProjectOptions): Promise<GitHubPublishData> {
+    if (!confirm("Do you want to publish this project to GitHub?:")) {
+        Deno.exit(0);
     }
 
-    return buildOptions as ProjectOptions;
+    const owner = await getNewRepoOwner();
+
+    const defaultName = project.name.replace(/\s/g, "-")
+    let name = prompt(`Please enter the name of the GitHub repo [default: ${defaultName}]:`);
+    if (name === null || name === "") name = defaultName;
+
+    return {
+        owner,
+        name,
+        description: "A Minecraft Bedrock project created with Netherite!",
+    };
 }

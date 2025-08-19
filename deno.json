@@ -1,10 +1,10 @@
 {
   "name": "@coldiron/netherite",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "tasks": {
     "dev": "deno run --allow-read --allow-write --allow-run --allow-env src/cli/cli.ts",
     "encode": "deno run -A src/templates/encode.ts",
-    "init": "netherite init --name 'Test' --author 'Caleb Coldiron' --namespace 'cld_test' --format_version 'latest' --type 'world' --script 'deno' --skinpack",
+    "init": "deno run -A src/cli/cli.ts init --name 'Test' --author 'Caleb Coldiron' --namespace 'cld_test' --format_version 'latest' --type 'world' --skinpack --no-publish",
     "install": "deno install -f -g -c deno.json --name netherite --allow-import --allow-read --allow-write --allow-run --allow-env --allow-net=localhost:3000,jsr.io src/cli/cli.ts",
     "test": "rm -rf Test && deno task install && deno task init"
   },

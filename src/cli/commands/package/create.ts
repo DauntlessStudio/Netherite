@@ -1,6 +1,6 @@
 import { Command, type CommandData } from "../../command.ts";
 import { Package } from "../../../core/classes/index.ts";
-import { Logger } from "../../../core/utils/index.ts";
+import { getNewRepoOwner, type GitHubPublishData } from "../../utils/github.ts";
 
 interface CreateCommandData extends CommandData {
     options: {
@@ -9,16 +9,6 @@ interface CreateCommandData extends CommandData {
         publish?: boolean;
         owner?: string;
     }
-}
-
-interface CreateData {
-    name: string;
-    description: string;
-    owner?: string;
-}
-
-interface GitHubAPIResponse {
-    login: string;
 }
 
 export default new Command<CreateCommandData>({
@@ -70,8 +60,8 @@ export default new Command<CreateCommandData>({
     },
 });
 
-async function getData(args: CreateCommandData): Promise<CreateData> {
-    const options: Partial<CreateData> = {};
+async function getData(args: CreateCommandData): Promise<GitHubPublishData> {
+    const options: Partial<GitHubPublishData> = {};
 
     if (args.options.name) {
         options.name = args.options.name;
@@ -104,40 +94,9 @@ async function getData(args: CreateCommandData): Promise<CreateData> {
         if (args.options.owner) {
             options.owner = args.options.owner;
         } else {
-            const owners: string[] = [];
-
-            const userResult = await new Deno.Command("gh", {args: ["api", "user"], stdout: "piped"}).output();
-
-            if (userResult.success) {
-                const response = JSON.parse(new TextDecoder().decode(userResult.stdout)) as GitHubAPIResponse;
-                owners.push(response.login);
-            }
-
-            const orgsResult = await new Deno.Command("gh", {args: ["api", "user/orgs"], stdout: "piped"}).output();
-
-            if (orgsResult.success) {
-                const response = JSON.parse(new TextDecoder().decode(orgsResult.stdout)) as GitHubAPIResponse[];
-                response.forEach(r => owners.push(r.login));
-            }
-
-            let index: number = NaN;
-
-            while (Number.isNaN(index)) {
-                for (let i = 0; i < owners.length; i++) {
-                    Logger.log(`[${Logger.Colors.green(i.toString())}]: ${Logger.Colors.green(owners[i])}`);
-                }
-
-                index = Number(prompt("Enter the index of the code owner:"));
-
-                if (index < 0 || index >= owners.length) {
-                    Logger.warn(`Invalid response, must be a number between 0 and ${owners.length - 1}`);
-                    index = NaN;
-                }
-            }
-
-            options.owner = owners[index];
+            options.owner = await getNewRepoOwner();
         }
     }
 
-    return options as CreateData;
+    return options as GitHubPublishData;
 }

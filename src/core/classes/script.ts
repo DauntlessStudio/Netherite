@@ -20,7 +20,7 @@ export class Script {
         }
     
         this.buildOptions = {
-            plugins: Config.Options.scripting === "deno" ? [...denoPlugins()] : undefined,
+            plugins: [...denoPlugins()],
             entryPoints: ["./src/behavior_pack/scripts/main.ts"],
             external: ["@minecraft/server", "@minecraft/server-ui"],
             outfile: Config.Paths.bp.scripts + `/main.js`,
