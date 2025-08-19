@@ -1,46 +1,7 @@
 import * as path from "@std/path";
 import { Config } from "../classes/config.ts";
-import { keywordReplacer, Logger } from "./index.ts";
+import { keywordReplacer } from "./index.ts";
 import { attemptRepeater } from "./error.ts";
-
-interface DistDirectoryMapEntry {
-    destDirGlob: RegExp;
-    replaceGlob: RegExp;
-    vanillaGlob?: RegExp;
-    destDir: () => string;
-}
-
-const distDirectoryMap: DistDirectoryMapEntry[] = [
-    {
-        destDirGlob: path.globToRegExp("**/resource_packs/**/textures/**/"),
-        vanillaGlob: path.globToRegExp("**/resource_packs/**/textures/vanilla/**"),
-        replaceGlob: /dist.+textures/,
-        destDir: () => path.join(Config.Paths.rp.root, "textures"),
-    },
-    {
-        destDirGlob: path.globToRegExp("**/behavior_packs/**/loot_tables/**/"),
-        vanillaGlob: path.globToRegExp("**/behavior_packs/**/loot_tables/vanilla/**"),
-        replaceGlob: /dist.+loot_tables/,
-        destDir: () => path.join(Config.Paths.bp.root, "loot_tables"),
-    },
-    {
-        destDirGlob: path.globToRegExp("**/behavior_packs/**/trading/**/"),
-        vanillaGlob: path.globToRegExp("**/behavior_packs/**/trading/vanilla/**"),
-        replaceGlob: /dist.+trading/,
-        destDir: () => path.join(Config.Paths.bp.root, "trading"),
-    },
-    {
-        destDirGlob: path.globToRegExp("**/behavior_packs/**/sounds/**/"),
-        vanillaGlob: path.globToRegExp("**/behavior_packs/**/sounds/vanilla/**"),
-        replaceGlob: /dist.+sounds/,
-        destDir: () => path.join(Config.Paths.bp.root, "sounds"),
-    },
-    {
-        destDirGlob: path.globToRegExp("**/behavior_packs/**/functions/**/"),
-        replaceGlob: /dist.+functions/,
-        destDir: () => path.join(Config.Paths.bp.root, "functions"),
-    }
-];
 
 export function emptyDirectorySync(dir: string): void {
     try {
@@ -72,6 +33,8 @@ export function sendToDist(src: string, dest: string, excludeGlob: string[] = []
     if (excludeGlob.some(glob => path.globToRegExp(glob).test(src))) {
         return;
     }
+
+    dest = dest.replace("PATH", path.join(Config.StudioName, Config.PackName));
     
     if (stat.isDirectory) {
         Deno.mkdirSync(dest, {recursive: true});
@@ -84,20 +47,6 @@ export function sendToDist(src: string, dest: string, excludeGlob: string[] = []
             }
         }
     } else {
-        for (const element of distDirectoryMap) {
-            if (element.destDirGlob.test(dest)) {
-                if (element.vanillaGlob?.test(dest)) {
-                    dest = dest.replace(new RegExp("vanilla" + path.SEPARATOR_PATTERN.source), "");
-                    dest = dest.replace(element.replaceGlob, element.destDir());
-                    Deno.mkdirSync(path.dirname(dest), {recursive: true});
-                } else {
-                    dest = dest.replace(element.replaceGlob, path.join(element.destDir(), Config.StudioName, Config.PackName));
-                    Deno.mkdirSync(path.dirname(dest), {recursive: true});
-                }
-                break;
-            }
-        }
-
         attemptRepeater(() => {
             if (isTextFile(src)) {
                 const content = Deno.readTextFileSync(src);
