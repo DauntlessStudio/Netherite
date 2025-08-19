@@ -1,4 +1,8 @@
 # Changelog
+## [0.2.4] - 8/19/2025
+### Changes
+- Changed the subdirectory pattern from using `vanilla/` to represent the base directory. Now base files are treated as vanilla, and `PATH/` directories are sent into the `<Creator>/<Project>` subdirectory structure.
+---
 ## [0.2.3] - 8/19/2025
 ### Changes
 - Fixed issue where log messages generated while a spinner was active would be dropped instead of cached until the spinner completed.
