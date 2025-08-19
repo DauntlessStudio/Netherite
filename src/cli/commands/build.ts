@@ -3,11 +3,13 @@ import { Command, type CommandData } from "../command.ts";
 import { Project } from "../../core/classes/project.ts";
 import { abortOnKeypress, Logger } from "../../core/utils/index.ts";
 import { Config } from "../../core/classes/config.ts";
+import { run } from "node:test";
 
 interface BuildCommandData extends CommandData {
     options: {
         watch?: boolean;
         silent?: boolean;
+        verbose?: boolean;
         all?: string;
         local?: string;
     }
@@ -29,6 +31,11 @@ export default new Command<BuildCommandData>({
                 description: "Do not send feedback to the console",
                 optional: true,
             },
+            "verbose": {
+                type: "boolean",
+                description: "Increase logging verbosity",
+                optional: true,
+            },
             "all": {
                 type: "string",
                 description: "Build all projects in the specified directory",
@@ -37,11 +44,12 @@ export default new Command<BuildCommandData>({
         },
     },
     parse: {
-        boolean: ["watch", "silent", "local"],
+        boolean: ["watch", "silent", "local", "verbose"],
         string: ["all"],
         alias: {
             watch: "w",
             silent: "s",
+            verbose: "v",
             all: "a",
         }
     },
@@ -50,7 +58,8 @@ export default new Command<BuildCommandData>({
         const silentValid = _args.options.silent === undefined || typeof _args.options.silent === "boolean";
         const allValid = _args.options.all === undefined || typeof _args.options.all === "string";
         const localValid = _args.options.local === undefined || typeof _args.options.local === "boolean";
-        return watchValid && silentValid && allValid && localValid;
+        const verboseValid = _args.options.verbose === undefined || typeof _args.options.verbose === "boolean";
+        return watchValid && silentValid && allValid && localValid && verboseValid;
     },
     async action(_args) {
         // The build command delegates to the installed version of Netherite, passing the hidden --local flag.
@@ -72,6 +81,11 @@ export default new Command<BuildCommandData>({
         }
 
         if (!_args.options.all) {
+            if (_args.options.verbose) {
+                Logger.Verbose = true;
+                Logger.log(`Verbose Loggings Enabled`, true);
+            };
+
             await Project.build(_args.options);
         } else {
             const args = ["build"];
