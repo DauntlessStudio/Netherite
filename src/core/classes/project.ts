@@ -155,20 +155,5 @@ export class Project {
         ];
 
         await new Deno.Command("deno", {args: ["add", ...deps]}).output();
-
-        this.developmentPatch();
-    }
-
-    private static developmentPatch(): void {
-        const localPackage: string|undefined = Deno.env.get("LOCALAPI");
-        const currentVersion: string|undefined = JSON.parse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json"))).version;
-        if (!localPackage || !currentVersion) return;
-
-        const deno = JSON.parse(Deno.readTextFileSync("deno.json"));
-
-        deno.imports["@coldiron/netherite"] = "jsr:@coldiron/netherite@^" + currentVersion;
-        deno.patch = [localPackage];
-
-        Deno.writeTextFileSync("deno.json", JSON.stringify(deno, null, "\t"));
     }
 }

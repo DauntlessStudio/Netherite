@@ -9,7 +9,6 @@ netherite.config({
     author: "${Config.Options.author}",
     namespace: "${Config.Options.namespace}",
     type: "${Config.Options.type}",
-    scripting: "${Config.Options.scripting}",
     version: "${Config.Options.version}",
     format_version: "${Config.Options.format_version}",
     uuid: "${Config.Options.uuid}",
