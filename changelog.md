@@ -2,6 +2,7 @@
 ## [0.2.4] - 8/19/2025
 ### Changes
 - Changed the subdirectory pattern from using `vanilla/` to represent the base directory. Now base files are treated as vanilla, and `PATH/` directories are sent into the `<Creator>/<Project>` subdirectory structure.
+- Added support for publishing to GitHub automatically after using `netherite init` to create a project.
 ---
 ## [0.2.3] - 8/19/2025
 ### Changes
