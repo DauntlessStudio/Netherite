@@ -1,4 +1,8 @@
 # Changelog
+## [0.2.5] - 8/25/2025
+### Changes
+- Fixed JSONC parsing invalidating strings like `"https://example.com"` which caused package importing to fail.
+---
 ## [0.2.4] - 8/19/2025
 ### Changes
 - Changed the subdirectory pattern from using `vanilla/` to represent the base directory. Now base files are treated as vanilla, and `PATH/` directories are sent into the `<Creator>/<Project>` subdirectory structure.
