@@ -103,7 +103,7 @@ export function replaceTextInFile(filepath: string, replacements: Record<string,
 // deno-lint-ignore no-explicit-any
 export function JSONCParse(...args: Parameters<JSON["parse"]>): any {
     args[0] = args[0]
-        .replace(/\/\/.*(?=[\n\r])/g, "")
+        .replace(/(^|[ \t])\/\/.*(?=[\n\r])/gm, "$1")
         .replace(/\/\*[\s\S]*?\*\//g, "");
     return JSON.parse.apply(JSON, args);
 }

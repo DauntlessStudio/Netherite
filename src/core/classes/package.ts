@@ -226,8 +226,18 @@ export class Package {
         const packages: {dir: string, manifest: NetheriteManifest}[] = [];
 
         await this.iterateInstalledPackages((dir) => {
-            const manifest: NetheriteManifest = JSONCParse(Deno.readTextFileSync(path.join(dir, "netherite.manifest.json")));
-            packages.push({dir, manifest});
+            const subpath = path.join(dir, "netherite.manifest.json");
+
+            try {
+                const manifest: NetheriteManifest = JSONCParse(Deno.readTextFileSync(subpath));
+                packages.push({dir, manifest});
+            } catch (error) {
+                if (error instanceof Error) {
+                    Logger.warn(`Failed to process ${subpath}: ${error.message}`);
+                } else {
+                    Logger.warn(`Failed to process ${subpath}: ${JSON.stringify(error)}`);
+                }
+            }
         });
 
         return packages;
