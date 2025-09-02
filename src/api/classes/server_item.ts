@@ -24,6 +24,26 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
         });
     }
 
+    public static armor(identifier: string, slot: string, protection?: number): MinecraftServerItem {
+        return new MinecraftServerItem({
+            "minecraft:item": {
+                description: {
+                    identifier,
+                    menu_category: {
+                        category: "equipment"
+                    }
+                },
+                components: {
+                    "minecraft:max_stack_size": 1,
+                    "minecraft:wearable": {
+                        protection,
+                        slot
+                    }
+                },
+            }
+        });
+    }
+
     // #endregion
 
     public get Identifier() : string {

@@ -13,4 +13,5 @@ export type * from "./client_terrain_texture.d.ts";
 export type * from "./client_item_texture.d.ts";
 export type * from "./client_sounds.d.ts";
 export type * from "./client_entity.d.ts";
+export type * from "./client_geometry.d.ts";
 export type * from "./skins.d.ts";

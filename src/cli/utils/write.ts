@@ -2,7 +2,7 @@ import type { MinecraftWriteable } from "../../api/api.ts";
 import { writeBufferToSrc } from "../../core/core.ts";
 
 export interface SourceWriteOptions {
-    overwrite: boolean
+    overwrite?: boolean
 }
 
 export function minecraftWriteableToSource(writeable: MinecraftWriteable<object, object>, options: SourceWriteOptions): void {
