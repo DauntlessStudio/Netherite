@@ -2,7 +2,7 @@ import * as path from "@std/path";
 import { formatText } from "../utils/text.ts";
 import { writeTextToDist } from "../utils/fileIO.ts";
 import { Config } from "./config.ts";
-import { sendToDist } from "../utils/index.ts";
+import { sendToDist, writeTextToSrc } from "../utils/index.ts";
 import { attemptRepeater } from "../utils/error.ts";
 
 export type LangType = "en_US" | "en_GB" | "de_DE" | "es_ES" | "es_MX" | "fr_FR" | "fr_CA" | "it_IT" | "ja_JP" | "ko_KR" | "pt_BR" | "pt_PT" | "ru_RU" | "zh_CN" | "zh_TW" | "nl_NL" | "bg_BG" | "cs_CZ" | "da_DK" | "el_GR" | "fi_FI" | "hu_HU" | "id_ID" | "nb_NO" | "pl_PL" | "sk_SK" | "sv_SE" | "tr_TR" | "uk_UA";
@@ -15,7 +15,6 @@ export class Language {
 
     public static addLangEntry(lang: LangType, category: string, key: string, value: string): void {
         category = category.toLowerCase().trim();
-        key = key.replace("NAMESPACE", Config.Options.namespace).toLocaleLowerCase().trim();
         value = value.trim();
 
         if (!this.langMap.has(lang)) {
@@ -32,7 +31,7 @@ export class Language {
 
     public static addPlaceholderEntry(category: string, key: string, value: string): void {
         category = category.toLowerCase().trim();
-        key = key.toLocaleLowerCase().trim();
+        key = key.trim();
         value = formatText(value, [/_/g]);
 
         for (const lang of this.langMap.keys()) {
@@ -98,6 +97,26 @@ export class Language {
         }
 
         this.buildNonResourceLanguages();
+    }
+
+    public static buildSource(): void {
+        for (const [lang, categories] of this.langMap) {
+            const langFile = path.join("./src/resource_pack/texts", `${lang}.lang`);
+    
+            let contents = "";
+    
+            for (const [category, keys] of categories) {
+                contents += `## ${category.toUpperCase()} ${"=".repeat(117 - category.length)}\n`;
+    
+                for (const [key, value] of keys) {
+                    contents += `${key}=${value}\n`;
+                }
+    
+                contents += "\n";
+            }
+    
+            writeTextToSrc(langFile, contents.trim());
+        }
     }
 
     private static buildNonResourceLanguages(): void {
