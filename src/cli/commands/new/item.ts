@@ -15,7 +15,7 @@ interface ItemCommandData extends CommandData {
 export default new Command<ItemCommandData>({
     name: "item",
     usage: {
-        description: "Creates a new package in the current project",
+        description: "Creates a new item in the current project",
         usage: "[--no-lang --stack <stack_size> --cooldown <cooldown_ticks> --overwrite] ...item_names",
         flags: {
             "lang": {

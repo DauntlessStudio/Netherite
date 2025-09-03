@@ -27,7 +27,7 @@ const ArmorTypeMap: Record<ArmorPiece, string> = {
 export default new Command<ArmorCommandData>({
     name: "armor",
     usage: {
-        description: "Creates a new package in the current project",
+        description: "Creates a new armor set in the current project",
         usage: "[--no-lang --no-suffix --piece <armor_piece> --protection <protection_level> --overwrite] ...item_names",
         flags: {
             "lang": {

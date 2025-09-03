@@ -38,6 +38,46 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
         });
     }
 
+    public static skeletal(name: string): MinecraftClientAttachable {
+        return new MinecraftClientAttachable({
+            format_version: "1.10.0",
+            "minecraft:client_attachable": {
+                description: {
+                    identifier: "NAMESPACE:name",
+                    materials: {
+                        default: "entity_alphatest",
+                        enchanted: "entity_alphatest_glint",
+                    },
+                    textures: {
+                        default: `textures/PATH/attachables/${name}`,
+                        enchanted: "textures/misc/enchanted_item_glint"
+                    },
+                    geometry: {
+                        default: `geometry.NAMESPACE.player.${name}`
+                    },
+                    animations: {
+                        [`ctrl.${name}`]: `controller.animation.NAMESPACE.item.custom_items.${name}`,
+                        [`${name}.idle.first_person`]: `animation.NAMESPACE.item.${name}.idle.first_person`,
+                        [`${name}.idle.third_person`]: `animation.NAMESPACE.item.${name}.idle.third_person`,
+                        [`${name}.attack.first_person`]: `animation.NAMESPACE.item.${name}.attack.first_person`,
+                        [`${name}.attack.third_person`]: `animation.NAMESPACE.item.${name}.attack.third_person`,
+                    },
+                    scripts: {
+                        pre_animation: [
+                            "variable.is_first_person = c.is_first_person;",
+                        ],
+                        animate: [
+                            `ctrl.${name}`,
+                        ],
+                    },
+                    render_controllers: [
+                        "controller.render.item_default"
+                    ]
+                }
+            }
+        });
+    }
+
     public get Identifier() : string {
         return this.minecraftObj["minecraft:client_attachable"].description.identifier ?? "NAMESPACE:SHORTNAME";
     }

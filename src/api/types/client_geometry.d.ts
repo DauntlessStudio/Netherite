@@ -1,5 +1,4 @@
 type Vector3 = [number, number, number];
-
 type Vector2 = [number, number];
 
 interface ClientGeometryDescription {

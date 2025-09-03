@@ -1,4 +1,4 @@
-import { type WorkerResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import type { WorkerResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientGeometryLoose, ClientGeometryStrict } from "../types/index.d.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -274,6 +274,118 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
                     }
                 ]
             },
+        }, name, "entity/player");
+    }
+
+    public static skeletalAttachable(name: string): MinecraftClientGeometry {
+        return new MinecraftClientGeometry({
+            format_version: "1.12.0",
+            "minecraft:geometry": [
+                {
+                    description: {
+                        identifier: `geometry.NAMESPACE.player.${name}`,
+                        texture_height: 32,
+                        texture_width: 32,
+                        visible_bounds_width: 3,
+                        visible_bounds_height: 4.5,
+                        visible_bounds_offset: [0, 1.75, 0],
+                    },
+                    bones: [
+                        {
+                            name: "root",
+                            pivot: [0, 0, 0]
+                        },
+                        {
+                            name: "waist",
+                            parent: "root",
+                            pivot: [0, 12, 0]
+                        },
+                        {
+                            name: "body",
+                            parent: "waist",
+                            pivot: [0, 24, 0]
+                        },
+                        {
+                            name: "head",
+                            parent: "body",
+                            pivot: [0, 24, 0]
+                        },
+                        {
+                            name: "hat",
+                            parent: "head",
+                            pivot: [0, 24, 0]
+                        },
+                        {
+                            name: "cape",
+                            parent: "body",
+                            pivot: [0, 24, 3]
+                        },
+                        {
+                            name: "leftArm",
+                            parent: "body",
+                            pivot: [5, 22, 0]
+                        },
+                        {
+                            name: "leftSleeve",
+                            parent: "leftArm",
+                            pivot: [5, 22, 0]
+                        },
+                        {
+                            name: "leftItem",
+                            parent: "leftArm",
+                            pivot: [6, 15, 1]
+                        },
+                        {
+                            name: "rightArm",
+                            parent: "body",
+                            pivot: [-5, 22, 0]
+                        },
+                        {
+                            name: "rightSleeve",
+                            parent: "rightArm",
+                            pivot: [-5, 22, 0]
+                        },
+                        {
+                            name: "rightItem",
+                            parent: "rightArm",
+                            pivot: [-6, 15, 1]
+                        },
+                        {
+                            name: name,
+                            parent: "rightItem",
+                            pivot: [-6, 8, 0],
+                            cubes: [
+                                { origin: [-10, 4, -4], size: [8, 8, 8], uv: [0, 0] }
+                            ]
+                        },
+                        {
+                            name: "jacket",
+                            parent: "body",
+                            pivot: [0, 24, 0]
+                        },
+                        {
+                            name: "leftLeg",
+                            parent: "root",
+                            pivot: [1.9, 12, 0]
+                        },
+                        {
+                            name: "leftPants",
+                            parent: "leftLeg",
+                            pivot: [1.9, 12, 0]
+                        },
+                        {
+                            name: "rightLeg",
+                            parent: "root",
+                            pivot: [-1.9, 12, 0]
+                        },
+                        {
+                            name: "rightPants",
+                            parent: "rightLeg",
+                            pivot: [-1.9, 12, 0]
+                        }
+                    ]
+                }
+            ]
         }, name, "entity/player");
     }
 

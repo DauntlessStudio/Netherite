@@ -17,8 +17,33 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                     }
                 },
                 components: {
+                    "minecraft:icon": "NAMESPACE:" + identifier,
                     "minecraft:max_stack_size": stack_size,
                     "minecraft:cooldown": cooldownComp,
+                },
+            }
+        });
+    }
+
+    public static attachable(identifier: string, stack_size?: number, cooldown?: number): MinecraftServerItem {
+        const cooldownComp: ServerItemCooldown|undefined = cooldown !== undefined ? {category: "SHORTNAME", duration: cooldown} : undefined;
+
+        return new MinecraftServerItem({
+            "minecraft:item": {
+                description: {
+                    identifier,
+                    menu_category: {
+                        category: "items"
+                    }
+                },
+                components: {
+                    "minecraft:icon": "NAMESPACE:" + identifier,
+                    "minecraft:max_stack_size": stack_size,
+                    "minecraft:cooldown": cooldownComp,
+                    "minecraft:use_modifiers": {
+                        use_duration: 30000,
+                        movement_modifier: 1
+                    }
                 },
             }
         });
@@ -34,6 +59,7 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                     }
                 },
                 components: {
+                    "minecraft:icon": "NAMESPACE:" + identifier,
                     "minecraft:max_stack_size": 1,
                     "minecraft:wearable": {
                         protection,

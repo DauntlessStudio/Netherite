@@ -1,5 +1,6 @@
 import { Command, type CommandData } from "../../command.ts";
 import armor from "./armor.ts";
+import attachable from "./attachable.ts";
 import item from "./item.ts";
 
 export default new Command<CommandData>({
@@ -14,3 +15,4 @@ export default new Command<CommandData>({
 })
 .addSubCommand(item)
 .addSubCommand(armor)
+.addSubCommand(attachable)

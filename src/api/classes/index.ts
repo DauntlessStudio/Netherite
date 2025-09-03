@@ -4,3 +4,5 @@ export * from "./server_entity.ts";
 export * from "./client_entity.ts";
 export * from "./client_geometry.ts";
 export * from "./client_attachable.ts";
+export * from "./client_animation_controller.ts";
+export * from "./client_animation.ts";
