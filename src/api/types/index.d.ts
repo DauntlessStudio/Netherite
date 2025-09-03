@@ -7,6 +7,7 @@ export type * from "./server_entity.d.ts";
 export type * from "./server_entity_components.d.ts";
 export type * from "./server_item.d.ts";
 export type * from "./server_item_components.d.ts";
+export type * from "./client_attachable.d.ts";
 export type * from "./client_blocks.d.ts";
 export type * from "./client_sound_definitions.d.ts";
 export type * from "./client_terrain_texture.d.ts";

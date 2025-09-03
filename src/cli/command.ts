@@ -140,7 +140,16 @@ export class Command<T extends CommandData> {
                 return acc;
             }, {arguments: [], options: {}} as CommandData as T);
 
-            if (!this.options.validateArgs(filteredArgs)) {
+            try {
+                if (!this.options.validateArgs(filteredArgs)) {
+                    this.printUsage();
+                    return false;
+                }
+            } catch (error) {
+                if (error instanceof Error) {
+                    Logger.error(error.message);
+                }
+                
                 this.printUsage();
                 return false;
             }

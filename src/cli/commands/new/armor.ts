@@ -3,6 +3,7 @@ import { Command, type CommandData } from "../../command.ts";
 import { Language } from "../../../core/core.ts";
 import { minecraftWriteableToSource, writeImage } from "../../utils/write.ts";
 import { MinecraftClientGeometry } from "../../../api/classes/client_geometry.ts";
+import { MinecraftClientAttachable } from "../../../api/classes/index.ts";
 
 type ArmorPiece = "helmet"|"chestplate"|"leggings"|"boots";
 
@@ -58,12 +59,11 @@ export default new Command<ArmorCommandData>({
     },
     parse: {
         boolean: ["overwrite"],
-        string: ["stack", "cooldown", "piece"],
+        string: ["protection", "cooldown", "piece"],
         alias: {
-            stack: "s",
+            protection: "p",
             cooldown: "c",
             overwrite: "o",
-            piece: "p",
         },
         negatable: [
             "lang",
@@ -71,6 +71,8 @@ export default new Command<ArmorCommandData>({
         ],
     },
     validateArgs(_args) {
+        if (_args.options.protection !== undefined && typeof _args.options.protection !== "number") _args.options.protection = Number(_args.options.protection);
+        
         if (Number.isNaN(_args.options.protection)) throw new Error("protection must be a valid number");
         if (_args.options.overwrite !== undefined && typeof _args.options.overwrite !== "boolean") throw new Error("overwrite must be a boolean");
         if (_args.options.lang !== undefined && typeof _args.options.lang !== "boolean") throw new Error("lang must be a boolean");
@@ -87,14 +89,18 @@ export default new Command<ArmorCommandData>({
         }
 
         const pieces: string[] = _args.options.piece ? [_args.options.piece] : Object.keys(ArmorTypeMap);
+        const protection = _args.options.piece ? _args.options.protection : Math.floor((_args.options.protection ?? 0) / 4);
 
         for (const name of _args.arguments) {
             for (const piece of pieces) {
                 const useName = _args.options.suffix === false ? String(name) : `${name}_${piece}`;
 
-                const writeable = MinecraftServerItem.armor(useName, ArmorTypeMap[piece as ArmorPiece], _args.options.protection);
-                minecraftWriteableToSource(writeable, {overwrite: _args.options.overwrite});
+                const item = MinecraftServerItem.armor(useName, ArmorTypeMap[piece as ArmorPiece], protection);
+                minecraftWriteableToSource(item, {overwrite: _args.options.overwrite});
                 writeImage(`PATH/items/${useName}`, "image_x16.png", {..._args.options, addToItem: true});
+
+                const attachable = MinecraftClientAttachable.armor((name as string), piece);
+                minecraftWriteableToSource(attachable, _args.options);
             }
 
             const geo = MinecraftClientGeometry.armor((name as string));
