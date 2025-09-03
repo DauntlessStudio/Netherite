@@ -3,6 +3,31 @@ import type { ClientEntityStrict, ClientEntityLoose } from "../types/index.d.ts"
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose, ClientEntityStrict> {
+    public static dummy(name: string): MinecraftClientEntity {
+        return new MinecraftClientEntity(
+            {
+                format_version: "FORMATVERSION",
+                "minecraft:client_entity": {
+                    description: {
+                        identifier: `NAMESPACE:${name}`,
+                        materials: {
+                            default: "entity_alphatest",
+                        },
+                        textures: {
+                            default: `textures/PATH/entity/${name}/default`,
+                        },
+                        geometry: {
+                            default: `geometry.NAMESPACE.${name}`,
+                        },
+                        render_controllers: [
+                            "controller.render.default",
+                        ],
+                    }
+                }
+            }
+        );
+    }
+
     public get Identifier() : string {
         return this.minecraftObj["minecraft:client_entity"].description.identifier ?? "NAMESPACE:SHORTNAME";
     }
