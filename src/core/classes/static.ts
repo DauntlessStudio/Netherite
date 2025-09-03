@@ -23,7 +23,7 @@ export class Static {
         ["**/*.lang", Language.watch.bind(Language)],
         ["**/scripts/**/*.ts", Script.watch.bind(Script)],
         ["**/textures/*.json", Texture.watch.bind(Texture)],
-        ["**/sound/sound_definitions.json", Sound.watch.bind(Sound)],
+        ["**/sounds/sound_definitions.json", Sound.watch.bind(Sound)],
     ]);
 
     public static build(watch?: boolean) {

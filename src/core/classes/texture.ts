@@ -59,11 +59,13 @@ export class Texture {
     }
     
     public static buildSource(): void {
-        if (Object.keys(this.terrainTexture.texture_data).length) 
+        if (Object.keys(this.terrainTexture.texture_data).length) {
             writeTextToSrc("./src/resource_pack/textures/terrain_texture.json", JSON.stringify(this.terrainTexture, null, "\t"));
+        }
 
-        if (Object.keys(this.itemTexture.texture_data).length)
+        if (Object.keys(this.itemTexture.texture_data).length) {
             writeTextToSrc("./src/resource_pack/textures/item_texture.json", JSON.stringify(this.itemTexture, null, "\t"));
+        }
     }
 
     public static watch(filePath: string): void {
