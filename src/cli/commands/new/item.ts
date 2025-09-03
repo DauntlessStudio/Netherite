@@ -1,7 +1,7 @@
 import { MinecraftServerItem } from "../../../api/api.ts";
 import { Command, type CommandData } from "../../command.ts";
 import { Language } from "../../../core/core.ts";
-import { minecraftWriteableToSource } from "../../utils/write.ts";
+import { minecraftWriteableToSource, writeImage } from "../../utils/write.ts";
 
 interface ItemCommandData extends CommandData {
     options: {
@@ -69,7 +69,8 @@ export default new Command<ItemCommandData>({
 
         for (const name of _args.arguments) {
             const writeable = MinecraftServerItem.dummy((name as string), _args.options.stack, _args.options.cooldown);
-            minecraftWriteableToSource(writeable, {overwrite: _args.options.overwrite ?? false});
+            minecraftWriteableToSource(writeable, {overwrite: _args.options.overwrite});
+            writeImage(`PATH/items/${name}`, "image_x16.png", {..._args.options, addToItem: true});
         }
         
         if (_args.options.lang !== false) {

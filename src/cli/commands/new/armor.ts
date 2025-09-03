@@ -1,7 +1,7 @@
 import { MinecraftServerItem } from "../../../api/api.ts";
 import { Command, type CommandData } from "../../command.ts";
 import { Language } from "../../../core/core.ts";
-import { minecraftWriteableToSource } from "../../utils/write.ts";
+import { minecraftWriteableToSource, writeImage } from "../../utils/write.ts";
 import { MinecraftClientGeometry } from "../../../api/classes/client_geometry.ts";
 
 type ArmorPiece = "helmet"|"chestplate"|"leggings"|"boots";
@@ -94,10 +94,12 @@ export default new Command<ArmorCommandData>({
 
                 const writeable = MinecraftServerItem.armor(useName, ArmorTypeMap[piece as ArmorPiece], _args.options.protection);
                 minecraftWriteableToSource(writeable, {overwrite: _args.options.overwrite});
+                writeImage(`PATH/items/${useName}`, "image_x16.png", {..._args.options, addToItem: true});
             }
 
             const geo = MinecraftClientGeometry.armor((name as string));
             minecraftWriteableToSource(geo, {overwrite: _args.options.overwrite});
+            writeImage(`PATH/attachables/${name}`, "armor_uv_texture.png", _args.options);
         }
         
         if (_args.options.lang !== false) {
