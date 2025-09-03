@@ -3,6 +3,7 @@ import { deepMerge, JSONCParse, writeTextToDist } from "../utils/index.ts";
 import { Config } from "./index.ts";
 import type { ClientItemTexture, ClientTerrainTexture } from "../../api/api.ts";
 import { attemptRepeater } from "../utils/error.ts";
+import { writeTextToSrc } from "../core.ts";
 
 export class Texture {
     private static terrainTexture: ClientTerrainTexture = {
@@ -36,6 +37,18 @@ export class Texture {
             }
         }
     }
+
+    public static addTerrainEntry(key: string, value: string): void {
+        this.terrainTexture.texture_data[key] = {
+            textures: value
+        };
+    }
+
+    public static addItemEntry(key: string, value: string): void {
+        this.itemTexture.texture_data[key] = {
+            textures: value
+        };
+    }
     
     public static build(): void {
         if (Object.keys(this.terrainTexture.texture_data).length) 
@@ -43,6 +56,14 @@ export class Texture {
 
         if (Object.keys(this.itemTexture.texture_data).length)
             writeTextToDist(path.join(path.join(Config.Paths.rp.root, "textures"), "item_texture.json"), JSON.stringify(this.itemTexture, null, "\t"));
+    }
+    
+    public static buildSource(): void {
+        if (Object.keys(this.terrainTexture.texture_data).length) 
+            writeTextToSrc("./src/resource_pack/textures/terrain_texture.json", JSON.stringify(this.terrainTexture, null, "\t"));
+
+        if (Object.keys(this.itemTexture.texture_data).length)
+            writeTextToSrc("./src/resource_pack/textures/item_texture.json", JSON.stringify(this.itemTexture, null, "\t"));
     }
 
     public static watch(filePath: string): void {
