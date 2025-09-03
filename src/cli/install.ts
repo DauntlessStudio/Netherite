@@ -16,7 +16,7 @@ if (arg === "beta") {
             "--allow-write",
             "--allow-run",
             "--allow-env",
-            "--allow-net=localhost:3000,jsr.io",
+            "--allow-net=localhost:0,jsr.io",
             `jsr:@coldiron/netherite@${beta}/cli`
         ],
         stdout: "inherit",
@@ -36,7 +36,7 @@ if (arg === "beta") {
             "--allow-write",
             "--allow-run",
             "--allow-env",
-            "--allow-net=localhost:3000,jsr.io",
+            "--allow-net=localhost:0,jsr.io",
             `jsr:@coldiron/netherite@${latest}/cli`
         ],
         stdout: "inherit",

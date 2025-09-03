@@ -9,6 +9,7 @@ export interface ModuleResponse {
     name: string;
     data: number[];
 }
+
 export interface ModuleWriteable extends WorkerWriteable<ProjectOptions, ModuleResponse> {}
 
 interface WriteData {
@@ -138,31 +139,10 @@ export class Module {
                 const cachedFiles = this.queue.get(file)?.keys().toArray() ?? [];
 
                 for (const {endpoint, response} of result) {
-                    let entry: WriteData | undefined;
-
-                    switch (endpoint) {
-                        case "minecraft_server_entity": {
-                            entry = {
-                                outputPath: `${Config.Paths.bp.root}entities/${response.name}.json`,
-                                content: response.data,
-                            }
-                            break;
-                        }
-                        case "minecraft_client_entity": {
-                            entry = {
-                                outputPath: `${Config.Paths.rp.root}entity/${response.name}.entity.json`,
-                                content: response.data,
-                            }
-                            break;
-                        }
-                        case "null": {
-                            // All content is empty, so don't write and delete any files registered to this source
-                            break;
-                        }
-                        default:
-                            Logger.error(`Unknown endpoint: ${endpoint}`);
-                            break;
-                    }
+                    const entry: WriteData = {
+                        outputPath: endpoint.replace("BP", Config.Paths.bp.root).replace("RP", Config.Paths.rp.root),
+                        content: response.data,
+                    };
 
                     if (entry) {
                         this.queue.get(file)?.set(entry.outputPath, entry.content);

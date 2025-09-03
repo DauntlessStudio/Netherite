@@ -77,10 +77,13 @@ export class Config {
     public static get LocalNetheriteVersion() : string {
         try {
             const deno = JSONCParse(Deno.readTextFileSync(path.join(Deno.cwd(), "deno.json")));
-            const version: string = deno.imports["@coldiron/netherite"].split("^")[1];
+            const imported: string = deno.imports["@coldiron/netherite"];
+
+            const version: string = imported.replace("jsr:@coldiron/netherite@", "").replace("^", "");
+
             return version;
         } catch (_error) {
-            Logger.warn("No local version of netherite found, using global version instead.");
+            console.warn("No local version of netherite found, using global version instead.");
             return this.InstalledNetheriteVersion;
         }
     }
@@ -174,8 +177,7 @@ export class Config {
         const namespaceParts = this.Options.namespace.split("_");
 
         if (namespaceParts.length !== 2) {
-            Logger.error("Namespace must be in the format of 'author_name'");
-            Deno.exit(1);
+            throw new Error("Namespace must be in the format of 'author_name'");
         }
 
         this.studioName = namespaceParts[0];

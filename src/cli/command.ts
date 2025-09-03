@@ -72,7 +72,13 @@ export class Command<T extends CommandData> {
         const version = Config.InstalledNetheriteVersion;
 
         try {
-            if (version.includes("beta")) {
+            if (Deno.args.includes("--local")) {
+                const compareVersion = await Config.LatestNetheriteVersion;
+                if (compareVersion !== version) {
+                    Logger.log(Logger.Colors.yellow(`Your project is using ${version}, but version ${Logger.Colors.green(compareVersion)} is available. Upgrade to latest with ${Logger.Colors.cyan(`deno add jsr:@coldiron/netherite`)}`));
+                    return;
+                }
+            } else if (version.includes("beta")) {
                 const compareVersion = await Config.BetaNetheriteVersion;
                 if (compareVersion !== version) {
                     Logger.log(Logger.Colors.yellow(`You are using version ${version}, but version ${Logger.Colors.green(compareVersion)} is available. Upgrade to latest beta with ${Logger.Colors.cyan(`deno run -A jsr:@coldiron/netherite/install beta`)}`));
@@ -140,7 +146,16 @@ export class Command<T extends CommandData> {
                 return acc;
             }, {arguments: [], options: {}} as CommandData as T);
 
-            if (!this.options.validateArgs(filteredArgs)) {
+            try {
+                if (!this.options.validateArgs(filteredArgs)) {
+                    this.printUsage();
+                    return false;
+                }
+            } catch (error) {
+                if (error instanceof Error) {
+                    Logger.error(error.message);
+                }
+                
                 this.printUsage();
                 return false;
             }

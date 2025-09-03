@@ -2,6 +2,7 @@ import * as path from "@std/path";
 import { Config } from "../classes/config.ts";
 import { keywordReplacer } from "./index.ts";
 import { attemptRepeater } from "./error.ts";
+import { Logger } from "./logger.ts";
 
 export function emptyDirectorySync(dir: string): void {
     try {
@@ -78,6 +79,32 @@ export function writeTextToDist(dest: string, content: string, overwrite: boolea
         Deno.writeTextFileSync(dest, modifiedContent, {createNew: !overwrite});
     } catch (_error) {
         // File already exists and overwrite is false
+    }
+}
+
+export function writeBufferToSrc(dest: string, content: Uint8Array, overwrite: boolean = true): void {
+    Deno.mkdirSync(path.dirname(dest), {recursive: true});
+
+    if (isTextFile(dest)) {
+        writeTextToSrc(dest, new TextDecoder().decode(content), overwrite);
+    } else {
+        try {
+            Deno.writeFileSync(dest, content, {createNew: !overwrite});
+            Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
+        } catch (_error) {
+            Logger.warn(`${dest} already exists and overwrite is false`);
+        }
+    }
+}
+
+export function writeTextToSrc(dest: string, content: string, overwrite: boolean = true): void {
+    Deno.mkdirSync(path.dirname(dest), {recursive: true});
+    
+    try {
+        Deno.writeTextFileSync(dest, content, {createNew: !overwrite});
+        Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
+    } catch (_error) {
+        Logger.warn(`${dest} already exists and overwrite is false`);
     }
 }
 
