@@ -174,8 +174,7 @@ export class Config {
         const namespaceParts = this.Options.namespace.split("_");
 
         if (namespaceParts.length !== 2) {
-            Logger.error("Namespace must be in the format of 'author_name'");
-            Deno.exit(1);
+            throw new Error("Namespace must be in the format of 'author_name'");
         }
 
         this.studioName = namespaceParts[0];
