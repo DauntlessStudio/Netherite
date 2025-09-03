@@ -5,7 +5,7 @@
     "dev": "deno run --allow-read --allow-write --allow-run --allow-env src/cli/cli.ts",
     "encode": "deno run -A src/templates/encode.ts",
     "init": "cd .. && rm -rf Test && netherite init --name 'Test' --author 'Caleb Coldiron' --namespace 'cld_test' --format_version 'latest' --type 'world' --skinpack --no-publish",
-    "install": "deno install -f -g -c deno.json --name netherite --allow-import --allow-read --allow-write --allow-run --allow-env --allow-net=localhost:3000,jsr.io src/cli/cli.ts",
+    "install": "deno install -f -g -c deno.json --name netherite --allow-import --allow-read --allow-write --allow-run --allow-env --allow-net=localhost:0,jsr.io src/cli/cli.ts",
     "test": "deno task install && deno task init"
   },
   "license": "MIT",
