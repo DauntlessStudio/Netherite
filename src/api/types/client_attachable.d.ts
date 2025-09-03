@@ -32,14 +32,14 @@ interface ClientAttachableScripts {
 
 export interface ClientAttachableStrict {
     format_version: "1.10.0";
-    "minecraft:client_attachable": {
+    "minecraft:attachable": {
         description: ClientAttachableDescription;
     }
 }
 
 export interface ClientAttachableLoose {
     format_version?: "1.10.0";
-    "minecraft:client_attachable": {
+    "minecraft:attachable": {
         description: Partial<ClientAttachableDescription>;
     }
 }

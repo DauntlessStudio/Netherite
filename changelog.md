@@ -1,4 +1,15 @@
 # Changelog
+## [0.3.0] - 9/3/2025
+### Changes
+- Fixed issue where moving/renaming/deleting a directory could cause the watcher to crash.
+- Fixed issue where src `sound_definitions.json` contents were being written to `sounds.json` in dist.
+- Fixed issue where the version message was identical between local and global installs. Now the update message is appropriate given the scope.
+- Fixed issue where an invalid config file would not always print the appropriate error in `watch` mode.
+- Added `netherite new item` which creates the files to add a new item to `src`.
+- Added `netherite new armor` which creates the files to add a new armor set to `src`.
+- Added `netherite new attachable` which creates the files to add a new skeletal attachable to `src`.
+- Added `netherite new entity` which creates the files to add a new dummy entity to `src`.
+---
 ## [0.2.5] - 8/25/2025
 ### Changes
 - Fixed JSONC parsing invalidating strings like `"https://example.com"` which caused package importing to fail.

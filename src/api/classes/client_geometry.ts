@@ -37,7 +37,7 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
     public static armor(name: string): MinecraftClientGeometry {
         return new MinecraftClientGeometry({
             format_version: "1.8.0",
-            [`geometry.NAMESPACE.player.${name}.armor.base` as "geometry.base"]: {
+            [`geometry.NAMESPACE.player.${name}.base` as "geometry.base"]: {
                 texturewidth: 64,
                 textureheight: 64,
                 visible_bounds_width: 3,
@@ -138,7 +138,7 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
                     }
                 ],
             },
-            [`geometry.NAMESPACE.player.${name}.armor.helmet:geometry.NAMESPACE.player.${name}.armor.base` as "geometry.helmet"]: {
+            [`geometry.NAMESPACE.player.${name}.helmet:geometry.NAMESPACE.player.${name}.base` as "geometry.helmet"]: {
                 bones: [
                     {
                         "name": "body",
@@ -174,7 +174,7 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
                     }
                 ]
             },
-            [`geometry.NAMESPACE.player.${name}.armor.chestplate:geometry.NAMESPACE.player.${name}.armor.base` as "geometry.chestplate"]: {
+            [`geometry.NAMESPACE.player.${name}.chestplate:geometry.NAMESPACE.player.${name}.base` as "geometry.chestplate"]: {
                 bones: [
                     {
                         "name": "head",
@@ -206,7 +206,7 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
                     }
                 ]
             },
-            [`geometry.NAMESPACE.player.${name}.armor.leggings:geometry.NAMESPACE.player.${name}.armor.base` as "geometry.leggings"]: {
+            [`geometry.NAMESPACE.player.${name}.leggings:geometry.NAMESPACE.player.${name}.base` as "geometry.leggings"]: {
                 bones: [
                     {
                         "name": "body",
@@ -238,7 +238,7 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
                     }
                 ]
             },
-            [`geometry.NAMESPACE.player.${name}.armor.boots:geometry.NAMESPACE.player.${name}.armor.base` as "geometry.boots"]: {
+            [`geometry.NAMESPACE.player.${name}.boots:geometry.NAMESPACE.player.${name}.base` as "geometry.boots"]: {
                 bones: [
                     {
                         "name": "head",

@@ -88,8 +88,12 @@ export function writeBufferToSrc(dest: string, content: Uint8Array, overwrite: b
     if (isTextFile(dest)) {
         writeTextToSrc(dest, new TextDecoder().decode(content), overwrite);
     } else {
-        Deno.writeFileSync(dest, content, {createNew: !overwrite});
-        Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
+        try {
+            Deno.writeFileSync(dest, content, {createNew: !overwrite});
+            Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
+        } catch (_error) {
+            Logger.warn(`${dest} already exists and overwrite is false`);
+        }
     }
 }
 

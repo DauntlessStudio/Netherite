@@ -99,7 +99,7 @@ export default new Command<ArmorCommandData>({
                 minecraftWriteableToSource(item, {overwrite: _args.options.overwrite});
                 writeImage(`PATH/items/${useName}`, "image_x16.png", {..._args.options, addToItem: true});
 
-                const attachable = MinecraftClientAttachable.armor((name as string), piece);
+                const attachable = MinecraftClientAttachable.armor(useName, piece);
                 minecraftWriteableToSource(attachable, _args.options);
             }
 

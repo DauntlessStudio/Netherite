@@ -17,6 +17,9 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                     }
                 },
                 components: {
+                    "minecraft:display_name": {
+                        value: `item.NAMESPACE:${identifier}.name`
+                    },
                     "minecraft:icon": "NAMESPACE:" + identifier,
                     "minecraft:max_stack_size": stack_size,
                     "minecraft:cooldown": cooldownComp,
@@ -37,6 +40,9 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                     }
                 },
                 components: {
+                    "minecraft:display_name": {
+                        value: `item.NAMESPACE:${identifier}.name`
+                    },
                     "minecraft:icon": "NAMESPACE:" + identifier,
                     "minecraft:max_stack_size": stack_size,
                     "minecraft:cooldown": cooldownComp,
@@ -59,6 +65,9 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                     }
                 },
                 components: {
+                    "minecraft:display_name": {
+                        value: `item.NAMESPACE:${identifier}.name`
+                    },
                     "minecraft:icon": "NAMESPACE:" + identifier,
                     "minecraft:max_stack_size": 1,
                     "minecraft:wearable": {
