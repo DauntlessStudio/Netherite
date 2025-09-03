@@ -23,7 +23,7 @@ export class Static {
         ["**/*.lang", Language.watch.bind(Language)],
         ["**/scripts/**/*.ts", Script.watch.bind(Script)],
         ["**/textures/*.json", Texture.watch.bind(Texture)],
-        ["**/sound/sound_definitions.json", Sound.watch.bind(Sound)],
+        ["**/sounds/sound_definitions.json", Sound.watch.bind(Sound)],
     ]);
 
     public static build(watch?: boolean) {
@@ -136,7 +136,7 @@ export class Static {
 
             try {
                 const stat = Deno.statSync(src);
-                if (stat.isDirectory) return;
+                if (stat.isDirectory && event.kind !== "rename") return;
             } catch (_error) {
                 // Do Nothing
             }
@@ -168,8 +168,12 @@ export class Static {
                     break;
                 }
                 case "remove": {
-                    Deno.removeSync(dest, {recursive: true});
-                    Logger.log(`[${Logger.Colors.red("remove")}] ${dest}`);
+                    try {
+                        Deno.removeSync(dest, { recursive: true });
+                        Logger.log(`[${Logger.Colors.red("remove")}] ${dest}`);
+                    } catch (_error) {
+                        // File was already removed at dest.
+                    }
                     break;
                 }
                 default:

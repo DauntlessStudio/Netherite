@@ -3,7 +3,6 @@ import { Command, type CommandData } from "../command.ts";
 import { Project } from "../../core/classes/project.ts";
 import { abortOnKeypress, Logger } from "../../core/utils/index.ts";
 import { Config } from "../../core/classes/config.ts";
-import { run } from "node:test";
 
 interface BuildCommandData extends CommandData {
     options: {

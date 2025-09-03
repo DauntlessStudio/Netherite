@@ -6,7 +6,7 @@ import { attemptRepeater } from "../utils/error.ts";
 
 export class Sound {
     private static soundDefinitions: ClientSoundDefinitions = {
-        format_version: "1.0.0",
+        format_version: "FORMATVERSION",
         sound_definitions: {}
     };
 
@@ -31,11 +31,13 @@ export class Sound {
     }
     
     public static build(): void {
-        if (Object.keys(this.soundDefinitions.sound_definitions).length)
-            writeTextToDist(path.join(Config.Paths.rp.root, "sounds.json"), JSON.stringify(this.soundDefinitions, null, "\t"));
+        if (Object.keys(this.sounds).length) {
+            writeTextToDist(path.join(Config.Paths.rp.root, "sounds.json"), JSON.stringify(this.sounds, null, "\t"));
+        }
 
-        if (Object.keys(this.sounds).length)
+        if (Object.keys(this.soundDefinitions).length) {
             writeTextToDist(path.join(Config.Paths.rp.root, "sounds", "sound_definitions.json"), JSON.stringify(this.soundDefinitions, null, "\t"));
+        }
     }
 
     public static watch(filePath: string): void {

@@ -1,3 +1,5 @@
+import { Logger } from "../core.ts";
+
 // deno-lint-ignore-file no-explicit-any
 export interface WorkerResponse<T> {
     endpoint: string;
@@ -8,14 +10,18 @@ export class WorkerManager {
     private static server?: Deno.HttpServer<Deno.NetAddr>;
     private static responses: WorkerResponse<unknown>[] = [];
     private static options: unknown = {};
+    private static port: number = 0;
 
     private static startServer(): void {
         if (!this.server) {
             this.server = Deno.serve(
                 {
-                    port: 3000,
+                    port: 0,
                     hostname: "localhost",
-                    onListen: () => {},
+                    onListen: ({port}) => {
+                        this.port = port;
+                        Logger.log(`Listening on port: ${this.port}`);
+                    },
                 },
                 async (req: Request) => {
                     switch (req.method) {
@@ -54,7 +60,7 @@ export class WorkerManager {
                 "run",
                 "--allow-read",
                 "--allow-env",
-                "--allow-net=localhost:3000",
+                `--allow-net=localhost:${this.port}`,
                 "-",
             ],
             stdin: "piped",
@@ -62,7 +68,7 @@ export class WorkerManager {
         }).spawn();
 
         const writer = task.stdin.getWriter();
-        await writer.write(new TextEncoder().encode(WorkerWriter.toString() + `WorkerWriter.run("${script.replaceAll("\\", "/")}");`));
+        await writer.write(new TextEncoder().encode(WorkerWriter.toString().replaceAll("PORT", `${this.port}`) + `WorkerWriter.run("${script.replaceAll("\\", "/")}");`));
         await writer.ready;
         await writer.close();
         const result = await task.output();
@@ -96,7 +102,7 @@ export class WorkerWriter {
     public static async broadcast(): Promise<void> {
         const registry = (self as any).workerRegistry;
         if (!registry || !registry.workers || !registry.workers.length) {
-            await fetch('http://localhost:3000', {
+            await fetch('http://localhost:PORT', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -113,7 +119,7 @@ export class WorkerWriter {
         const workers = registry.workers as WorkerWriteable<unknown, unknown>[];
 
         for (const worker of workers) {
-            const response = await fetch('http://localhost:3000', {
+            const response = await fetch('http://localhost:PORT', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -123,7 +129,7 @@ export class WorkerWriter {
             const options = (await response.json()).data;
             const data = worker.generate(options);
     
-            await fetch('http://localhost:3000', {
+            await fetch('http://localhost:PORT', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
