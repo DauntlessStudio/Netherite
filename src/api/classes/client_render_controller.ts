@@ -31,17 +31,7 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
     protected validate(): ClientRenderControllerStrict {
         const baseline: ClientRenderControllerStrict = {
             format_version: "1.10.0",
-            render_controllers: {
-                [`controller.render.NAMESPACE.${name}`]: {
-                    geometry: "Geometry.default",
-                    materials: [
-                        { "*": "Material.default" },
-                    ],
-                    textures: [
-                        "Texture.default"
-                    ]
-                }
-            }
+            render_controllers: {}
         }
 
         return deepMerge(baseline, this.minecraftObj);
