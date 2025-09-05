@@ -228,6 +228,7 @@ export interface Components {
     "minecraft:group_size"?: GroupSize
     "minecraft:grows_crop"?: GrowsCrop
     "minecraft:healable"?: Healable
+    "minecraft:health"?: Health
     "minecraft:heartbeat"?: Heartbeat
     "minecraft:home"?: Home
     "minecraft:hurt_on_condition"?: HurtOnCondition
@@ -4529,6 +4530,12 @@ export interface Interact {
      * @default "entity_interact"
      */
     vibration?: "none"|"shear"|"entity_die"|"entity_act"|"entity_interact";
+}
+
+export interface Health {
+    max?: number,
+    value?: number,
+    min?: number,
 }
 
 /**
