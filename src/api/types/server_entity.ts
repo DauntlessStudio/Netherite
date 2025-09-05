@@ -1,5 +1,5 @@
-import type { ServerFilters } from "./filters.d.ts";
-import type { Components } from "./server_entity_components.d.ts";
+import type { ServerFilters } from "./filters.ts";
+import type { Components } from "./server_entity_components.ts";
 
 interface ServerEntityProperty {
     client_sync?: boolean;

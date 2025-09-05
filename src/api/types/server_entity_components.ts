@@ -1,8 +1,8 @@
 // deno-lint-ignore-file no-empty-interface
-import type { DamageType } from "./damage_type.d.ts";
-import type { ServerFilters } from "./filters.d.ts";
-import type { MobEffects } from "./mob_effects.d.ts";
-import type { Molang } from "./molang.d.ts";
+import type { DamageType } from "./damage_type.ts";
+import type { ServerFilters } from "./filters.ts";
+import type { MobEffects } from "./mob_effects.ts";
+import type { Molang } from "./molang.ts";
 
 export interface Components {
     "minecraft:behavior.admire_item"?: BehaviorAdmireItem

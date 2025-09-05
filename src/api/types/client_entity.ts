@@ -1,4 +1,4 @@
-import type { Molang } from "./index.d.ts";
+import type { Molang } from "./index.ts";
 
 interface ClientEntityDescription {
     identifier: string;

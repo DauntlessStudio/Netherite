@@ -1,5 +1,5 @@
 import { type WorkerResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
-import type { ClientAttachableStrict, ClientAttachableLoose } from "../types/index.d.ts";
+import type { ClientAttachableStrict, ClientAttachableLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachableLoose, ClientAttachableStrict> {

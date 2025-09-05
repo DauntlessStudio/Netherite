@@ -1,4 +1,4 @@
-import type { DamageType } from "./damage_type.d.ts";
+import type { DamageType } from "./damage_type.ts";
 
 export type ServerFilterSubject = "block"|"damager"|"other"|"parent"|"player"|"self"|"target";
 
