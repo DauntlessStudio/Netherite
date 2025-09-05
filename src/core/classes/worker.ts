@@ -1,6 +1,6 @@
+// deno-lint-ignore-file no-explicit-any no-explicit-any
 import { Logger } from "../core.ts";
 
-// deno-lint-ignore-file no-explicit-any
 export interface WorkerResponse<T> {
     endpoint: string;
     response: T;
@@ -101,18 +101,9 @@ export class WorkerWriter {
 
     public static async broadcast(): Promise<void> {
         const registry = (self as any).workerRegistry;
+        
         if (!registry || !registry.workers || !registry.workers.length) {
-            await fetch('http://localhost:PORT', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    endpoint: "null",
-                    response: {}
-                }),
-            });
-
+            // Do not interact with the server if there is nothing to do.
             return;
         };
 
