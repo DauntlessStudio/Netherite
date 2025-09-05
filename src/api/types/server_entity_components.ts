@@ -222,6 +222,7 @@ export interface Components {
     "minecraft:experience_reward"?: ExperienceReward
     "minecraft:explode"?: Explode
     "minecraft:flocking"?: Flocking
+    "minecraft:follow_range"?: FollowRange
     "minecraft:game_event_movement_tracking"?: GameEventMovementTracking
     "minecraft:genetics"?: Genetics
     "minecraft:giveable"?: Giveable
@@ -245,6 +246,7 @@ export interface Components {
     "minecraft:managed_wandering_trader"?: ManagedWanderingTrader
     "minecraft:mob_effect"?: MobEffect
     "minecraft:mob_effect_immunity"?: MobEffectImmunity
+    "minecraft:movement"?: Movement
     "minecraft:movement.amphibious"?: MovementAmphibious
     "minecraft:movement.basic"?: MovementBasic
     "minecraft:movement.fly"?: MovementFly
@@ -351,6 +353,7 @@ export interface Components {
     "minecraft:on_target_acquired"?: OnTargetAcquired
     "minecraft:on_target_escape"?: OnTargetEscape
     "minecraft:on_wake_with_owner"?: OnWakeWithOwner
+    "minecraft:underwater_movement"?: UnderwaterMovement
 }
 
 type EventTarget = "block"|"damager"|"self"|"other"|"player"|"parent"|"target";
@@ -372,45 +375,46 @@ export interface Trigger {
 }
 
 export interface EntityType {
+    priority?: number;
     /**
      * The amount of time in seconds to wait before selecting a target of the same type again
      * @default 0
      */
-    cooldown: number;
+    cooldown?: number;
     /**
      * Conditions that make this entry valid
      */
-    filters: ServerFilters|ServerFilters[];
+    filters?: ServerFilters|ServerFilters[];
     /**
      * Max distance away this entity can be from the target to be selected
      * @default 16
      */
-    max_dist: number;
+    max_dist?: number;
     /**
      * If true, potential target must be visible to be selected
      * @default false
      */
-    must_see: boolean;
+    must_see?: boolean;
     /**
      * The amount of time in seconds before the entity forgets the target that it can no longer see
      * @default 3
      */
-    must_see_forget_duration: number;
+    must_see_forget_duration?: number;
     /**
      * If true, the target will be dropped if it no longer meets the conditions
      * @default false
      */
-    reevaluate_description: boolean;
+    reevaluate_description?: boolean;
     /**
      * Multiplier for the running speed
      * @default 1.0
      */
-    sprint_speed_multiplier: number;
+    sprint_speed_multiplier?: number;
     /**
      * Multiplier for the walking speed
      * @default 1.0
      */
-    walk_speed_multiplier: number;
+    walk_speed_multiplier?: number;
 }
 
 // #region Attributes
@@ -1909,7 +1913,7 @@ export interface BehaviorOpenDoor {
  */
 export interface BehaviorOwnerHurtByTarget {
     [key: string]: unknown;
-    entity_types?: EntityType[];
+    entity_types?: EntityType[]|EntityType;
 }
 
 /**
@@ -1917,7 +1921,7 @@ export interface BehaviorOwnerHurtByTarget {
  */
 export interface BehaviorOwnerHurtTarget {
     [key: string]: unknown;
-    entity_types?: EntityType[];
+    entity_types?: EntityType[]|EntityType;
 }
 
 /**
@@ -4138,6 +4142,11 @@ export interface Flocking {
     use_center_of_mass?: boolean;
 }
 
+export interface FollowRange {
+    value?: number;
+    max?: number;
+}
+
 /**
  * Allows an entity to emit move, swim, and flap game events depending on the block the entity is moving through. It by default exists on all entities and can be overriden
  */
@@ -4419,117 +4428,119 @@ export interface InstantDespawn {
  */
 export interface Interact {
     [key: string]: unknown;
-    /**
-     * Loot tables with items to add to the player's inventory upon successful interaction
-     */
-    add_items?: {
+    interactions?: {
         /**
-         * File path, relative to the behavior pack root pointing to the loot table file
+         * Loot tables with items to add to the player's inventory upon successful interaction
          */
-        table?: string;
-    };
-    /**
-     * Time in seconds before this entity can be interacted with again
-     * @default 0
-     */
-    cooldown?: number;
-    /**
-     * Time in seconds before this entity can be interacted with after being attacked
-     * @default 0
-     */
-    cooldown_after_being_attacked?: number;
-    /**
-     * The entity's slot to remove and drop the item from, if any, upon successful interaction
-     */
-    drop_item_slot?: string;
-    /**
-     * The entity's slot to equip the item to, if any, upon successful interaction
-     */
-    equip_item_slot?: string;
-    /**
-     * The amount of health to change upon successful interaction
-     * @default 0
-     */
-    health_amount?: number;
-    /**
-     * The amount of damage the item will take when used to interact with this entity
-     * @default 0
-     */
-    hurt_item?: number;
-    /**
-     * Text to show when the player is able to interact with this entity with Touch controls
-     */
-    interact_text?: string;
-    /**
-     * Event to fire when the interaction occurs
-     */
-    on_interact?: string;
-    /**
-     * Particle effect triggered at the start of the interaction
-     */
-    particle_on_start?: {
+        add_items?: {
+            /**
+             * File path, relative to the behavior pack root pointing to the loot table file
+             */
+            table?: string;
+        };
         /**
-         * Whether the particle should be offset towards the interactor
+         * Time in seconds before this entity can be interacted with again
+         * @default 0
          */
-        particle_offset_towards_interactor?: boolean;
+        cooldown?: number;
         /**
-         * The type of particle to spawn
+         * Time in seconds before this entity can be interacted with after being attacked
+         * @default 0
          */
-        particle_type?: string;
+        cooldown_after_being_attacked?: number;
         /**
-         * Will offset the particle in the y direction
+         * The entity's slot to remove and drop the item from, if any, upon successful interaction
          */
-        particle_y_offset?: number;
-    };
-    /**
-     * List of sounds to play when the interaction occurs
-     */
-    play_sounds?: string[];
-    /**
-     * Allows to repair one of the entity's items
-     */
-    repair_entity_item?: {
+        drop_item_slot?: string;
         /**
-         * How much durability to restore
+         * The entity's slot to equip the item to, if any, upon successful interaction
          */
-        amount?: number;
+        equip_item_slot?: string;
         /**
-         * The slot to repair the item containe within
+         * The amount of health to change upon successful interaction
+         * @default 0
          */
-        slot?: number;
-    };
-    /**
-     * List of entities to spawn when the interaction occurs
-     */
-    spawn_entities?: string;
-    /**
-     * Loot table with items to drop on the ground during successful interaction
-     */
-    spawn_items?: {
+        health_amount?: number;
         /**
-         * File path, relative to the behavior pack root pointing to the loot table file
+         * The amount of damage the item will take when used to interact with this entity
+         * @default 0
          */
-        table?: string;
-    };
-    /**
-     * If true, the player will do the swing arm animation
-     * @default false
-     */
-    swing?: boolean;
-    /**
-     * The item used will transform into this item upon successful interaction
-     */
-    transform_to_item?: string;
-    /**
-     * If true, the interaction will consume an item
-     * @default false
-     */
-    use_item?: boolean;
-    /**
-     * Vibration to emit when the interaction occurs
-     * @default "entity_interact"
-     */
-    vibration?: "none"|"shear"|"entity_die"|"entity_act"|"entity_interact";
+        hurt_item?: number;
+        /**
+         * Text to show when the player is able to interact with this entity with Touch controls
+         */
+        interact_text?: string;
+        /**
+         * Event to fire when the interaction occurs
+         */
+        on_interact?: string;
+        /**
+         * Particle effect triggered at the start of the interaction
+         */
+        particle_on_start?: {
+            /**
+             * Whether the particle should be offset towards the interactor
+             */
+            particle_offset_towards_interactor?: boolean;
+            /**
+             * The type of particle to spawn
+             */
+            particle_type?: string;
+            /**
+             * Will offset the particle in the y direction
+             */
+            particle_y_offset?: number;
+        };
+        /**
+         * List of sounds to play when the interaction occurs
+         */
+        play_sounds?: string[];
+        /**
+         * Allows to repair one of the entity's items
+         */
+        repair_entity_item?: {
+            /**
+             * How much durability to restore
+             */
+            amount?: number;
+            /**
+             * The slot to repair the item containe within
+             */
+            slot?: number;
+        };
+        /**
+         * List of entities to spawn when the interaction occurs
+         */
+        spawn_entities?: string;
+        /**
+         * Loot table with items to drop on the ground during successful interaction
+         */
+        spawn_items?: {
+            /**
+             * File path, relative to the behavior pack root pointing to the loot table file
+             */
+            table?: string;
+        };
+        /**
+         * If true, the player will do the swing arm animation
+         * @default false
+         */
+        swing?: boolean;
+        /**
+         * The item used will transform into this item upon successful interaction
+         */
+        transform_to_item?: string;
+        /**
+         * If true, the interaction will consume an item
+         * @default false
+         */
+        use_item?: boolean;
+        /**
+         * Vibration to emit when the interaction occurs
+         * @default "entity_interact"
+         */
+        vibration?: "none" | "shear" | "entity_die" | "entity_act" | "entity_interact";
+    }[]
 }
 
 export interface Health {
@@ -4594,6 +4605,12 @@ export interface JumpStatic {
      * @default 0.42
      */
     jump_power?: number;
+}
+
+export interface KnockbackResistance {
+    [key: string]: unknown;
+    max?: number;
+    value?: number;
 }
 
 /**
@@ -4751,6 +4768,10 @@ export interface SharedMovement {
      * @default 30.0
      */
     max_turn?: number;
+}
+
+export interface Movement {
+    value: number;
 }
 
 /**
@@ -5692,7 +5713,10 @@ export interface Tameable {
     /**
      * The event to fire when the entity is tamed
      */
-    tame_event?: string;
+    tame_event?: string|{
+        event?: string,
+        target: EventTarget,
+    };
     /**
      * The list of items that can be used to tame the entity
      */
@@ -6553,5 +6577,9 @@ export interface OnTargetEscape extends Trigger {}
  * Adds a trigger that will fire when this pet's owner wakes after sleeping with the pet
  */
 export interface OnWakeWithOwner extends Trigger {}
+
+export interface UnderwaterMovement {
+    value?: number;
+}
 
 // #endregion
