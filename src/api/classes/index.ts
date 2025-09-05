@@ -6,3 +6,4 @@ export * from "./client_geometry.ts";
 export * from "./client_attachable.ts";
 export * from "./client_animation_controller.ts";
 export * from "./client_animation.ts";
+export * from "./client_render_controller.ts";
