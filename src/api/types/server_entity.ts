@@ -1,5 +1,5 @@
 // deno-lint-ignore-file ban-types
-import type { ServerFilters } from "./filters.ts";
+import type { ServerFilters, ServerFilterSubject } from "./filters.ts";
 import type { Components } from "./server_entity_components.ts";
 
 interface ServerEntityProperty {
@@ -65,7 +65,7 @@ interface ServerEntityEvents {
     filters?: ServerFilters|ServerFilters[];
     queue_command?: {
         command: string|string[];
-        target?: EventTarget;
+        target?: ServerFilterSubject;
     },
     reset_target?: {},
 }

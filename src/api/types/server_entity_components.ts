@@ -241,6 +241,7 @@ export interface Components {
     "minecraft:item_hopper"?: ItemHopper
     "minecraft:jump.dynamic"?: JumpDynamic
     "minecraft:jump.static"?: JumpStatic
+    "minecraft:knockback_resistance"?: KnockbackResistance
     "minecraft:leashable"?: Leashable
     "minecraft:looked_at"?: LookedAt
     "minecraft:managed_wandering_trader"?: ManagedWanderingTrader
@@ -6027,7 +6028,7 @@ export interface Transformation {
          * @default 0
          */
         value?: number;
-    };
+    }|number;
     /**
      * If true, the entity drops all equipment on transform
      * @default false
