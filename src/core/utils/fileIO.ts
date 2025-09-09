@@ -28,34 +28,32 @@ export function copyDirSync(src: string, dest: string): void {
     }
 }
 
-export function sendToDist(src: string, dest: string, excludeGlob: string[] = []): void {
-    const stat = Deno.statSync(src);
-
+export async function sendToDist(src: string, dest: string, excludeGlob: string[] = []): Promise<void> {
     if (excludeGlob.some(glob => path.globToRegExp(glob).test(src))) {
         return;
     }
-
+    
     dest = dest.replace("PATH", path.join(Config.StudioName, Config.PackName));
+    const stat = Deno.statSync(src);
     
     if (stat.isDirectory) {
         Deno.mkdirSync(dest, {recursive: true});
 
         for (const entry of Deno.readDirSync(src)) {
-            sendToDist(path.join(src, entry.name), path.join(dest, entry.name), excludeGlob);
+            try {
+                sendToDist(path.join(src, entry.name), path.join(dest, entry.name), excludeGlob);
 
-            if (!Deno.readDirSync(dest).toArray().length) {
-                Deno.removeSync(dest);
+                if (!Deno.readDirSync(dest).toArray().length) {
+                    Deno.removeSync(dest);
+                }
+            } catch (error) {
+                Logger.warn(String(error));
             }
         }
     } else {
-        attemptRepeater(() => {
-            if (isTextFile(src)) {
-                const content = Deno.readTextFileSync(src);
-                writeTextToDist(dest, content);
-            } else {
-                const content = Deno.readFileSync(src);
-                writeBufferToDist(dest, content);
-            }
+        await attemptRepeater(() => {
+            const content = Deno.readFileSync(src);
+            writeBufferToDist(dest, content);
         });
     }
 }

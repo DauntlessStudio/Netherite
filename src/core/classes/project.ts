@@ -84,7 +84,7 @@ export class Project {
         }
 
         await Module.build(options?.watch);
-        Static.build(options?.watch);
+        await Static.build(options?.watch);
         await Script.build(options?.watch);
         await World.build();
         Language.build();

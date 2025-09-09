@@ -8,6 +8,7 @@ import { Logger } from "../utils/logger.ts";
 export class Script {
     private static buildOptions?: esbuild.BuildOptions;
     private static context?: esbuild.BuildContext<esbuild.BuildOptions>;
+    private static buildError: boolean = false;
 
     public static async build(watch?: boolean): Promise<void> {
         if (Config.Options.type === "skin-pack") return;
@@ -48,17 +49,27 @@ export class Script {
 
         let firstRun = false;
 
-        if (!this.context) {
-            firstRun = true;
-            this.context = await esbuild.context(this.buildOptions);
-        }
+        try {
+            if (!this.context) {
+                firstRun = true;
+                this.context = await esbuild.context(this.buildOptions);
+            }
 
-        const result = await this.context.rebuild();
-        
-        for (const out of result.outputFiles ?? []) {
-            writeTextToDist(out.path, out.text);
-        }
+            const result = await this.context.rebuild();
+            
+            for (const out of result.outputFiles ?? []) {
+                writeTextToDist(out.path, out.text);
+            }
 
-        if (!firstRun) Logger.log("Rebuilt Scripts...");
+            if (this.buildError) {
+                console.clear();
+                this.buildError = false;
+            }
+
+            if (!firstRun) Logger.log("Rebuilt Scripts...");
+        } catch (_error) {
+            // Build options ensure that detailed error message is printed, avoid crash and continue watching
+            this.buildError = true;
+        }
     }
 }
