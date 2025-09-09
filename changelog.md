@@ -1,5 +1,5 @@
 # Changelog
-## [0.3.0] - 9/9/2025
+## [0.3.1] - 9/9/2025
 ### Changes
 - Fixed issue where type data required by the API was not included in the published package.
 - Added missing server entity components.
