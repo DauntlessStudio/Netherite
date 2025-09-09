@@ -1,4 +1,13 @@
 # Changelog
+## [0.3.0] - 9/9/2025
+### Changes
+- Fixed issue where type data required by the API was not included in the published package.
+- Added missing server entity components.
+- Added the missing `ClientRenderController` class.
+- Fixed issue where `blocks.json` was not being processed correctly.
+- Fixed issue where a script build error would cause `build --watch` to exit.
+- Fixed issue where nested directories with only files ignored by the static watcher (i.e. the behavior_pack/scripts directory which is handled by the script watcher instead) would silently fail and prevent any subsequent directories from being processed.
+---
 ## [0.3.0] - 9/3/2025
 ### Changes
 - Fixed issue where moving/renaming/deleting a directory could cause the watcher to crash.

@@ -1,5 +1,6 @@
-import type { ServerFilters } from "./filters.d.ts";
-import type { Components } from "./server_entity_components.d.ts";
+// deno-lint-ignore-file ban-types
+import type { ServerFilters, ServerFilterSubject } from "./filters.ts";
+import type { Components } from "./server_entity_components.ts";
 
 interface ServerEntityProperty {
     client_sync?: boolean;
@@ -64,7 +65,9 @@ interface ServerEntityEvents {
     filters?: ServerFilters|ServerFilters[];
     queue_command?: {
         command: string|string[];
-    }
+        target?: ServerFilterSubject;
+    },
+    reset_target?: {},
 }
 
 export interface ServerEntityStrict {

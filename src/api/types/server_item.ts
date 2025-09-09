@@ -1,4 +1,4 @@
-import type { ServerItemComponents } from "./server_item_components.d.ts";
+import type { ServerItemComponents } from "./server_item_components.ts";
 
 interface ServerItemDescription {
     identifier: string;

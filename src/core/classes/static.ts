@@ -26,16 +26,16 @@ export class Static {
         ["**/sounds/sound_definitions.json", Sound.watch.bind(Sound)],
     ]);
 
-    public static build(watch?: boolean) {
+    public static async build(watch?: boolean) {
         if (Config.Options.type === "skin-pack") {
-            this.processSkinPath(this.skinsPath);
+            await this.processSkinPath(this.skinsPath);
         } else {
             if (Config.Options.include_skin_pack === true) {
-                this.processSkinPath(this.skinsPath);
+                await this.processSkinPath(this.skinsPath);
             }
             
-            this.processBehaviorPath(this.behaviorPath);
-            this.processResourcePath(this.resourcePath);
+            await this.processBehaviorPath(this.behaviorPath);
+            await this.processResourcePath(this.resourcePath);
         }
 
         try {
@@ -45,17 +45,17 @@ export class Static {
                         const subPath = path.join(this.modulePath, entry.name, subEntry.name);
         
                         if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "bp")) {
-                            this.processBehaviorPath(subPath);
+                            await this.processBehaviorPath(subPath);
                             continue;
                         }
                         
                         if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "rp")) {
-                            this.processResourcePath(subPath);
+                            await this.processResourcePath(subPath);
                             continue;
                         }
                         
                         if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "skin_pack")) {
-                            this.processSkinPath(subPath);
+                            await this.processSkinPath(subPath);
                             continue;
                         }
                     }
@@ -70,15 +70,15 @@ export class Static {
         }
     }
 
-    private static processBehaviorPath(src: string): void {
+    private static async processBehaviorPath(src: string): Promise<void> {
         try {
-            sendToDist(src, Config.Paths.bp.root, ["**/*.ts"]);
-        } catch (_error) {
-            // Do Nothing
+            await sendToDist(src, Config.Paths.bp.root, ["**/behavior_pack/scripts/", "**/*.ts"]);
+        } catch (error) {
+            Logger.error(String(error));
         }
     }
 
-    private static processResourcePath(src: string): void {
+    private static async processResourcePath(src: string): Promise<void> {
         try {
             Texture.ingestTextureFiles(path.join(src, "textures"));
             Language.ingestLangFiles(path.join(src, "texts"));
@@ -86,19 +86,19 @@ export class Static {
             Block.ingestBlockFiles(src);
             Sound.ingestSoundFiles(src);
     
-            sendToDist(src, Config.Paths.rp.root, ["**/.lang"]);
-        } catch (_error) {
-            // Do Nothing
+            await sendToDist(src, Config.Paths.rp.root, ["**/.lang"]);
+        } catch (error) {
+            Logger.error(String(error));
         }
     }
 
-    private static processSkinPath(src: string): void {
+    private static async processSkinPath(src: string): Promise<void> {
         try {
             Skin.ingestSkinFiles(src);
         
-            sendToDist(src, Config.Paths.skins.root, ["**/*.json", "**/*.lang"]);
-        } catch (_error) {
-            // Do Nothing
+            await sendToDist(src, Config.Paths.skins.root, ["**/*.json", "**/*.lang"]);
+        } catch (error) {
+            Logger.error(String(error));
         }
     }
 

@@ -1,5 +1,5 @@
 import { type WorkerResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
-import type { ClientEntityStrict, ClientEntityLoose } from "../types/index.d.ts";
+import type { ClientEntityStrict, ClientEntityLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose, ClientEntityStrict> {

@@ -1,5 +1,5 @@
 import type { WorkerResponse, ModuleResponse } from "../../core/core.ts";
-import type { ClientGeometryLoose, ClientGeometryStrict } from "../types/index.d.ts";
+import type { ClientGeometryLoose, ClientGeometryStrict } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLoose, ClientGeometryStrict> {

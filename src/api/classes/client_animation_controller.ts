@@ -1,5 +1,5 @@
 import type { WorkerResponse, ModuleResponse } from "../../core/core.ts";
-import type { ClientAnimationControllerLoose, ClientAnimationControllerStrict } from "../types/index.d.ts";
+import type { ClientAnimationControllerLoose, ClientAnimationControllerStrict } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftClientAnimationController extends MinecraftWriteable<ClientAnimationControllerLoose, ClientAnimationControllerStrict> {

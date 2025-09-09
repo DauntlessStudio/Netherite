@@ -1,4 +1,4 @@
-import type { Molang } from "./index.d.ts";
+import type { Molang } from "./index.ts";
 
 type AnimVector3 = [number|Molang, number|Molang, number|Molang];
 type AnimVector2 = [number|Molang, number|Molang];

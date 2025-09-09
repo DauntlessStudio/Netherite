@@ -1,4 +1,4 @@
-import type { DamageType } from "./damage_type.d.ts";
+import type { DamageType } from "./damage_type.ts";
 
 export interface ServerItemComponents {
     "minecraft:allow_off_hand"?: ServerItemAllowOffHand
