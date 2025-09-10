@@ -23,6 +23,7 @@ export class Block {
     }
     
     public static build(): void {
+        if (!Object.keys(this.blocks).length) return;
         writeTextToDist(path.join(Config.Paths.rp.root, "blocks.json"), JSON.stringify(this.blocks, null, "\t"));
     }
 
