@@ -14,6 +14,9 @@ export class Language {
     private static readonly langMap: Map<LangType, Map<string, Map<string, string>>> = new Map<LangType, Map<string, Map<string, string>>>();
 
     public static addLangEntry(lang: LangType, category: string, key: string, value: string): void {
+        if (!category) category = "misc";
+        if (!value) return;
+
         category = category.toLowerCase().trim();
         value = value.trim();
 
@@ -30,8 +33,6 @@ export class Language {
     }
 
     public static addPlaceholderEntry(category: string, key: string, value: string): void {
-        category = category.toLowerCase().trim();
-        key = key.trim();
         value = formatText(value, [/_/g]);
 
         for (const lang of this.langMap.keys()) {
@@ -61,10 +62,15 @@ export class Language {
         const categoryGroups = fileContent.split(/(?=(#+ .+ =+))/g);
 
         for (const category of categoryGroups) {
-            const lines = category.split("\n").map(line => line.trim()).filter(line => line.length > 0);
+            const lines = category
+                .split("\n")
+                .filter(line => line.length > 0)
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+
             if (lines.length === 0) continue;
 
-            const categoryName = lines.shift()!.replace(/#+ | =+/g, "").toLowerCase().trim();
+            let categoryName = (lines.shift() ?? "misc").replace(/#+ | =+/g, "").toLowerCase().trim();
 
             for (const line of lines) {
                 const [key, value] = line.split("=");
