@@ -1,6 +1,6 @@
 import { Logger, sleep } from "./index.ts";
 
-export async function attemptRepeater(func: () => unknown, attempts: number = 5): Promise<void> {
+export async function attemptRepeater(func: () => unknown, prefix: string = "Action", attempts: number = 5): Promise<void> {
     let lastError: string = "";
 
     for (let attempt = 1; attempt <= attempts; attempt++) {
@@ -14,5 +14,5 @@ export async function attemptRepeater(func: () => unknown, attempts: number = 5)
         }
     }
 
-    Logger.error(`Failed due to: ${lastError}`);
+    Logger.error(`${prefix} failed due to: ${lastError}`);
 }

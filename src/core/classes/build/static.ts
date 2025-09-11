@@ -1,12 +1,10 @@
 import * as path from "@std/path";
-import { Logger, sendToDist, sleep } from "../utils/index.ts";
-import { Config, Language } from "./index.ts";
-import { Texture } from "./texture.ts";
-import { Module } from "./module.ts";
+import { Logger, sendToDist, sleep } from "../../utils/index.ts";
+import { Config } from "../index.ts";
 import { Script } from "./script.ts";
-import { Sound } from "./sound.ts";
-import { Block } from "./block.ts";
-import { Skin } from "./skin.ts";
+import { Module } from "../module.ts";
+import { Language } from "./language.ts";
+import { CompositeJSON, composites } from "./composite.ts";
 
 export class Static {
     private static readonly behaviorPath = path.join(Deno.cwd(), "src/behavior_pack");
@@ -16,14 +14,10 @@ export class Static {
 
     private static readonly pendingChanges: Map<string, boolean> = new Map();
 
-    private static readonly specialFiles: Map<string, (file: string) => void> = new Map([
-        ["**/skins.json", Skin.watch.bind(Skin)],
-        ["**/sounds.json", Sound.watch.bind(Sound)],
-        ["**/blocks.json", Block.watch.bind(Block)],
+    private static readonly specialFiles: Map<string, (filepath: string, event: Deno.FsEvent["kind"]) => void> = new Map([
         ["**/*.lang", Language.watch.bind(Language)],
         ["**/scripts/**/*.ts", Script.watch.bind(Script)],
-        ["**/textures/*.json", Texture.watch.bind(Texture)],
-        ["**/sounds/sound_definitions.json", Sound.watch.bind(Sound)],
+        ...CompositeJSON.watchMap()
     ]);
 
     public static async build(watch?: boolean) {
@@ -80,11 +74,12 @@ export class Static {
 
     private static async processResourcePath(src: string): Promise<void> {
         try {
-            Texture.ingestTextureFiles(path.join(src, "textures"));
             Language.ingestLangFiles(path.join(src, "texts"));
-            Sound.ingestSoundFiles(path.join(src, "sounds"));
-            Block.ingestBlockFiles(src);
-            Sound.ingestSoundFiles(src);
+            composites.sound_definitions.ingestDir(path.join(src, "sounds"));
+            composites.terrain_texture.ingestDir(path.join(src, "textures"));
+            composites.item_texture.ingestDir(path.join(src, "textures"));
+            composites.sounds.ingestDir(src);
+            composites.blocks.ingestDir(src);
     
             await sendToDist(src, Config.Paths.rp.root, ["**/.lang"]);
         } catch (error) {
@@ -94,7 +89,7 @@ export class Static {
 
     private static async processSkinPath(src: string): Promise<void> {
         try {
-            Skin.ingestSkinFiles(src);
+            composites.skins.ingestDir(src);
         
             await sendToDist(src, Config.Paths.skins.root, ["**/*.json", "**/*.lang"]);
         } catch (error) {
@@ -143,7 +138,7 @@ export class Static {
             
             for (const [file, callback] of this.specialFiles.entries()) {
                 if (path.globToRegExp(file).test(src)) {
-                    callback(src);
+                    callback(src, event.kind);
                     return;
                 }
             }

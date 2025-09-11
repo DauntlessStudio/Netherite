@@ -1,9 +1,9 @@
 import * as path from "@std/path";
 import * as esbuild from "esbuild";
 import {denoPlugins} from "@luca/esbuild-deno-loader";
-import { Config } from "./config.ts";
-import { writeTextToDist } from "../utils/index.ts";
-import { Logger } from "../utils/logger.ts";
+import { Config } from "../config.ts";
+import { writeTextToDist } from "../../utils/index.ts";
+import { Logger } from "../../utils/logger.ts";
 
 export class Script {
     private static buildOptions?: esbuild.BuildOptions;

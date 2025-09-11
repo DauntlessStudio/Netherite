@@ -44,7 +44,7 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                         value: `item.NAMESPACE:${identifier}.name`
                     },
                     "minecraft:icon": "NAMESPACE:" + identifier,
-                    "minecraft:max_stack_size": stack_size,
+                    "minecraft:max_stack_size": stack_size ?? 1,
                     "minecraft:cooldown": cooldownComp,
                     "minecraft:use_modifiers": {
                         use_duration: 30000,

@@ -1,4 +1,11 @@
 # Changelog
+## [0.3.2] - 9/11/2025
+### Changes
+- Fixed issue where `new attachable` command improperly handled the `--stack` argument, causing it to default to 64 and incorrectly be written as a string if provided.
+- Fixed issue where composite files (files who's ouput is combined from the base project and modules, such as sounds.json or en_US.lang) would print unhelpful error messages when unable to parse, and did not log successful file writes.
+- Fixed issue where `blocks.json` would generate in the dist as an empty JSON object if no source files existed.
+- Fixed issue where deleting entries in composite files, or deleting the file entirely, would not remove the entries from the dist while using `build --watch` requiring a rebuild to update.
+---
 ## [0.3.1] - 9/9/2025
 ### Changes
 - Fixed issue where type data required by the API was not included in the published package.

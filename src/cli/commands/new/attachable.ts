@@ -9,6 +9,8 @@ type AttachmentType = "skeletal"; // TODO: Add parented here which creates a sim
 interface AttachableCommandData extends CommandData {
     options: {
         lang?: boolean;
+        stack?: number;
+        cooldown?: number;
         type?: AttachmentType;
         overwrite?: boolean;
     }
@@ -25,6 +27,16 @@ export default new Command<AttachableCommandData>({
                 description: "Should a lang entry based on the item name be added?",
                 optional: true,
             },
+            "stack": {
+                type: "number",
+                description: "The stack size of the item",
+                optional: true,
+            },
+            "cooldown": {
+                type: "number",
+                description: "The duration of the cooldown in ticks",
+                optional: true,
+            },
             "type": {
                 type: "string",
                 description: `The attachment type, valid options are ["skeletal"]. Default is "skeletal"`,
@@ -39,8 +51,10 @@ export default new Command<AttachableCommandData>({
     },
     parse: {
         boolean: ["overwrite"],
-        string: ["type"],
+        string: ["stack", "cooldown", "type"],
         alias: {
+            stack: "s",
+            cooldown: "c",
             type: "t",
             overwrite: "o",
         },
@@ -49,6 +63,10 @@ export default new Command<AttachableCommandData>({
         ],
     },
     validateArgs(_args) {
+        if (_args.options.stack) _args.options.stack = Number(_args.options.stack);
+        if (_args.options.cooldown) _args.options.cooldown = Number(_args.options.cooldown);
+        if (Number.isNaN(_args.options.stack)) throw new Error("stack must be a valid number");
+        if (Number.isNaN(_args.options.cooldown)) throw new Error("cooldown must be a valid number");
         if (_args.options.overwrite !== undefined && typeof _args.options.overwrite !== "boolean") throw new Error("overwrite must be a boolean");
         if (_args.options.lang !== undefined && typeof _args.options.lang !== "boolean") throw new Error("lang must be a boolean");
         if (_args.options.type !== undefined && !["skeletal"].includes(_args.options.type)) throw new Error(`piece must be one of ${["skeletal"].join(", ")}`)
@@ -63,7 +81,7 @@ export default new Command<AttachableCommandData>({
         }
 
         for (const name of _args.arguments) {
-            const item = MinecraftServerItem.attachable((name as string));
+            const item = MinecraftServerItem.attachable((name as string), _args.options.stack, _args.options.cooldown);
             minecraftWriteableToSource(item, _args.options);
             writeImage(`PATH/items/${name}`, "image_x16.png", {..._args.options, addToItem: true});
 

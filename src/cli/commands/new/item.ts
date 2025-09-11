@@ -53,6 +53,8 @@ export default new Command<ItemCommandData>({
         ],
     },
     validateArgs(_args) {
+        if (_args.options.stack) _args.options.stack = Number(_args.options.stack);
+        if (_args.options.cooldown) _args.options.cooldown = Number(_args.options.cooldown);
         if (Number.isNaN(_args.options.stack)) throw new Error("stack must be a valid number");
         if (Number.isNaN(_args.options.cooldown)) throw new Error("cooldown must be a valid number");
         if (_args.options.overwrite !== undefined && typeof _args.options.overwrite !== "boolean") throw new Error("overwrite must be a boolean");
