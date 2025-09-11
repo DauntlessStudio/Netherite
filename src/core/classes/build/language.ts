@@ -12,6 +12,7 @@ export class Language {
      * A map structured as Langauge/Category/Key/Value
      */
     private static readonly langMap: Map<LangType, Map<string, Map<string, string>>> = new Map<LangType, Map<string, Map<string, string>>>();
+    private static readonly langFileRefs: Set<string> = new Set();
 
     public static addLangEntry(lang: LangType, category: string, key: string, value: string): void {
         if (!category) category = "misc";
@@ -52,7 +53,19 @@ export class Language {
         }
     }
 
+    private static reIngestFiles(): void {
+        this.langMap.clear();
+        this.langFileRefs.forEach(filepath => this.ingestFile(filepath));
+    }
+
     private static ingestFile(filePath: string): void {
+        try {
+            Deno.statSync(filePath);
+        } catch (_error) {
+            this.langFileRefs.delete(filePath);
+            return;
+        }
+
         if (!filePath.endsWith(".lang")) return;
 
         const langKey = path.basename(filePath).replace(".lang", "") as LangType;
@@ -77,6 +90,8 @@ export class Language {
                 this.addLangEntry(langKey, categoryName, key, value);
             }
         }
+
+        this.langFileRefs.add(filePath);
     }
 
     public static build(): void {
@@ -159,10 +174,28 @@ export class Language {
         }
     }
     
-    public static watch(filePath: string): void {
+    public static watch(filePath: string, event: Deno.FsEvent["kind"]): void {
+        if (!filePath.endsWith(".lang")) return;
+
         attemptRepeater(() => {
-            if (filePath.endsWith(".lang")) {
-                this.ingestFile(filePath);
+            switch (event) {
+                case "create":
+                    this.ingestFile(filePath);
+                    break;
+                case "modify":
+                    this.reIngestFiles();
+                    this.ingestFile(filePath);
+                    break;
+                case "rename":
+                    this.reIngestFiles();
+                    this.ingestFile(filePath);
+                    break;
+                case "remove":
+                    this.langFileRefs.delete(filePath);
+                    this.reIngestFiles();
+                    break;
+                default:
+                    return;
             }
 
             this.build();
