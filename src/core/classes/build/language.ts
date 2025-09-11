@@ -2,7 +2,7 @@ import * as path from "@std/path";
 import { formatText } from "../../utils/text.ts";
 import { writeTextToDist } from "../../utils/fileIO.ts";
 import { Config } from "../config.ts";
-import { sendToDist, writeTextToSrc } from "../../utils/index.ts";
+import { Logger, sendToDist, writeTextToSrc } from "../../utils/index.ts";
 import { attemptRepeater } from "../../utils/error.ts";
 
 export type LangType = "en_US" | "en_GB" | "de_DE" | "es_ES" | "es_MX" | "fr_FR" | "fr_CA" | "it_IT" | "ja_JP" | "ko_KR" | "pt_BR" | "pt_PT" | "ru_RU" | "zh_CN" | "zh_TW" | "nl_NL" | "bg_BG" | "cs_CZ" | "da_DK" | "el_GR" | "fi_FI" | "hu_HU" | "id_ID" | "nb_NO" | "pl_PL" | "sk_SK" | "sv_SE" | "tr_TR" | "uk_UA";
@@ -174,24 +174,24 @@ export class Language {
         }
     }
     
-    public static watch(filePath: string, event: Deno.FsEvent["kind"]): void {
-        if (!filePath.endsWith(".lang")) return;
+    public static watch(filepath: string, event: Deno.FsEvent["kind"]): void {
+        if (!filepath.endsWith(".lang")) return;
 
-        attemptRepeater(() => {
+        try {
             switch (event) {
                 case "create":
-                    this.ingestFile(filePath);
+                    this.ingestFile(filepath);
                     break;
                 case "modify":
                     this.reIngestFiles();
-                    this.ingestFile(filePath);
+                    this.ingestFile(filepath);
                     break;
                 case "rename":
                     this.reIngestFiles();
-                    this.ingestFile(filePath);
+                    this.ingestFile(filepath);
                     break;
                 case "remove":
-                    this.langFileRefs.delete(filePath);
+                    this.langFileRefs.delete(filepath);
                     this.reIngestFiles();
                     break;
                 default:
@@ -199,6 +199,10 @@ export class Language {
             }
 
             this.build();
-        });
+            Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(path.join(path.join(Config.Paths.rp.root, "texts"), "languages.json"))}`);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            Logger.error(`Failed to read ${filepath} [${message}]`);
+        }
     }
 }

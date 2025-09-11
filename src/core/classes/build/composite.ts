@@ -1,5 +1,5 @@
 import * as path from "@std/path";
-import { deepMerge, JSONCParse, writeTextToDist } from "../../utils/index.ts";
+import { deepMerge, JSONCParse, Logger, writeTextToDist } from "../../utils/index.ts";
 import { Config } from "../index.ts";
 import { attemptRepeater } from "../../utils/error.ts";
 import type { ClientItemTexture, ClientTerrainTexture, ClientSounds, ClientSoundDefinitions, ClientBlocks, Skins } from "../../../api/api.ts";
@@ -25,7 +25,11 @@ export class CompositeJSON<T extends object> {
     public readonly fileGlob: string;
     private readonly outPath: string;
     private readonly fileMap: Map<string, T> = new Map();
-
+    
+    public get OutPath() : string {
+        return this.outPath.replace("RP", Config.Paths.rp.root).replace("BP", Config.Paths.bp.root).replace("SKINS", Config.Paths.skins.root);
+    }
+    
     constructor(fileGlob: string, outPath: string) {
         this.fileGlob = fileGlob;
         this.outPath = outPath;
@@ -62,8 +66,7 @@ export class CompositeJSON<T extends object> {
     public build(): void {
         if (this.fileMap.size > 0) {
             const obj = this.fileMap.values().reduce((acc, v) => deepMerge(acc, v));
-            const out = this.outPath.replace("RP", Config.Paths.rp.root).replace("BP", Config.Paths.bp.root).replace("SKINS", Config.Paths.skins.root);
-            writeTextToDist(out, JSON.stringify(obj, null, "\t"));
+            writeTextToDist(this.OutPath, JSON.stringify(obj, null, "\t"));
         }
     }
 
@@ -76,7 +79,7 @@ export class CompositeJSON<T extends object> {
     }
 
     public watch(filepath: string, event: Deno.FsEvent["kind"]): void {
-        attemptRepeater(() => {
+        try {
             switch (event) {
                 case "create": {
                     this.ingestFile(filepath);
@@ -99,7 +102,11 @@ export class CompositeJSON<T extends object> {
             }
 
             this.build();
-        });
+            Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(this.OutPath)}`);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            Logger.error(`Failed to read ${filepath} [${message}]`);
+        }
     }
 }
 
