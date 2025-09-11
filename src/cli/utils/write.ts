@@ -1,5 +1,5 @@
 import type { MinecraftWriteable } from "../../api/api.ts";
-import { Texture, writeBufferToSrc } from "../../core/core.ts";
+import { composites, writeBufferToSrc } from "../../core/core.ts";
 import encoded from "../../templates/encoded.ts";
 
 export interface SourceWriteOptions {
@@ -24,9 +24,36 @@ export function writeImage<T extends keyof typeof encoded>(subpath: string, sour
     const contents = Uint8Array.from(atob(encoded[sourceKey]), c => c.charCodeAt(0));
     
     writeBufferToSrc(`./src/resource_pack/textures/${subpath}.png`, contents, options.overwrite);
-    
-    Texture.ingestTextureFiles("./src/resource_pack/textures/");
-    if (options.addToItem) Texture.addItemEntry(name, `textures/${subpath}`);
-    if (options.addToTerrain) Texture.addTerrainEntry(name, `textures/${subpath}`);
-    if (options.addToItem || options.addToTerrain) Texture.buildSource();
+
+    if (options.addToItem) {
+        composites.item_texture.ingestDir("./src/resource_pack/textures/");
+        composites.item_texture.ingestData({
+            resource_pack_name: "NAMESPACE",
+            texture_name: "atlas.items",
+            texture_data: {
+                [name]: {
+                    textures: `textures/${subpath}`
+                }
+            }
+        });
+
+        composites.item_texture.buildSource();
+    }
+
+    if (options.addToTerrain) {
+        composites.terrain_texture.ingestDir("./src/resource_pack/textures/");
+        composites.terrain_texture.ingestData({
+            num_mip_levels: 4,
+            padding: 8,
+            resource_pack_name: "vanilla",
+            texture_name: "atlas.terrain",
+            texture_data: {
+                [name]: {
+                    textures: `textures/${subpath}`
+                }
+            }
+        });
+
+        composites.terrain_texture.buildSource();
+    }
 }

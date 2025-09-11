@@ -1,8 +1,8 @@
 import * as path from "@std/path";
-import type * as types from "../../api/types/index.ts";
-import { Config } from "./config.ts";
-import { writeTextToDist } from "../utils/fileIO.ts";
-import { JSONCParse } from "../utils/index.ts";
+import type * as types from "../../../api/types/index.ts";
+import { Config } from "../config.ts";
+import { writeTextToDist } from "../../utils/fileIO.ts";
+import { JSONCParse } from "../../utils/index.ts";
 
 export class Manifest {
     public static get BehaviorManifest() : Promise<types.Manifest> {

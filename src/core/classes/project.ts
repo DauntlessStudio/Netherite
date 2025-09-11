@@ -1,7 +1,7 @@
 import * as path from "@std/path";
 import { TemplateFile } from "../../templates/index.ts";
 import { emptyDirectorySync } from "../utils/index.ts";
-import { Config, Sound, Texture, Script, Manifest, Language, Block, Static, Module, World, Skin, WorkerManager } from "./index.ts";
+import { Config, Script, Manifest, Language, Static, Module, World, WorkerManager, CompositeJSON } from "./index.ts";
 import { Logger } from "../utils/logger.ts";
 
 // TODO: Possibly remove skin-pack as an option and instead build a skin pack with the world or add-on
@@ -88,10 +88,7 @@ export class Project {
         await Script.build(options?.watch);
         await World.build();
         Language.build();
-        Block.build();
-        Sound.build();
-        Texture.build();
-        Skin.build();
+        CompositeJSON.build();
         await Manifest.build();
 
         if (!options?.watch) WorkerManager.stopServer();
