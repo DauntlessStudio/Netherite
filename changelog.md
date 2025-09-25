@@ -1,4 +1,8 @@
 # Changelog
+## [0.3.3] - 9/25/2025
+### Changes
+- Fixed issue where `.mcfunction` files did not perform text replacement for keywords like `NAMESPACE`.
+---
 ## [0.3.2] - 9/11/2025
 ### Changes
 - Fixed issue where `new attachable` command improperly handled the `--stack` argument, causing it to default to 64 and incorrectly be written as a string if provided.
