@@ -152,7 +152,9 @@ export class Manifest {
             const value = file.imports[module] as string | undefined;
 
             if (!value) throw new Error(`Could not find module ${module} in deno.json`);
-            return value.split("@^")[1]; // TODO: handle beta versions correctly
+            const match = value.match(/\d+\.\d+\.\d+(-beta)?/)?.[0];
+            if (!match) throw new Error(`Failed to parse ${module} version in deno.json`);
+            return match; // TODO: handle beta versions correctly
         } catch (_error) {
             throw new Error(`Could not get version number for module ${module} as deno.json doesn't exist`);
         }
