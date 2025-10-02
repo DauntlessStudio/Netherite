@@ -1,4 +1,10 @@
 # Changelog
+## [0.3.4] - 10/2/2025
+### Changes
+- Fixed issue where temporary files created by external programs (like image editors) could crash the build watch process.
+- Fixed issue where the `animate` property in `MinecraftClientEntity` only accepted strings instead of allowing for key value pairs.
+- Fixed issue where the auto-generated manifest's dependency section could fail to properly parse the installed dependency's version. Also added support for detecting the `-beta` flag.
+---
 ## [0.3.3] - 9/25/2025
 ### Changes
 - Fixed issue where `.mcfunction` files did not perform text replacement for keywords like `NAMESPACE`.

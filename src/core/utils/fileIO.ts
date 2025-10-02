@@ -34,27 +34,32 @@ export async function sendToDist(src: string, dest: string, excludeGlob: string[
     }
     
     dest = dest.replace("PATH", path.join(Config.StudioName, Config.PackName));
-    const stat = Deno.statSync(src);
     
-    if (stat.isDirectory) {
-        Deno.mkdirSync(dest, {recursive: true});
+    try {
+        const stat = Deno.statSync(src);
+        
+        if (stat.isDirectory) {
+            Deno.mkdirSync(dest, {recursive: true});
 
-        for (const entry of Deno.readDirSync(src)) {
-            try {
-                sendToDist(path.join(src, entry.name), path.join(dest, entry.name), excludeGlob);
+            for (const entry of Deno.readDirSync(src)) {
+                try {
+                    sendToDist(path.join(src, entry.name), path.join(dest, entry.name), excludeGlob);
 
-                if (!Deno.readDirSync(dest).toArray().length) {
-                    Deno.removeSync(dest);
+                    if (!Deno.readDirSync(dest).toArray().length) {
+                        Deno.removeSync(dest);
+                    }
+                } catch (error) {
+                    Logger.warn(String(error));
                 }
-            } catch (error) {
-                Logger.warn(String(error));
             }
+        } else {
+            await attemptRepeater(() => {
+                const content = Deno.readFileSync(src);
+                writeBufferToDist(dest, content);
+            });
         }
-    } else {
-        await attemptRepeater(() => {
-            const content = Deno.readFileSync(src);
-            writeBufferToDist(dest, content);
-        });
+    } catch (_error) {
+        Logger.warn(`Failed to process file ${src}`);
     }
 }
 
