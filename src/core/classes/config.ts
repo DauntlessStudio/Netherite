@@ -152,8 +152,8 @@ export class Config {
 
     public static get Paths(): ConfigPaths {
         const root = this.Options.type === "world" ? "./dist/Content/world_template/" : "./dist/Content/";
-        const bpRoot = root + "behavior_packs/" + this.Options.namespace + "_bp/";
-        const rpRoot = root + "resource_packs/" + this.Options.namespace + "_rp/";
+        const bpRoot = root + "behavior_packs/" + this.packName + "_bp/";
+        const rpRoot = root + "resource_packs/" + this.packName + "_rp/";
         const skinRoot = "./dist/Content/skin_pack";
 
         return {
