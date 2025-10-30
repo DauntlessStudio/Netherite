@@ -104,7 +104,7 @@ export class Project {
     private static createSymlinks(): void {
         if (Config.Options.type === "skin-pack") return;
 
-        const projectNamespace = Config.Options.namespace;
+        const projectNamespace = Config.PackName;
 
         const mojangBP = path.join(Config.MojangDirectory, "development_behavior_packs", projectNamespace + "_bp");
         const mojangRP = path.join(Config.MojangDirectory, "development_resource_packs", projectNamespace + "_rp");

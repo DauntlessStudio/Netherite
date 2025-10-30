@@ -133,8 +133,8 @@ export class Config {
     }
     
     public static get MojangDirectory() : string {
-        const APPDATA = (Deno.env.get("LOCALAPPDATA") || (platform == 'darwin' ? Deno.env.get("HOME") + '/Library/Preferences' : Deno.env.get("HOME") + "/.local/share")).replace(/\\/g, '/');
-        return `${APPDATA}/Packages/Microsoft.MinecraftUWP_8wekyb3d8bbwe/LocalState/games/com.mojang`;
+        const APPDATA = (Deno.env.get("APPDATA") || (platform == 'darwin' ? Deno.env.get("HOME") + '/Library/Preferences' : Deno.env.get("HOME") + "/.local/share")).replace(/\\/g, '/');
+        return `${APPDATA}/Minecraft Bedrock/Users/Shared/games/com.mojang`;
     }
 
     public static get HomeDirectory() : string {
@@ -152,8 +152,8 @@ export class Config {
 
     public static get Paths(): ConfigPaths {
         const root = this.Options.type === "world" ? "./dist/Content/world_template/" : "./dist/Content/";
-        const bpRoot = root + "behavior_packs/" + this.Options.namespace + "_bp/";
-        const rpRoot = root + "resource_packs/" + this.Options.namespace + "_rp/";
+        const bpRoot = root + "behavior_packs/" + this.packName + "_bp/";
+        const rpRoot = root + "resource_packs/" + this.packName + "_rp/";
         const skinRoot = "./dist/Content/skin_pack";
 
         return {
