@@ -1,4 +1,9 @@
 # Changelog
+## [0.4.0] - 10/29/2025
+### Changes
+- Changed dev pack install location from from the Universal Windows Platform (UWP) over to the Game Development Kit (GDK) platform.
+- Changed behavior pack output from `<studio_name>_<pack_id>_<rp|bp>` to `<pack_id>_<rp|bp>`.
+---
 ## [0.3.4] - 10/2/2025
 ### Changes
 - Fixed issue where temporary files created by external programs (like image editors) could crash the build watch process.
