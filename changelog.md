@@ -1,4 +1,8 @@
 # Changelog
+## [0.4.1] - 12/4/2025
+### Changes
+- Fixed issue where Netherite could fail to link the packs to the development folder depending depending on Windows settings (Likely Developer Mode).
+---
 ## [0.4.0] - 10/29/2025
 ### Changes
 - Changed dev pack install location from from the Universal Windows Platform (UWP) over to the Game Development Kit (GDK) platform.
