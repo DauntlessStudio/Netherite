@@ -25,29 +25,31 @@ export interface CommandOptions<T extends CommandData> {
     parse?: ParseOptions;
     parent?: Command<CommandData>;
     validateArgs: (args: T) => boolean;
-    action?: (args: T) => void;
+    action?: (args: T) => Promise<void>|void;
 }
 
 export class Command<T extends CommandData> {
     private static registry: Command<CommandData>[] = [];
 
-    public static parseCommands(args: string[]): boolean {
-        if (this.registry.some((command) => command.parse(args))) {
-            this.checkVersion(false);
-            return true;
-        } else {
-            if (this.versionCommand(args)) {
-                this.checkVersion(true);
+    public static async parseCommands(args: string[]): Promise<boolean> {
+        for (const command of this.registry.values()) {
+            if (await command.parse(args)) {
+                this.checkVersion(false);
                 return true;
             }
-
-            this.registry.forEach((command) => {
-                if (!command.isSubcommand) command.printHelp();
-            });
-
-            this.checkVersion(false);
-            return false;
         }
+        
+        if (this.versionCommand(args)) {
+            this.checkVersion(true);
+            return true;
+        }
+
+        this.registry.forEach((command) => {
+            if (!command.isSubcommand) command.printHelp();
+        });
+
+        this.checkVersion(false);
+        return false;
     }
 
     private static versionCommand(args: string[]): boolean {
@@ -118,19 +120,9 @@ export class Command<T extends CommandData> {
         return this;
     }
 
-    public parse(args: string[]): boolean {
+    public async parse(args: string[]): Promise<boolean> {
         if (args[0] === this.options.name) {
             args = args.slice(1);
-
-            if (this.subcommands.length) {
-                for (const subcommand of this.subcommands) {
-                    if (subcommand.parse(args)) {
-                        return true;
-                    }
-                }
-
-                args.push("--help");
-            }
 
             this.options.parse = this.options.parse ?? {};
             this.options.parse.alias = this.options.parse.alias ?? {};
@@ -166,7 +158,18 @@ export class Command<T extends CommandData> {
             }
 
             if (this.options.action) {
-                this.options.action(filteredArgs as T);
+                await this.options.action(filteredArgs as T);
+            }
+
+            if (this.subcommands.length) {
+                for (const subcommand of this.subcommands) {
+                    if (await subcommand.parse(args)) {
+                        return true;
+                    }
+                }
+                
+                this.printUsage();
+                return false;
             }
 
             return true;
