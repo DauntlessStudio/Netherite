@@ -1,3 +1,4 @@
+import { Config } from "../../../core/core.ts";
 import { Command, type CommandData } from "../../command.ts";
 import armor from "./armor.ts";
 import attachable from "./attachable.ts";
@@ -10,8 +11,11 @@ export default new Command<CommandData>({
         description: "Create new files in src from templates",
         usage: "<subcommand> [options]",
     },
-    validateArgs(_args) {
+    validateArgs() {
         return true;
+    },
+    async action() {
+        await Config.ingestConfig();
     },
 })
 .addSubCommand(item)

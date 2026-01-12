@@ -2,9 +2,7 @@ import { Config } from "../core/classes/index.ts";
 
 const arg = Deno.args[0];
 
-if (arg === "beta") {
-    const beta = await Config.BetaNetheriteVersion;
-
+if (arg.match(/\d\.\d\.\d?.+/)) {
     new Deno.Command("deno", {
         args: [
             "install",
@@ -17,7 +15,7 @@ if (arg === "beta") {
             "--allow-run",
             "--allow-env",
             "--allow-net=localhost:0,jsr.io",
-            `jsr:@coldiron/netherite@${beta}/cli`
+            `jsr:@coldiron/netherite@${arg}/cli`
         ],
         stdout: "inherit",
         stderr: "inherit",

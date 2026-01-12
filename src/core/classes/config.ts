@@ -2,7 +2,7 @@ import "@std/dotenv/load";
 import { platform } from 'node:process';
 import { v4 } from "uuid";
 import * as path from "@std/path";
-import type { ProjectOptions } from "./project.ts";
+import type { EnvironmentType, ProjectOptions } from "./project.ts";
 import { Buffer } from "node:buffer";
 import { JSONCParse, Logger } from "../utils/index.ts";
 import { WorkerManager } from "./index.ts";
@@ -184,7 +184,9 @@ export class Config {
         this.packName = namespaceParts[1];
     }
 
-    public static async ingestConfig(): Promise<void> {
+    public static async ingestConfig(environment?: EnvironmentType): Promise<void> {
+        environment = environment ?? "development";
+
         try {
             Deno.statSync(path.join(Deno.cwd(), "netherite.config.ts"));
         } catch (_error) {
@@ -192,8 +194,9 @@ export class Config {
         }
         
         try {
-            const value = await WorkerManager.run<ProjectOptions>(path.join(Deno.cwd(), "netherite.config.ts"));
-            this.setOptions(value[0].response);
+            // Environment is ommitted because it is provided by Netherite rather than the config file.
+            const value = await WorkerManager.run<Omit<ProjectOptions, "environment">>(path.join(Deno.cwd(), "netherite.config.ts"));
+            this.setOptions({environment, ...value[0].response});
         } catch (error) {
             throw new Error("Failed to ingest netherite.config.ts due to " + error);
         }

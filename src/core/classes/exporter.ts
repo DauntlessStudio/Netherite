@@ -12,7 +12,7 @@ export class Exporter {
         out = path.resolve(out);
         Deno.mkdirSync(out, {recursive: true});
         
-        await Project.build({ignoreSymlinks: true});
+        await Project.build({ignoreSymlinks: true, environment: "production"});
         
         Logger.Spinner.start("Exporting Project...");
 

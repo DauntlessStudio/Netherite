@@ -85,7 +85,7 @@ export default new Command<BuildCommandData>({
                 Logger.log(`Verbose Loggings Enabled`, true);
             };
 
-            await Project.build(_args.options);
+            await Project.build({environment: "development", ..._args.options});
         } else {
             const args = ["build"];
             if (_args.options.watch) args.push("--watch");

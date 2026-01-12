@@ -21,6 +21,7 @@ export function keywordReplacer(content: string, options: ProjectOptions): strin
 
     const modifiedContent = content
     .replace(/FORMATVERSION/g, options.format_version)
+    .replace(/ENVIRONMENT/g, options.environment)
     .replace(/NAMESPACE/g, options.namespace)
     .replace(/VERSION/g, options.version)
     .replace(/AUTHOR/g, options.author)
