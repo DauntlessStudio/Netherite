@@ -7,7 +7,11 @@ import { Logger } from "../utils/logger.ts";
 // TODO: Possibly remove skin-pack as an option and instead build a skin pack with the world or add-on
 // TODO: Generate level.dat and world_icon.jpeg for world projects
 export type ProjectType = "world"|"add-on"|"skin-pack";
+export type EnvironmentType = "development" | "production";
 
+/**
+ * The base is what is provided by the netherite.config.ts file.
+ */
 interface ProjectOptionsBase {
     type: ProjectType;
     name: string;
@@ -18,23 +22,28 @@ interface ProjectOptionsBase {
     version: `${number}.${number}.${number}`;
 };
 
-interface ProjectOptionsWorld extends ProjectOptionsBase {
+/**
+ * The extended options take the base and add values Netherite infers during execution and are not provided by the config.
+ */
+interface ProjectOptionsExtended extends ProjectOptionsBase {
+    environment: EnvironmentType;
+}
+
+interface ProjectOptionsWorld extends ProjectOptionsExtended {
     type: "world";
     include_skin_pack?: boolean;
     random_seed?: boolean;
 }
 
-interface ProjectOptionsAddOn extends ProjectOptionsBase {
+interface ProjectOptionsAddOn extends ProjectOptionsExtended {
     type: "add-on";
     include_skin_pack?: boolean;
     random_seed?: boolean;
 }
 
-interface ProjectOptionsSkinPack extends ProjectOptionsBase {
+interface ProjectOptionsSkinPack extends ProjectOptionsExtended {
     type: "skin-pack";
 }
-
-export type EnvironmentType = "development" | "production";
 
 export type ProjectOptions = ProjectOptionsWorld | ProjectOptionsAddOn | ProjectOptionsSkinPack;
 
@@ -70,8 +79,7 @@ export class Project {
         if (options?.silent !== true) Logger.Spinner.start("Building Project...");
 
         try {
-            await Config.ingestConfig();
-            Config.Environment = options?.environment ?? "development";
+            await Config.ingestConfig(options?.environment);
         } catch (error) {
             if (options?.silent !== true) Logger.Spinner.fail("Build Failed");
             Logger.error(String(error));
