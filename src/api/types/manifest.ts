@@ -27,4 +27,5 @@ export interface Manifest {
         product_type?: string;
         authors?: string[];
     };
+    capabilities?: ("script_eval" | "chemistry" | "editorExtension" | "experimental_custom_ui" | "pbr" | "raytraced")[];
 }

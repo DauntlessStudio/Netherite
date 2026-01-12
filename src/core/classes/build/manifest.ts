@@ -49,6 +49,7 @@ export class Manifest {
                 metadata: Config.Options.type === "add-on" ? {
                     product_type: "addon",
                 } : undefined,
+                capabilities: Config.Options.environment === "development" ? ["script_eval"] : undefined,
             };
 
             resolve(manifest);
@@ -84,6 +85,7 @@ export class Manifest {
                 metadata: Config.Options.type === "add-on" ? {
                     product_type: "addon",
                 } : undefined,
+                capabilities: Config.Options.vibrant_visuals ? ["pbr"] : undefined,
             };
 
             resolve(manifest);
@@ -116,7 +118,7 @@ export class Manifest {
                     authors: [
                         Config.Options.author
                     ],
-                },
+                }
             };
 
             resolve(manifest);

@@ -9,9 +9,6 @@ import { Logger } from "../utils/logger.ts";
 export type ProjectType = "world"|"add-on"|"skin-pack";
 export type EnvironmentType = "development" | "production";
 
-/**
- * The base is what is provided by the netherite.config.ts file.
- */
 interface ProjectOptionsBase {
     type: ProjectType;
     name: string;
@@ -20,32 +17,37 @@ interface ProjectOptionsBase {
     format_version: string;
     uuid: string;
     version: `${number}.${number}.${number}`;
+    vibrant_visuals?: boolean;
 };
 
-/**
- * The extended options take the base and add values Netherite infers during execution and are not provided by the config.
- */
-interface ProjectOptionsExtended extends ProjectOptionsBase {
-    environment: EnvironmentType;
-}
-
-interface ProjectOptionsWorld extends ProjectOptionsExtended {
+interface ProjectOptionsWorld extends ProjectOptionsBase {
     type: "world";
     include_skin_pack?: boolean;
     random_seed?: boolean;
 }
 
-interface ProjectOptionsAddOn extends ProjectOptionsExtended {
+interface ProjectOptionsAddOn extends ProjectOptionsBase {
     type: "add-on";
     include_skin_pack?: boolean;
     random_seed?: boolean;
 }
 
-interface ProjectOptionsSkinPack extends ProjectOptionsExtended {
+interface ProjectOptionsSkinPack extends ProjectOptionsBase {
     type: "skin-pack";
 }
 
-export type ProjectOptions = ProjectOptionsWorld | ProjectOptionsAddOn | ProjectOptionsSkinPack;
+interface ProjectOptionsExtended {
+    environment: EnvironmentType;
+}
+
+/**
+ * The configuration data defined in `netherite.config.ts`.
+ */
+export type ProjectConfig = ProjectOptionsWorld | ProjectOptionsAddOn | ProjectOptionsSkinPack;
+/**
+ * The extended configuration that includes values provided by Netherite itself.
+ */
+export type ProjectOptions = ProjectConfig & ProjectOptionsExtended;
 
 export class Project {
     private static readonly processDir: string = Deno.cwd();

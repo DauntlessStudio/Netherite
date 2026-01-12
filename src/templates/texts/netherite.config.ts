@@ -13,6 +13,7 @@ netherite.config({
     format_version: "${Config.Options.format_version}",
     uuid: "${Config.Options.uuid}",
     include_skin_pack: ${Config.Options.type !== "skin-pack" ? Config.Options.include_skin_pack : undefined},
+    vibrant_visuals: ${Config.Options.vibrant_visuals},
 });`;
 
 new TemplateFile({

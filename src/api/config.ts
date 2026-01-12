@@ -1,15 +1,15 @@
-import type { ProjectOptions, WorkerResponse, WorkerWriteable } from "../core/classes/index.ts";
+import type { ProjectConfig, WorkerResponse, WorkerWriteable } from "../core/classes/index.ts";
 import { WorkerWriter } from "../core/classes/worker.ts";
 
-class OptionsGenerator implements WorkerWriteable<void, ProjectOptions> {
-    private options: ProjectOptions;
+class OptionsGenerator implements WorkerWriteable<void, ProjectConfig> {
+    private options: ProjectConfig;
 
-    constructor(options: ProjectOptions) {
+    constructor(options: ProjectConfig) {
         this.options = options;
         WorkerWriter.register(this);
     }
 
-    public generate(): WorkerResponse<ProjectOptions> {
+    public generate(): WorkerResponse<ProjectConfig> {
         return {
             endpoint: "options",
             response: this.options,
@@ -17,6 +17,6 @@ class OptionsGenerator implements WorkerWriteable<void, ProjectOptions> {
     }
 }
 
-export function config(options: ProjectOptions): void {
+export function config(options: ProjectConfig): void {
     new OptionsGenerator(options);
 }
