@@ -1,7 +1,8 @@
 # Changelog
-## [0.4.1] - 12/4/2025
+## [0.5.0] - 01/12/2026
 ### Changes
-- Fixed issue where Netherite could fail to link the packs to the development folder depending depending on Windows settings (Likely Developer Mode).
+- Added `ENVIRONMENT` keyword that resolves to `development` or `production` depending on whether you ran `netherite build` or `netherite export`.
+- Added `vibrant_visuals` option to `netherite.config.ts` which adds the `pbr` cabability when generating RP `manifest.json` files.
 ---
 ## [0.4.0] - 10/29/2025
 ### Changes

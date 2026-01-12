@@ -13,6 +13,7 @@ interface InitCommandData extends CommandData {
         format_version?: string;
         type?: ProjectType;
         skinpack?: boolean;
+        vibrant_visuals?: boolean;
         publish?: boolean;
     }
 }
@@ -20,7 +21,7 @@ interface InitCommandData extends CommandData {
 new Command<InitCommandData>({
 	name: "init",
 	parse: {
-		string: ["name", "author", "namespace", "format_version", "type"],
+		string: ["name", "author", "namespace", "format_version", "type", "vibrant_visuals"],
         boolean: ["skinpack"],
         negatable: ["publish"],
         alias: {
@@ -30,6 +31,7 @@ new Command<InitCommandData>({
             f: "format_version",
             t: "type",
             sp: "skinpack",
+            vv: "vibrant_visuals",
         },
 	},
 	usage: {
@@ -66,6 +68,11 @@ new Command<InitCommandData>({
 				description: "When the type is a world or add-on, should a skin pack be included? will prompt if missing",
 				optional: true,
 			},
+			vibrant_visuals: {
+				type: "boolean",
+				description: "Should the project have PBR enabled for the Resource Pack?",
+				optional: true,
+			},
             publish: {
                 type: "boolean",
                 description: "Use --no-publish if you don't want a prompt to publish to GitHub",
@@ -99,9 +106,10 @@ new Command<InitCommandData>({
         const validFormatVersion = _args.options.format_version === undefined || (typeof _args.options.format_version === "string" && _args.options.format_version.length > 0);
         const validType = _args.options.type === undefined || (typeof _args.options.type === "string" && ["world", "add-on", "skin-pack"].includes(_args.options.type));
         const validSkinpack = _args.options.skinpack === undefined || (typeof _args.options.skinpack === "boolean");
+        const validVibrantVisuals = _args.options.vibrant_visuals === undefined || (typeof _args.options.vibrant_visuals === "boolean");
         const validPublish = _args.options.publish === undefined || (typeof _args.options.publish === "boolean");
 
-		return validName && validAuthor && validNamespace && validFormatVersion && validType && validSkinpack && validPublish;
+		return validName && validAuthor && validNamespace && validFormatVersion && validType && validSkinpack && validPublish && validVibrantVisuals;
 	},
 });
 
@@ -151,6 +159,14 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectOption
         if (val === null || val === "") val = Package.LatestVanillaVersion;
 
         buildOptions.format_version = val;
+    }
+
+    if (args.options.vibrant_visuals !== undefined) {
+        buildOptions.vibrant_visuals = args.options.vibrant_visuals;
+    } else {
+        const val = prompt(`Please enter the whether you want Vibrant Visuals enabled [default: true]:`);
+        if (val === null || val === "") buildOptions.vibrant_visuals = true;
+        else buildOptions.vibrant_visuals = Boolean(val);
     }
 
     if (args.options.type) {
