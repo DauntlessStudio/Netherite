@@ -34,6 +34,8 @@ interface ProjectOptionsSkinPack extends ProjectOptionsBase {
     type: "skin-pack";
 }
 
+export type EnvironmentType = "development" | "production";
+
 export type ProjectOptions = ProjectOptionsWorld | ProjectOptionsAddOn | ProjectOptionsSkinPack;
 
 export class Project {
@@ -62,13 +64,14 @@ export class Project {
         Logger.Spinner.succeed("Project created successfully!");
     }
 
-    public static async build(options?: {watch?: boolean, ignoreSymlinks?: boolean, silent?: boolean}): Promise<void> {
+    public static async build(options?: {watch?: boolean, ignoreSymlinks?: boolean, silent?: boolean, environment?: EnvironmentType}): Promise<void> {
         const cachedTime = Date.now();
 
         if (options?.silent !== true) Logger.Spinner.start("Building Project...");
 
         try {
             await Config.ingestConfig();
+            Config.Environment = options?.environment ?? "development";
         } catch (error) {
             if (options?.silent !== true) Logger.Spinner.fail("Build Failed");
             Logger.error(String(error));

@@ -2,7 +2,7 @@ import "@std/dotenv/load";
 import { platform } from 'node:process';
 import { v4 } from "uuid";
 import * as path from "@std/path";
-import type { ProjectOptions } from "./project.ts";
+import type { EnvironmentType, ProjectOptions } from "./project.ts";
 import { Buffer } from "node:buffer";
 import { JSONCParse, Logger } from "../utils/index.ts";
 import { WorkerManager } from "./index.ts";
@@ -36,6 +36,8 @@ export class Config {
     private static studioName: string;
     private static packName: string;
     private static meta?: JSRMeta;
+    
+    public static Environment: EnvironmentType = "development";
     
     public static get Options() : ProjectOptions {
         if (!this.options) {

@@ -76,7 +76,7 @@ export function writeBufferToDist(dest: string, content: Uint8Array): void {
 export function writeTextToDist(dest: string, content: string, overwrite: boolean = true): void {
     Deno.mkdirSync(path.dirname(dest), {recursive: true});
     
-    const modifiedContent = keywordReplacer(content, Config.Options);
+    const modifiedContent = keywordReplacer(content, Config.Options, Config.Environment);
     
     try {
         Deno.writeTextFileSync(dest, modifiedContent, {createNew: !overwrite});
