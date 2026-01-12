@@ -86,7 +86,7 @@ export default new Command<BuildCommandData>({
             };
 
             await Project.build({environment: "development", ..._args.options});
-            await abortOnKeypress([]);
+            if (_args.options.watch) await abortOnKeypress([]);
         } else {
             const args = ["build"];
             if (_args.options.watch) args.push("--watch");

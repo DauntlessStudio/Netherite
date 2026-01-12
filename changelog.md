@@ -1,4 +1,8 @@
 # Changelog
+## [0.5.1] - 01/12/2026
+### Changes
+- Fixed issue where `netherite build --watch` was terminating after a successful build rather that awaiting file changes. Now `build --watch` will prompt the user "Press any key to exit..." for the signal to terminate the program.
+---
 ## [0.5.0] - 01/12/2026
 ### Changes
 - Added `ENVIRONMENT` keyword that resolves to `development` or `production` depending on whether you ran `netherite build` or `netherite export`.
