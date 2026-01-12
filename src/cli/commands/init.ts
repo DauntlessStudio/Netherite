@@ -165,7 +165,8 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectOption
         buildOptions.vibrant_visuals = args.options.vibrant_visuals;
     } else {
         const val = prompt(`Please enter the whether you want Vibrant Visuals enabled [default: true]:`);
-        buildOptions.vibrant_visuals = Boolean(val);
+        if (val === null || val === "") buildOptions.vibrant_visuals = true;
+        else buildOptions.vibrant_visuals = Boolean(val);
     }
 
     if (args.options.type) {
