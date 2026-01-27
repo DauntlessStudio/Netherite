@@ -3,15 +3,15 @@ import { formatText } from "../../utils/text.ts";
 import { writeTextToDist } from "../../utils/fileIO.ts";
 import { Config } from "../config.ts";
 import { Logger, sendToDist, writeTextToSrc } from "../../utils/index.ts";
-import { attemptRepeater } from "../../utils/error.ts";
 
 export type LangType = "en_US" | "en_GB" | "de_DE" | "es_ES" | "es_MX" | "fr_FR" | "fr_CA" | "it_IT" | "ja_JP" | "ko_KR" | "pt_BR" | "pt_PT" | "ru_RU" | "zh_CN" | "zh_TW" | "nl_NL" | "bg_BG" | "cs_CZ" | "da_DK" | "el_GR" | "fi_FI" | "hu_HU" | "id_ID" | "nb_NO" | "pl_PL" | "sk_SK" | "sv_SE" | "tr_TR" | "uk_UA";
+type LangEntries = Map<string, {category: string, value: string}>;
 
 export class Language {
     /**
-     * A map structured as Langauge/Category/Key/Value
+     * A map structured as Language/Key/{Category&Value}
      */
-    private static readonly langMap: Map<LangType, Map<string, Map<string, string>>> = new Map<LangType, Map<string, Map<string, string>>>();
+    private static readonly langMap: Map<LangType, LangEntries> = new Map();
     private static readonly langFileRefs: Set<string> = new Set();
 
     public static addLangEntry(lang: LangType, category: string, key: string, value: string): void {
@@ -21,16 +21,13 @@ export class Language {
         category = category.toLowerCase().trim();
         value = value.trim();
 
+        // Get map for lang file
         if (!this.langMap.has(lang)) {
-            this.langMap.set(lang, new Map<string, Map<string, string>>());
+            this.langMap.set(lang, new Map());
         }
 
-        const langMap = this.langMap.get(lang)!;
-        if (!langMap.has(category)) {
-            langMap.set(category, new Map<string, string>());
-        }
-
-        langMap.get(category)!.set(key, value);
+        const langEntries = this.langMap.get(lang)!;
+        langEntries.set(key, {category, value});
     }
 
     public static addPlaceholderEntry(category: string, key: string, value: string): void {
@@ -94,24 +91,33 @@ export class Language {
         this.langFileRefs.add(filePath);
     }
 
+    private static buildContents(langEntries: LangEntries): string {
+        let contents = "";
+        const categoryEntries: Map<string, Map<string, string>> = new Map();
+
+        langEntries.entries().forEach(([key, entry]) => {
+            if (!categoryEntries.has(entry.category)) categoryEntries.set(entry.category, new Map());
+            categoryEntries.get(entry.category)?.set(key, entry.value);
+        });
+
+        for (const [category, keys] of categoryEntries) {
+            contents += `## ${category.toUpperCase()} ${"=".repeat(117 - category.length)}\n`;
+
+            for (const [key, value] of keys) {
+                contents += `${key}=${value}\n`;
+            }
+
+            contents += "\n";
+        }
+
+        return contents.trim();
+    }
+
     public static build(): void {
         if (Config.Options.type !== "skin-pack") {
-            for (const [lang, categories] of this.langMap) {
+            for (const [lang, langEntries] of this.langMap) {
                 const langFile = path.join(path.join(Config.Paths.rp.root, "texts"), `${lang}.lang`);
-    
-                let contents = "";
-    
-                for (const [category, keys] of categories) {
-                    contents += `## ${category.toUpperCase()} ${"=".repeat(117 - category.length)}\n`;
-    
-                    for (const [key, value] of keys) {
-                        contents += `${key}=${value}\n`;
-                    }
-    
-                    contents += "\n";
-                }
-    
-                writeTextToDist(langFile, contents.trim());
+                writeTextToDist(langFile, this.buildContents(langEntries));
             }
     
             writeTextToDist(path.join(path.join(Config.Paths.rp.root, "texts"), "languages.json"), JSON.stringify([...this.langMap.keys()], null, "\t"));
@@ -121,22 +127,9 @@ export class Language {
     }
 
     public static buildSource(): void {
-        for (const [lang, categories] of this.langMap) {
+        for (const [lang, langEntries] of this.langMap) {
             const langFile = path.join("./src/resource_pack/texts", `${lang}.lang`);
-    
-            let contents = "";
-    
-            for (const [category, keys] of categories) {
-                contents += `## ${category.toUpperCase()} ${"=".repeat(117 - category.length)}\n`;
-    
-                for (const [key, value] of keys) {
-                    contents += `${key}=${value}\n`;
-                }
-    
-                contents += "\n";
-            }
-    
-            writeTextToSrc(langFile, contents.trim());
+            writeTextToSrc(langFile, this.buildContents(langEntries));
         }
     }
 
@@ -200,6 +193,9 @@ export class Language {
 
             this.build();
             Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(path.join(path.join(Config.Paths.rp.root, "texts"), "languages.json"))}`);
+            for (const lang of this.langMap.keys()) {
+                Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(path.join(path.join(Config.Paths.rp.root, "texts"), `${lang}.lang`))}`);
+            }
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             Logger.error(`Failed to read ${filepath} [${message}]`);
