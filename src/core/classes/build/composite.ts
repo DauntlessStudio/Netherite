@@ -1,7 +1,6 @@
 import * as path from "@std/path";
 import { deepMerge, JSONCParse, Logger, writeTextToDist } from "../../utils/index.ts";
 import { Config } from "../index.ts";
-import { attemptRepeater } from "../../utils/error.ts";
 import type { ClientItemTexture, ClientTerrainTexture, ClientSounds, ClientSoundDefinitions, ClientBlocks, Skins } from "../../../api/api.ts";
 
 export class CompositeJSON<T extends object> {
@@ -20,6 +19,10 @@ export class CompositeJSON<T extends object> {
         });
 
         return map;
+    }
+
+    public static endWatch(): void {
+        this.registry.values().forEach(composite => composite.fileMap.clear());
     }
 
     public readonly fileGlob: string;

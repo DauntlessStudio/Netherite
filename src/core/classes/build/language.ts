@@ -201,4 +201,9 @@ export class Language {
             Logger.error(`Failed to read ${filepath} [${message}]`);
         }
     }
+
+    public static endWatch(): void {
+        this.langFileRefs.clear();
+        this.langMap.clear();
+    }
 }
