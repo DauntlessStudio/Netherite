@@ -22,7 +22,7 @@ Netherite depends on Deno, so see their [installation guide](https://github.com/
 ### Installing Netherite
 You can use Deno to install Netherite with the following command
 ```
-deno run -A jsr:@coldiron/netherite/install
+deno run -A jsr:@coldiron/netherite/install latest
 ```
 
 ## Getting Started
