@@ -9,6 +9,7 @@ export class Script {
     private static buildOptions?: esbuild.BuildOptions;
     private static context?: esbuild.BuildContext<esbuild.BuildOptions>;
     private static buildError: boolean = false;
+    private static endWatchCallback: () => Promise<void>;
 
     public static async build(watch?: boolean): Promise<void> {
         if (Config.Options.type === "skin-pack") return;
@@ -53,6 +54,11 @@ export class Script {
             if (!this.context) {
                 firstRun = true;
                 this.context = await esbuild.context(this.buildOptions);
+                this.endWatchCallback = async () => {
+                    await this.context?.cancel();
+                    await this.context?.dispose();
+                    this.context = undefined;
+                }
             }
 
             const result = await this.context.rebuild();
@@ -71,5 +77,9 @@ export class Script {
             // Build options ensure that detailed error message is printed, avoid crash and continue watching
             this.buildError = true;
         }
+    }
+
+    public static async endWatch(): Promise<void> {
+        if (this.endWatchCallback) await this.endWatchCallback();
     }
 }

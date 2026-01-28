@@ -22,7 +22,7 @@ interface ClientAttachableScripts {
     variables?: {
         [key: string]: "public";
     };
-    animate?: string[];
+    animate?: (string|{ [key: string]: Molang })[];
     initialize?: string[];
     parent_setup?: string;
     pre_animation?: string[];

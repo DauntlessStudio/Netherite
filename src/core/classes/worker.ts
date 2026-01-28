@@ -48,6 +48,7 @@ export class WorkerManager {
 
     public static stopServer(): void {
         this.server?.shutdown();
+        this.server = undefined;
     }
     
     public static async run<T>(script: string, options?: unknown): Promise<WorkerResponse<T>[]> {
