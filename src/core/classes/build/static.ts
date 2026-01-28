@@ -1,5 +1,5 @@
 import * as path from "@std/path";
-import { Logger, sendToDist, sleep } from "../../utils/index.ts";
+import { Logger, sendToDist } from "../../utils/index.ts";
 import { Config } from "../index.ts";
 import { Script } from "./script.ts";
 import { Module } from "../module.ts";
@@ -150,6 +150,7 @@ export class Static {
                 }
 
                 changedPaths.forEach(Static.syncPath.bind(Static));
+                changedPaths.clear();
             }, 200);
         };
 
