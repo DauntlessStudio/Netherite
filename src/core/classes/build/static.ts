@@ -5,14 +5,14 @@ import { Script } from "./script.ts";
 import { Module } from "../module.ts";
 import { Language } from "./language.ts";
 import { CompositeJSON, composites } from "./composite.ts";
+import { Project } from "../project.ts";
 
 export class Static {
     private static readonly behaviorPath = path.join(Deno.cwd(), "src/behavior_pack");
     private static readonly resourcePath = path.join(Deno.cwd(), "src/resource_pack");
     private static readonly skinsPath = path.join(Deno.cwd(), "src/skin_pack");
     private static readonly modulePath = path.join(Deno.cwd(), "src/modules");
-
-    private static readonly pendingChanges: Map<string, boolean> = new Map();
+    private static endWatchCallback: () => void;
 
     private static readonly specialFiles: Map<string, (filepath: string, event: Deno.FsEvent["kind"]) => void> = new Map([
         ["**/*.lang", Language.watch.bind(Language)],
@@ -63,6 +63,10 @@ export class Static {
         if (watch) {
             this.watch();
         }
+    }
+
+    public static endWatch(): void {
+        if (this.endWatchCallback) this.endWatchCallback();
     }
 
     private static async processBehaviorPath(src: string): Promise<void> {
@@ -125,72 +129,79 @@ export class Static {
     }
 
     private static async watch(): Promise<void> {
-        const sync = (event: Deno.FsEvent) => {
-            const src = event.paths[0];
-            
-            if (!this.canWrite(src)) return;
+        let debounceHandler: number | undefined;
+        const changedPaths = new Set<string>();
 
-            try {
-                const stat = Deno.statSync(src);
-                if (stat.isDirectory && event.kind !== "rename") return;
-            } catch (_error) {
-                // Do Nothing
-            }
-            
-            for (const [file, callback] of this.specialFiles.entries()) {
-                if (path.globToRegExp(file).test(src)) {
-                    callback(src, event.kind);
+        let currentBranchRef = this.getBranchRef() ;
+
+        const sync = (event: Deno.FsEvent) => {
+            event.paths.forEach(path => changedPaths.add(path));
+
+            clearTimeout(debounceHandler);
+            debounceHandler = setTimeout(() => {
+                const newBranchRef = this.getBranchRef();
+                
+                if (currentBranchRef !== newBranchRef) {
+                    Logger.log(`[${Logger.Colors.green("git")}] Detected change from ${currentBranchRef} to ${newBranchRef}. Rebuilding...`);
+                    currentBranchRef = newBranchRef;
+                    changedPaths.clear();
+                    Project.rebuild();
                     return;
                 }
-            }
 
-            const dest = this.getDistFromPath(src);
-            if (!dest) return;
-
-            switch (event.kind) {
-                case "create": {
-                    sendToDist(src, dest);
-                    Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
-                    break;
-                }
-                case "modify": {
-                    sendToDist(src, dest);
-                    Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
-                    break;
-                }
-                case "rename": {
-                    sendToDist(src, dest);
-                    Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
-                    break;
-                }
-                case "remove": {
-                    try {
-                        Deno.removeSync(dest, { recursive: true });
-                        Logger.log(`[${Logger.Colors.red("remove")}] ${dest}`);
-                    } catch (_error) {
-                        // File was already removed at dest.
-                    }
-                    break;
-                }
-                default:
-                    break;
-            }
+                changedPaths.forEach(Static.syncPath.bind(Static));
+            }, 200);
         };
 
         const watcher = Deno.watchFs(path.join(Deno.cwd(), "src"), {recursive: true});
+        this.endWatchCallback = () => watcher.close();
 
         for await (const event of watcher) {
-          sync(event);
+            sync(event);
         }
     }
 
-    private static canWrite(src: string): boolean {
-        if (this.pendingChanges.has(src)) return false;
-    
-        this.pendingChanges.set(src, true);
-        this.canWrite(src);
-        sleep(200).then(() => this.pendingChanges.delete(src));
-    
-        return true;
+    private static syncPath(src: string): void {
+        let stat: Deno.FileInfo | null = null;
+        try {
+            stat = Deno.statSync(src);
+            if (stat.isDirectory) return;
+        } catch (_error) {
+            // File doesn't exist
+        }
+
+        for (const [file, callback] of this.specialFiles.entries()) {
+            if (path.globToRegExp(file).test(src)) {
+                callback(src, stat ? "modify" : "remove");
+                return;
+            }
+        }
+
+        const dest = this.getDistFromPath(src);
+        if (!dest) return;
+
+        if (stat) {
+            try {
+                sendToDist(src, dest);
+                Logger.log(`[${Logger.Colors.green("write")}] ${dest}`);
+            } catch (error) {
+                Logger.error(`Failed to write ${dest}: ${error}`);
+            }
+        } else {
+            try {
+                Deno.removeSync(dest, { recursive: true });
+                Logger.log(`[${Logger.Colors.red("remove")}] ${dest}`);
+            } catch (_error) {
+                // File already removed
+            }
+        }
+    }
+
+    private static getBranchRef(): string {
+        try {
+            return Deno.readTextFileSync(path.join(Deno.cwd(), ".git", "HEAD")).trim();
+        } catch (_error) {
+            return "unknown";
+        }
     }
 }

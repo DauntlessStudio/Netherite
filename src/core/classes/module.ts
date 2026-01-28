@@ -22,6 +22,7 @@ type ModuleSubdirectory = "bp"|"rp"|"skin_pack"|"root";
 export class Module {
     private static readonly moduleDir: string = path.join(Deno.cwd(), "src/modules");
     private static readonly queue: Map<string, Map<string, number[]>> = new Map();
+    private static endWatchCallback: () => void;
 
     public static async build(watch?: boolean): Promise<void> {
         try {
@@ -39,6 +40,11 @@ export class Module {
         if (watch) {
             this.watch();
         }
+    }
+
+    public static endWatch(): void {
+        if (this.endWatchCallback) this.endWatchCallback();
+        this.queue.clear();
     }
 
     public static async iterate(callback: (filepath: string) => Promise<void>): Promise<void> {
@@ -112,6 +118,7 @@ export class Module {
         }, 200);
 
         const watcher = Deno.watchFs(this.moduleDir);
+        this.endWatchCallback = () => watcher.close();
 
         for await (const event of watcher) {
             ingest(event);
