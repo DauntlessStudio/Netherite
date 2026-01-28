@@ -21,17 +21,7 @@ export class Static {
     ]);
 
     public static async build(watch?: boolean) {
-        if (Config.Options.type === "skin-pack") {
-            await this.processSkinPath(this.skinsPath);
-        } else {
-            if (Config.Options.include_skin_pack === true) {
-                await this.processSkinPath(this.skinsPath);
-            }
-            
-            await this.processBehaviorPath(this.behaviorPath);
-            await this.processResourcePath(this.resourcePath);
-        }
-
+        // Ingest modules first, this allows projects to override module provided defaults
         try {
             for (const entry of Deno.readDirSync(this.modulePath)) {
                 if (entry.isDirectory) {
@@ -57,6 +47,17 @@ export class Static {
             }
         } catch (_error) {
             // Do Nothing
+        }
+
+        if (Config.Options.type === "skin-pack") {
+            await this.processSkinPath(this.skinsPath);
+        } else {
+            if (Config.Options.include_skin_pack === true) {
+                await this.processSkinPath(this.skinsPath);
+            }
+            
+            await this.processBehaviorPath(this.behaviorPath);
+            await this.processResourcePath(this.resourcePath);
         }
 
         if (watch) {

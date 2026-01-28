@@ -116,6 +116,8 @@ export class Project {
         Module.endWatch();
         Static.endWatch();
         await Script.endWatch();
+        Language.endWatch();
+        CompositeJSON.endWatch();
 
         if (this.rebuildCallback) this.rebuildCallback();
         else {
