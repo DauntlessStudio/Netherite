@@ -51,6 +51,7 @@ export type ProjectOptions = ProjectConfig & ProjectOptionsExtended;
 
 export class Project {
     private static readonly processDir: string = Deno.cwd();
+    private static rebuildCallback: () => void;
 
     public static async init(options: ProjectOptions): Promise<void> {
         Config.setOptions(options);
@@ -107,6 +108,20 @@ export class Project {
         if (!options?.watch) WorkerManager.stopServer();
         if (options?.silent !== true) Logger.Spinner.succeed(`Project built in ${Date.now() - cachedTime}ms`);
         if (options?.watch) Logger.log("Watching for changes...");
+
+        this.rebuildCallback = () => this.build(options);
+    }
+
+    public static async rebuild(): Promise<void> {
+        Module.endWatch();
+        Static.endWatch();
+        await Script.endWatch();
+
+        if (this.rebuildCallback) this.rebuildCallback();
+        else {
+            Logger.error(`[FATAL] Cannot trigger rebuild before build finishes!`);
+            Deno.exit(1);
+        }
     }
 
     private static createDirectories(): void {
