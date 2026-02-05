@@ -1,7 +1,7 @@
 import * as path from "@std/path";
 import { debounce } from "@std/async/debounce";
 import { writeBufferToDist } from "../utils/fileIO.ts";
-import { WorkerManager, type WorkerWriteable, type ProjectOptions } from "./index.ts";
+import { WorkerManager, type WorkerWriteable, type ProjectOptions, composites } from "./index.ts";
 import { Config } from "./config.ts";
 import { Logger } from "../utils/index.ts";
 
@@ -171,11 +171,21 @@ export class Module {
             Logger.error(String(error));
         }
 
+        const modifiedComposites = new Set<keyof typeof composites>();
+
         for (const module of this.queue.values()) {
             for (const [key, data] of module) {
+                if (key in composites) {
+                    const compositeKey = key as keyof typeof composites;
+                    modifiedComposites.add(compositeKey);
+                    composites[compositeKey].ingestData(JSON.parse(new TextDecoder().decode(new Uint8Array(data))));
+                }
+
                 writeBufferToDist(key, new Uint8Array(data));
                 if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(key)}`);
             }
         }
+
+        modifiedComposites.forEach(mod => composites[mod].build());
     }
 }

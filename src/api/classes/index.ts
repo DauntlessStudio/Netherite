@@ -8,3 +8,4 @@ export * from "./client_attachable.ts";
 export * from "./client_animation_controller.ts";
 export * from "./client_animation.ts";
 export * from "./client_render_controller.ts";
+export * from "./client_terrain_texture.ts";
