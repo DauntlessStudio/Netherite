@@ -355,6 +355,8 @@ export interface Components {
     "minecraft:on_target_escape"?: OnTargetEscape
     "minecraft:on_wake_with_owner"?: OnWakeWithOwner
     "minecraft:underwater_movement"?: UnderwaterMovement
+    // deno-lint-ignore no-explicit-any
+    [key: string]: any;
 }
 
 type EventTarget = "block"|"damager"|"self"|"other"|"player"|"parent"|"target";
