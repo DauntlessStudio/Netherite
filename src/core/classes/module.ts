@@ -179,6 +179,7 @@ export class Module {
                     const compositeKey = key as keyof typeof composites;
                     modifiedComposites.add(compositeKey);
                     composites[compositeKey].ingestData(JSON.parse(new TextDecoder().decode(new Uint8Array(data))));
+                    continue;
                 }
 
                 writeBufferToDist(key, new Uint8Array(data));
@@ -186,6 +187,9 @@ export class Module {
             }
         }
 
-        modifiedComposites.forEach(mod => composites[mod].build());
+        modifiedComposites.forEach(mod => {
+            composites[mod].build();
+            if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(composites[mod].OutPath)}`);
+        });
     }
 }
