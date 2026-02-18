@@ -3,7 +3,7 @@ import type { BlockComponents } from "./server_block_components.ts";
 interface ServerBlockDescription {
     identifier?: string;
     menu_category?: {
-        category: "construction" | "equipment" | "items" | "nature";
+        category: "construction" | "equipment" | "items" | "nature" | "none";
         group?: string;
         is_hidden_in_commands?: boolean;
     };
