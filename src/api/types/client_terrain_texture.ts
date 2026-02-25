@@ -8,12 +8,12 @@ export interface ClientTerrainTexture {
     }
 }
 
-interface TerrainTextureData {
+export interface TerrainTextureData {
     quad?: number;
     textures: string|(string|TerrainTexture)[];
 }
 
-interface TerrainTexture {
+export interface TerrainTexture {
     path: string;
     overlay_color: string;
 }

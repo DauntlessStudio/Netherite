@@ -1,5 +1,5 @@
 export interface ClientBlocks {
-    [key: string]: unknown;
+    [key: string]: Block;
 }
 
 interface Block {
@@ -23,4 +23,6 @@ interface Block {
         west?: string;
         side?: string;
     }|string;
+    // deno-lint-ignore no-explicit-any
+    [key: string]: any;
 }

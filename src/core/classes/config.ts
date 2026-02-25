@@ -203,7 +203,7 @@ export class Config {
     }
 
     public static async getUUID(category: string): Promise<string> {
-        const hash = await crypto.subtle.digest("SHA-256", Buffer.from(category + Config.Options.uuid));
+        const hash = await crypto.subtle.digest("SHA-256", new Uint8Array(Buffer.from(category + Config.Options.uuid)));
         return v4({rng: () => new Uint8Array(Buffer.from(hash, 0, 16))});
     }
 }

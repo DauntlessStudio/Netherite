@@ -1,6 +1,6 @@
 {
   "name": "@coldiron/netherite",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "tasks": {
     "dev": "deno run --allow-read --allow-write --allow-run --allow-env src/cli/cli.ts",
     "encode": "deno run -A src/templates/encode.ts",
