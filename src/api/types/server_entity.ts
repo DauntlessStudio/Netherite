@@ -1,5 +1,6 @@
 // deno-lint-ignore-file ban-types
 import type { ServerFilters, ServerFilterSubject } from "./filters.ts";
+import type { Float } from "./float.ts";
 import type { Components } from "./server_entity_components.ts";
 
 interface ServerEntityProperty {
@@ -9,9 +10,8 @@ interface ServerEntityProperty {
 
 interface ServerEntityFloatProperty extends ServerEntityProperty {
     type: "float";
-    // TODO: add float type so this can maintain precision
-    default: number;
-    range: [number, number];
+    default: Float;
+    range: [Float, Float];
 }
 
 interface ServerEntityIntProperty extends ServerEntityProperty {

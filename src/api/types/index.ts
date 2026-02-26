@@ -22,3 +22,4 @@ export * from "./client_entity.ts";
 export * from "./client_geometry.ts";
 export * from "./client_render_controller.ts";
 export * from "./skins.ts";
+export * from "./float.ts";
