@@ -23,8 +23,7 @@ export abstract class MinecraftWriteable<Loose extends object, Strict extends Lo
         let content = JSON.stringify(this.validate(), null, "\t");
         content = content.replace(/IDENTIFIER/g, this.Identifier);
         content = content.replace(/SHORTNAME/g, this.Shortname);
-
-        // TODO: Handle Floats
+        content = content.replace(/"__FLOAT__(-?\d+\.0)"/g, "$1");
 
         return Array.from(new TextEncoder().encode(content));
     }

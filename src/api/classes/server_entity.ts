@@ -1,4 +1,5 @@
 import { Language, type WorkerResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { Float } from "../types/float.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -84,6 +85,17 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
                 }
                 return f;
             });
+        }
+
+        const properties = this.minecraftObj["minecraft:entity"].description.properties;
+        if (properties) {
+            for (const value of Object.values(properties)) {
+                if (value.type === "float") {
+                    value.default = Float(value.default);
+                    value.range[0] = Float(value.range[0]);
+                    value.range[1] = Float(value.range[1]);
+                }
+            }
         }
 
         const baseline: ServerEntityStrict = {
