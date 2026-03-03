@@ -79,7 +79,11 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
             }
         });
     }
-
+    
+    public get Attachable() : ClientAttachableLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.minecraftObj["minecraft:attachable"].description.identifier ?? "NAMESPACE:SHORTNAME";
     }

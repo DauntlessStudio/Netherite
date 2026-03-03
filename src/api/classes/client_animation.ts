@@ -19,7 +19,11 @@ export class MinecraftClientAnimation extends MinecraftWriteable<ClientAnimation
             }
         }, name);
     }
-
+    
+    public get Animation() : ClientAnimationLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.name;
     }

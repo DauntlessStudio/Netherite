@@ -63,7 +63,11 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
     }
 
     // #endregion
-
+    
+    public get Entity() : ServerEntityLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.minecraftObj["minecraft:entity"].description?.identifier ?? "NAMESPACE:SHORTNAME";
     }

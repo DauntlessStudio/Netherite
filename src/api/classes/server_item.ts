@@ -80,7 +80,11 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
     }
 
     // #endregion
-
+    
+    public get Item() : ServerItemLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.minecraftObj["minecraft:item"].description?.identifier ?? "NAMESPACE:SHORTNAME";
     }

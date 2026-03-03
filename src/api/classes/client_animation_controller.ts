@@ -66,7 +66,11 @@ export class MinecraftClientAnimationController extends MinecraftWriteable<Clien
             }
         }, name);
     }
-
+    
+    public get AnimationController() : ClientAnimationControllerLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.name;
     }

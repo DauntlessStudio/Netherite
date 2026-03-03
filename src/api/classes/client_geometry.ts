@@ -388,7 +388,11 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
             ]
         }, name, "entity/player");
     }
-
+    
+    public get Geometry() : ClientGeometryLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.name;
     }

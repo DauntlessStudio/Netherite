@@ -19,7 +19,11 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
                 }
             }, name);
     }
-
+    
+    public get RenderController() : ClientRenderControllerLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return `NAMESPACE:${this.name}`;
     }

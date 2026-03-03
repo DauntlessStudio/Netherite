@@ -26,7 +26,11 @@ export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, S
 
     // #endregion
     private serverItem?: MinecraftServerItem;
-
+    
+    public get Block() : ServerBlockLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.minecraftObj["minecraft:block"]?.description?.identifier ?? "NAMESPACE:SHORTNAME";
     }

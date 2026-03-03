@@ -3,6 +3,10 @@ import type { ClientTerrainTexture } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftClientTerrainTexture extends MinecraftWriteable<Partial<ClientTerrainTexture>, ClientTerrainTexture> {
+    public get TerrainTexture() : Partial<ClientTerrainTexture> {
+        return this.minecraftObj;
+    }
+    
     public override get Identifier(): string {
         return ""
     }

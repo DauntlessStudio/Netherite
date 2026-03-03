@@ -3,6 +3,10 @@ import type { ClientBlocks } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftClientBlocks extends MinecraftWriteable<ClientBlocks, ClientBlocks> {
+    public get Blocks() : ClientBlocks {
+        return this.minecraftObj;
+    }
+    
     public override get Identifier(): string {
         return ""
     }

@@ -1,5 +1,5 @@
 import { type WorkerResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
-import type { ClientEntityStrict, ClientEntityLoose } from "../types/index.ts";
+import type { ClientEntityStrict, ClientEntityLoose, Molang } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose, ClientEntityStrict> {
@@ -27,9 +27,23 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
             }
         );
     }
-
+    
+    public get Entity() : ClientEntityLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.minecraftObj["minecraft:client_entity"].description.identifier ?? "NAMESPACE:SHORTNAME";
+    }
+
+    /**
+     * **Overwrites** rather than modifies the `render_controllers` array. Useful when extending a base entity.
+     * @param rcs The new `render_controllers` array.
+     * @returns This {@link MinecraftClientEntity}.
+     */
+    public setRenderControllers(rcs?: (string|{ [key: string]: Molang })[]): MinecraftClientEntity {
+        this.minecraftObj["minecraft:client_entity"].description.render_controllers = rcs;
+        return this;
     }
     
     protected validate(): ClientEntityStrict {

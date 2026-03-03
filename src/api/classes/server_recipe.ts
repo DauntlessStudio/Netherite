@@ -3,6 +3,10 @@ import type { ServerRecipe, ServerRecipeShaped, ServerRecipeShapeless } from "..
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerRecipe>, ServerRecipe> {
+    public get Recipe() : Partial<ServerRecipe> {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return (this.minecraftObj as ServerRecipeShaped)["minecraft:recipe_shaped"]?.description?.identifier
         ?? (this.minecraftObj as ServerRecipeShapeless)["minecraft:recipe_shapeless"]?.description?.identifier
