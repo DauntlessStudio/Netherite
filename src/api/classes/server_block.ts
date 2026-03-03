@@ -105,7 +105,7 @@ export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, S
         return result;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         const response = {
             endpoint: `BP/blocks/${this.Shortname}.json`,
             response: {

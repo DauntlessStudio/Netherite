@@ -15,7 +15,7 @@ export class MinecraftClientItemTexture extends MinecraftWriteable<Partial<Clien
         return this.minecraftObj as ClientItemTexture;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         const response = {
             endpoint: `item_texture`,
             response: {

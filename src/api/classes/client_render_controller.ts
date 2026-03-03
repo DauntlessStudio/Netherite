@@ -37,7 +37,7 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
         return deepMerge(baseline, this.minecraftObj);
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         return {
             endpoint: `RP/render_controllers/${this.Shortname}.rc.json`,
             response: {

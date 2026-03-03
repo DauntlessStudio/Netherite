@@ -115,7 +115,7 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
         return deepMerge(baseline, this.minecraftObj);
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         const data = this.encode();
 
         return {

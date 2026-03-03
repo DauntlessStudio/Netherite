@@ -79,7 +79,7 @@ export class MinecraftClientAnimationController extends MinecraftWriteable<Clien
         return this.minecraftObj as ClientAnimationControllerStrict;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         return {
             endpoint: `RP/animation_controllers/${this.name}.ac.json`,
             response: {

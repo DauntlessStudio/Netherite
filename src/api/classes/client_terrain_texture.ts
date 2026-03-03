@@ -17,7 +17,7 @@ export class MinecraftClientTerrainTexture extends MinecraftWriteable<Partial<Cl
         return this.minecraftObj as ClientTerrainTexture;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         const response = {
             endpoint: `terrain_texture`,
             response: {

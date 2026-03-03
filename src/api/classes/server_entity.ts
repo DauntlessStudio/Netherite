@@ -115,7 +115,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
         return deepMerge(baseline, this.minecraftObj);
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         const response = {
             endpoint: `BP/entities/${this.Shortname}.json`,
             response: {

@@ -401,7 +401,7 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
         return this.minecraftObj as ClientGeometryStrict;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         return {
             endpoint: `RP/models/${this.subpath}/${this.name}.geo.json`,
             response: {

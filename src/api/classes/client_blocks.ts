@@ -11,7 +11,7 @@ export class MinecraftClientBlocks extends MinecraftWriteable<ClientBlocks, Clie
         return this.minecraftObj;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         const response = {
             endpoint: `blocks`,
             response: {

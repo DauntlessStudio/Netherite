@@ -110,7 +110,7 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
         return deepMerge(baseline, this.minecraftObj);
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         const response = {
             endpoint: `BP/items/${this.Shortname}.json`,
             response: {

@@ -19,7 +19,7 @@ export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerReci
         return this.minecraftObj as ServerRecipe;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WorkerResponse<ModuleResponse> {
         const response = {
             endpoint: `BP/recipes/${this.Shortname}.json`,
             response: {
