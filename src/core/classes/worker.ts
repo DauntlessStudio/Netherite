@@ -80,19 +80,11 @@ export class WorkerManager {
 
     private static getEncodedScript(script: string): Uint8Array<ArrayBuffer> {
         return new TextEncoder().encode(`
+            self.workers = [];
             ${WorkerWriter.toString().replaceAll("PORT", `${this.port}`).replace("OPTIONS", JSON.stringify(this.options))}
             WorkerWriter.run("${script.replaceAll("\\", "/")}");
         `);
     }
-}
-
-if (!('workerRegistry' in self)) {
-    (self as any).workerRegistry = {
-        workers: [],
-        register: function <T, U>(worker: WorkerWriteable<T, U>): void {
-            this.workers.push(worker as WorkerWriteable<unknown, unknown>);
-        }
-    };
 }
 
 export interface WorkerWriteable<T, U> {
@@ -100,21 +92,20 @@ export interface WorkerWriteable<T, U> {
 }
 
 export class WorkerWriter {
+    // Pins workers array to globalthis object so it can be accessed by all modules
+    private static workers: WorkerWriteable<unknown, unknown>[] = (self as any).workers;
+
     public static register<T, U>(worker: WorkerWriteable<T, U>): void {
-        (self as any).workerRegistry.register(worker);
+        this.workers.push(worker);
     }
 
     public static async broadcast(): Promise<void> {
-        const registry = (self as any).workerRegistry;
-        
-        if (!registry || !registry.workers || !registry.workers.length) {
+        if (!this.workers.length) {
             // Do not interact with the server if there is nothing to do.
             return;
         };
 
-        const workers = registry.workers as WorkerWriteable<unknown, unknown>[];
-
-        for (const worker of workers) {
+        for (const worker of this.workers) {
             const options = JSON.parse('OPTIONS');
             const data = worker.generate(options);
     
@@ -127,7 +118,7 @@ export class WorkerWriter {
             });
         }
 
-        workers.length = 0; // Clear the registry after broadcasting
+        this.workers.length = 0; // Clear the registry after broadcasting
     }
 
     public static async run(script: string): Promise<void> {
