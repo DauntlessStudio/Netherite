@@ -34,9 +34,6 @@ export class WorkerManager {
                                 return new Response(JSON.stringify({ message: "Invalid request" }), { status: 400 });
                             }
                         }
-                        case "GET": {
-                            return new Response(JSON.stringify({message: "Requested Data", data: this.options}), { status: 200 });
-                        }
                         default: {
                             return new Response(JSON.stringify({ message: "Method not allowed" }), { status: 405 });
                         }
@@ -69,7 +66,7 @@ export class WorkerManager {
         }).spawn();
 
         const writer = task.stdin.getWriter();
-        await writer.write(new TextEncoder().encode(WorkerWriter.toString().replaceAll("PORT", `${this.port}`) + `WorkerWriter.run("${script.replaceAll("\\", "/")}");`));
+        await writer.write(this.getEncodedScript(script));
         await writer.ready;
         await writer.close();
         const result = await task.output();
@@ -79,6 +76,13 @@ export class WorkerManager {
         } else {
             return this.responses as WorkerResponse<T>[];
         }
+    }
+
+    private static getEncodedScript(script: string): Uint8Array<ArrayBuffer> {
+        return new TextEncoder().encode(`
+            ${WorkerWriter.toString().replaceAll("PORT", `${this.port}`).replace("OPTIONS", JSON.stringify(this.options))}
+            WorkerWriter.run("${script.replaceAll("\\", "/")}");
+        `);
     }
 }
 
@@ -111,14 +115,7 @@ export class WorkerWriter {
         const workers = registry.workers as WorkerWriteable<unknown, unknown>[];
 
         for (const worker of workers) {
-            const response = await fetch('http://localhost:PORT', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-    
-            const options = (await response.json()).data;
+            const options = JSON.parse('OPTIONS');
             const data = worker.generate(options);
     
             await fetch('http://localhost:PORT', {
