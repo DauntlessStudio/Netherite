@@ -1,4 +1,4 @@
-import { Language, type WorkerResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { Language, type ModuleResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
 import type { ServerItemStrict, ServerItemLoose, ServerItemCooldown } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -80,7 +80,11 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
     }
 
     // #endregion
-
+    
+    public get Item() : ServerItemLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.minecraftObj["minecraft:item"].description?.identifier ?? "NAMESPACE:SHORTNAME";
     }
@@ -110,7 +114,7 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
         return deepMerge(baseline, this.minecraftObj);
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): ModuleResponse<ModuleResponse> {
         const response = {
             endpoint: `BP/items/${this.Shortname}.json`,
             response: {

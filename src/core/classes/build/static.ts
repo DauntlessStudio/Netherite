@@ -7,6 +7,8 @@ import { Language } from "./language.ts";
 import { CompositeJSON, composites } from "./composite.ts";
 import { Project } from "../project.ts";
 
+type ModuleSubdirectory = "bp"|"rp"|"skin_pack"|"root";
+
 export class Static {
     private static readonly behaviorPath = path.join(Deno.cwd(), "src/behavior_pack");
     private static readonly resourcePath = path.join(Deno.cwd(), "src/resource_pack");
@@ -17,6 +19,7 @@ export class Static {
     private static readonly specialFiles: Map<string, (filepath: string, event: Deno.FsEvent["kind"]) => void> = new Map([
         ["**/*.lang", Language.watch.bind(Language)],
         ["**/scripts/**/*.ts", Script.watch.bind(Script)],
+        ["**/*.mod.ts", Module.watch.bind(Module)],
         ...CompositeJSON.watchMap()
     ]);
 
@@ -28,17 +31,17 @@ export class Static {
                     for (const subEntry of Deno.readDirSync(path.join(this.modulePath, entry.name))) {
                         const subPath = path.join(this.modulePath, entry.name, subEntry.name);
         
-                        if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "bp")) {
+                        if (subEntry.isDirectory && this.isInModuleDirectory(subPath, "bp")) {
                             await this.processBehaviorPath(subPath);
                             continue;
                         }
                         
-                        if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "rp")) {
+                        if (subEntry.isDirectory && this.isInModuleDirectory(subPath, "rp")) {
                             await this.processResourcePath(subPath);
                             continue;
                         }
                         
-                        if (subEntry.isDirectory && Module.isInModuleDirectory(subPath, "skin_pack")) {
+                        if (subEntry.isDirectory && this.isInModuleDirectory(subPath, "skin_pack")) {
                             await this.processSkinPath(subPath);
                             continue;
                         }
@@ -115,13 +118,13 @@ export class Static {
             return path.resolve(path.join(Config.Paths.rp.root, src));
         }
 
-        if (Module.isInModuleDirectory(src, "bp")) {
+        if (this.isInModuleDirectory(src, "bp")) {
             src = src.replace(this.modulePath, "");
             const segments = src.split(path.SEPARATOR_PATTERN).filter(Boolean);
             return path.resolve(path.join(Config.Paths.bp.root, ...segments.slice(2)));
         }
 
-        if (Module.isInModuleDirectory(src, "rp")) {
+        if (this.isInModuleDirectory(src, "rp")) {
             src = src.replace(this.modulePath, "");
             const segments = src.split(path.SEPARATOR_PATTERN).filter(Boolean);
             return path.resolve(path.join(Config.Paths.rp.root, ...segments.slice(2)));
@@ -204,5 +207,18 @@ export class Static {
         } catch (_error) {
             return "unknown";
         }
+    }
+
+    private static isInModuleDirectory(directory: string, subdirectory: ModuleSubdirectory): boolean {
+        const absoluteModuleDir = path.isAbsolute(this.modulePath) ? this.modulePath : path.resolve(Deno.cwd(), this.modulePath);
+        const absoluteDirectory = path.isAbsolute(directory) ? directory : path.resolve(Deno.cwd(), directory);
+    
+        if (!absoluteDirectory.startsWith(absoluteModuleDir)) {
+            return false;
+        }
+    
+        const directorySegments = absoluteDirectory.replace(absoluteModuleDir, "").split(path.SEPARATOR_PATTERN).filter(Boolean);
+    
+        return RegExp(subdirectory, "i").test(directorySegments.at(1) ?? "") || absoluteDirectory === absoluteModuleDir;
     }
 }

@@ -1,3 +1,5 @@
+import type { Molang } from "./molang.ts";
+
 /**
  * @remarks This method is required due to Minecraft failing to treat `1` and `1.0` the same when parsing JSON.
  * @param value The float value.
@@ -11,4 +13,4 @@ export function Float(value: Float): Float {
     return value;
 }
 
-export type Float = `__FLOAT__${number}.0`|number;
+export type Float = `__FLOAT__${number}.0`|number|Molang;

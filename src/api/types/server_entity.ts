@@ -1,6 +1,7 @@
 // deno-lint-ignore-file ban-types
 import type { ServerFilters, ServerFilterSubject } from "./filters.ts";
 import type { Float } from "./float.ts";
+import type { Molang } from "./molang.ts";
 import type { Components } from "./server_entity_components.ts";
 
 interface ServerEntityProperty {
@@ -10,14 +11,14 @@ interface ServerEntityProperty {
 
 interface ServerEntityFloatProperty extends ServerEntityProperty {
     type: "float";
-    default: Float;
-    range: [Float, Float];
+    default: Float|Molang;
+    range: [Float|Molang, Float|Molang];
 }
 
 interface ServerEntityIntProperty extends ServerEntityProperty {
     type: "int";
-    default: number;
-    range: [number, number];
+    default: number|Molang;
+    range: [number|Molang, number|Molang];
 }
 
 interface ServerEntityEnumProperty extends ServerEntityProperty {
@@ -28,12 +29,12 @@ interface ServerEntityEnumProperty extends ServerEntityProperty {
 
 interface ServerEntityBoolProperty extends ServerEntityProperty {
     type: "bool";
-    default: boolean;
+    default: boolean|Molang;
 }
 
-type ServerEntityPropertyType = ServerEntityFloatProperty | ServerEntityIntProperty | ServerEntityEnumProperty | ServerEntityBoolProperty;
+export type ServerEntityPropertyType = ServerEntityFloatProperty | ServerEntityIntProperty | ServerEntityEnumProperty | ServerEntityBoolProperty;
 
-interface ServerEntityDescription {
+export interface ServerEntityDescription {
     identifier: string;
     is_spawnable: boolean;
     is_summonable: boolean;
@@ -49,7 +50,7 @@ interface ServerEntityDescription {
     }
 }
 
-interface ServerEntityEvents {
+export interface ServerEntityEvents {
     add?: {
         component_groups: string[];
     };

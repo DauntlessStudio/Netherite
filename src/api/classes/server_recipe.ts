@@ -1,8 +1,12 @@
-import type { WorkerResponse, ModuleResponse } from "../../core/core.ts";
+import type { ModuleResponse, ModuleResponse } from "../../core/core.ts";
 import type { ServerRecipe, ServerRecipeShaped, ServerRecipeShapeless } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerRecipe>, ServerRecipe> {
+    public get Recipe() : Partial<ServerRecipe> {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return (this.minecraftObj as ServerRecipeShaped)["minecraft:recipe_shaped"]?.description?.identifier
         ?? (this.minecraftObj as ServerRecipeShapeless)["minecraft:recipe_shapeless"]?.description?.identifier
@@ -19,7 +23,7 @@ export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerReci
         return this.minecraftObj as ServerRecipe;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): ModuleResponse<ModuleResponse> {
         const response = {
             endpoint: `BP/recipes/${this.Shortname}.json`,
             response: {

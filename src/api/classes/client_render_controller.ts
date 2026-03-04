@@ -1,4 +1,4 @@
-import { type WorkerResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { type ModuleResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
 import type { ClientRenderControllerStrict, ClientRenderControllerLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -19,7 +19,11 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
                 }
             }, name);
     }
-
+    
+    public get RenderController() : ClientRenderControllerLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return `NAMESPACE:${this.name}`;
     }
@@ -37,7 +41,7 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
         return deepMerge(baseline, this.minecraftObj);
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): ModuleResponse<ModuleResponse> {
         return {
             endpoint: `RP/render_controllers/${this.Shortname}.rc.json`,
             response: {
