@@ -1,4 +1,4 @@
-import { type ModuleResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { type WriteableResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
 import type { ServerBlockStrict, ServerBlockLoose } from "../types/index.ts";
 import type { BlockGeometry, BlockMaterialInstances } from "../types/server_block_components.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
@@ -109,7 +109,7 @@ export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, S
         return result;
     }
 
-    protected generate(): ModuleResponse<ModuleResponse> {
+    protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
             endpoint: `BP/blocks/${this.Shortname}.json`,
             response: {

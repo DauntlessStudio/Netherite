@@ -1,4 +1,4 @@
-import { type ModuleResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { type WriteableResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
 import type { ClientAttachableStrict, ClientAttachableLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -119,7 +119,7 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
         return deepMerge(baseline, this.minecraftObj);
     }
 
-    protected generate(): ModuleResponse<ModuleResponse> {
+    protected generate(): WriteableResponse<ModuleResponse> {
         const data = this.encode();
 
         return {

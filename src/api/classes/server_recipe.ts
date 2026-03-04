@@ -1,4 +1,4 @@
-import type { ModuleResponse, ModuleResponse } from "../../core/core.ts";
+import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ServerRecipe, ServerRecipeShaped, ServerRecipeShapeless } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -23,7 +23,7 @@ export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerReci
         return this.minecraftObj as ServerRecipe;
     }
 
-    protected generate(): ModuleResponse<ModuleResponse> {
+    protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
             endpoint: `BP/recipes/${this.Shortname}.json`,
             response: {

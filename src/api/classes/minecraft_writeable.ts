@@ -1,4 +1,4 @@
-import { type ModuleResponse, type ModuleWriteable, type ModuleResponse, ModuleWriter, deepMerge } from "../../core/core.ts";
+import { type WriteableResponse, type ModuleWriteable, ModuleWriter, deepMerge, type ModuleResponse } from "../../core/core.ts";
 
 export abstract class MinecraftWriteable<Loose extends object, Strict extends Loose> {
     protected minecraftObj: Loose;
@@ -36,5 +36,5 @@ export abstract class MinecraftWriteable<Loose extends object, Strict extends Lo
     /**
      * Generates a WorkerResponse, can also add Language or other such entries.
      */
-    protected abstract generate(): ModuleResponse<ModuleResponse>;
+    protected abstract generate(): WriteableResponse<ModuleResponse>;
 }

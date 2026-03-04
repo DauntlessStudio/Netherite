@@ -1,4 +1,4 @@
-import type { ModuleResponse, ModuleResponse } from "../../core/core.ts";
+import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientItemTexture } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -19,7 +19,7 @@ export class MinecraftClientItemTexture extends MinecraftWriteable<Partial<Clien
         return this.minecraftObj as ClientItemTexture;
     }
 
-    protected generate(): ModuleResponse<ModuleResponse> {
+    protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
             endpoint: `item_texture`,
             response: {

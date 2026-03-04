@@ -1,7 +1,5 @@
 // deno-lint-ignore-file no-explicit-any no-explicit-any
-import { Logger } from "../core.ts";
-
-export interface ModuleResponse<T> {
+export interface WriteableResponse<T> {
     endpoint: string;
     response: T;
 }
@@ -53,7 +51,7 @@ export class ModuleManager {
      * @param options The project's options that are passed to the writeable objects.
      * @returns An array of objects created by any writeable objects in the `.ts` file.
      */
-    public static async run<T>(script: string, options?: unknown): Promise<ModuleResponse<T>[]> {
+    public static async run<T>(script: string, options?: unknown): Promise<WriteableResponse<T>[]> {
         this.startup();
 
         if (!this.daemon) throw new Error(`Failed to spawn Daemon before processing "${script}"`);
@@ -87,7 +85,7 @@ export class ModuleManager {
 }
 
 export interface WriteableModule<T, U> {
-    generate(options: T): ModuleResponse<U>;
+    generate(options: T): WriteableResponse<U>;
 }
 
 /**
@@ -107,11 +105,11 @@ export class ModuleWriter {
         this.writeables.push(writeable);
     }
 
-    private static async run(data: { script: string, options: unknown }): Promise<ModuleResponse<unknown>[]> {
+    private static async run(data: { script: string, options: unknown }): Promise<WriteableResponse<unknown>[]> {
         const url = new URL("file://" + data.script + `?t=${Date.now()}`);
         await import(url.toString());
 
-        const responses: ModuleResponse<unknown>[] = [];
+        const responses: WriteableResponse<unknown>[] = [];
 
         for (const worker of this.writeables) {
             responses.push(worker.generate(data.options));

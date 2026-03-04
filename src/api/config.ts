@@ -1,4 +1,4 @@
-import type { ProjectConfig, ModuleResponse, WriteableModule } from "../core/classes/index.ts";
+import type { ProjectConfig, WriteableResponse, WriteableModule } from "../core/classes/index.ts";
 import { ModuleWriter } from "../core/classes/worker.ts";
 
 class OptionsGenerator implements WriteableModule<void, ProjectConfig> {
@@ -9,7 +9,7 @@ class OptionsGenerator implements WriteableModule<void, ProjectConfig> {
         ModuleWriter.register(this);
     }
 
-    public generate(): ModuleResponse<ProjectConfig> {
+    public generate(): WriteableResponse<ProjectConfig> {
         return {
             endpoint: "options",
             response: this.options,

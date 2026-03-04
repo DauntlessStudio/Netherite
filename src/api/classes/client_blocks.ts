@@ -1,4 +1,4 @@
-import type { ModuleResponse, ModuleResponse } from "../../core/core.ts";
+import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientBlocks } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -15,7 +15,7 @@ export class MinecraftClientBlocks extends MinecraftWriteable<ClientBlocks, Clie
         return this.minecraftObj;
     }
 
-    protected generate(): ModuleResponse<ModuleResponse> {
+    protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
             endpoint: `blocks`,
             response: {
