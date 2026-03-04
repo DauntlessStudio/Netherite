@@ -1,4 +1,4 @@
-import type { WorkerResponse, ModuleResponse } from "../../core/core.ts";
+import type { ModuleResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientGeometryLoose, ClientGeometryStrict } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -405,7 +405,7 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
         return this.minecraftObj as ClientGeometryStrict;
     }
 
-    protected generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): ModuleResponse<ModuleResponse> {
         return {
             endpoint: `RP/models/${this.subpath}/${this.name}.geo.json`,
             response: {

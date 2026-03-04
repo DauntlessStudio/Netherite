@@ -1,4 +1,4 @@
-import type { WorkerResponse, ModuleResponse } from "../../core/core.ts";
+import type { ModuleResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientAnimationControllerLoose, ClientAnimationControllerStrict } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -83,7 +83,7 @@ export class MinecraftClientAnimationController extends MinecraftWriteable<Clien
         return this.minecraftObj as ClientAnimationControllerStrict;
     }
 
-    protected generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): ModuleResponse<ModuleResponse> {
         return {
             endpoint: `RP/animation_controllers/${this.name}.ac.json`,
             response: {

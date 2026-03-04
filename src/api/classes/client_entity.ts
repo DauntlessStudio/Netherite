@@ -1,4 +1,4 @@
-import { type WorkerResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { type ModuleResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
 import type { ClientEntityStrict, ClientEntityLoose, Molang } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -77,7 +77,7 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
         return deepMerge(baseline, this.minecraftObj);
     }
 
-    protected generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): ModuleResponse<ModuleResponse> {
         return {
             endpoint: `RP/entity/${this.Shortname}.entity.json`,
             response: {

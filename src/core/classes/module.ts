@@ -1,7 +1,7 @@
 import * as path from "@std/path";
 import { debounce } from "@std/async/debounce";
 import { writeBufferToDist } from "../utils/fileIO.ts";
-import { WorkerManager, type WorkerWriteable, type ProjectOptions, composites } from "./index.ts";
+import { ModuleManager, type WriteableModule, type ProjectOptions, composites } from "./index.ts";
 import { Config } from "./config.ts";
 import { Logger } from "../utils/index.ts";
 
@@ -10,7 +10,7 @@ export interface ModuleResponse {
     data: number[];
 }
 
-export interface ModuleWriteable extends WorkerWriteable<ProjectOptions, ModuleResponse> {}
+export interface ModuleWriteable extends WriteableModule<ProjectOptions, ModuleResponse> {}
 
 interface WriteData {
     outputPath: string;
@@ -136,7 +136,7 @@ export class Module {
         }
 
         try {
-            const result = await WorkerManager.run<ModuleResponse>(file, Config.Options);
+            const result = await ModuleManager.run<ModuleResponse>(file, Config.Options);
 
             if (result.length > 0) {
                 if (!this.queue.has(file)) {
@@ -167,8 +167,7 @@ export class Module {
                 }
             }
         } catch (error) {
-            Logger.error(`Error processing module: ${file}`);
-            Logger.error(String(error));
+            Logger.error(`Cannot run "${file}". [${error}]`);
         }
 
         const modifiedComposites = new Set<keyof typeof composites>();

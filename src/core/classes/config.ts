@@ -5,7 +5,7 @@ import * as path from "@std/path";
 import type { EnvironmentType, ProjectOptions } from "./project.ts";
 import { Buffer } from "node:buffer";
 import { JSONCParse, Logger } from "../utils/index.ts";
-import { WorkerManager } from "./index.ts";
+import { ModuleManager } from "./index.ts";
 import deno from "../../../deno.json" with {type: "json" };
 
 interface ConfigPaths {
@@ -195,10 +195,10 @@ export class Config {
         
         try {
             // Environment is ommitted because it is provided by Netherite rather than the config file.
-            const value = await WorkerManager.run<Omit<ProjectOptions, "environment">>(path.join(Deno.cwd(), "netherite.config.ts"));
+            const value = await ModuleManager.run<Omit<ProjectOptions, "environment">>(path.join(Deno.cwd(), "netherite.config.ts"));
             this.setOptions({environment, ...value[0].response});
         } catch (error) {
-            throw new Error("Failed to ingest netherite.config.ts due to " + error);
+            throw `Encountered fatal issue processing netherite.config.ts. [${error}]\nAborting...`;
         }
     }
 
