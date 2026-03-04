@@ -14,7 +14,7 @@ if (arg.match(/\d\.\d\.\d?.+/)) {
             "--allow-write",
             "--allow-run",
             "--allow-env",
-            "--allow-net=localhost:0,jsr.io",
+            "--allow-net=localhost,jsr.io",
             `jsr:@coldiron/netherite@${arg}/cli`
         ],
         stdout: "inherit",
@@ -34,7 +34,7 @@ if (arg.match(/\d\.\d\.\d?.+/)) {
             "--allow-write",
             "--allow-run",
             "--allow-env",
-            "--allow-net=localhost:0,jsr.io",
+            "--allow-net=localhost,jsr.io",
             `jsr:@coldiron/netherite@${latest}/cli`
         ],
         stdout: "inherit",

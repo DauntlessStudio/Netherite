@@ -1,26 +1,25 @@
 // deno-lint-ignore-file no-explicit-any no-explicit-any
+import { Logger } from "../core.ts";
+
 export interface ModuleResponse<T> {
     endpoint: string;
     response: T;
-}
-
-interface Daemon {
-    task: Deno.ChildProcess;
-    writer: WritableStreamDefaultWriter<Uint8Array>;
-    reader: ReadableStreamDefaultReader<string>;
 }
 
 /**
  * Manages the long-running daemon for importing `*.mod.ts` files.
  */
 export class ModuleManager {
-    private static daemon?: Daemon;
+    private static daemon?: Deno.ChildProcess;
+    private static port: number = 0;
 
     /**
      * Spawns the daemon process with the ability to read and write output via stdin and stdout.
      */
     private static startup(): void {
         if (this.daemon) return;
+
+        Deno.serve({hostname: "localhost", port: 0, onListen: ({port}) => {this.port = port}}, () => new Response()).shutdown();
 
         const task = new Deno.Command("deno", {
             args: [
@@ -29,24 +28,22 @@ export class ModuleManager {
                 "deno.json",
                 "--allow-read",
                 "--allow-env",
+                `--allow-net=localhost:${this.port}`,
                 this.getEncodedScript(),
             ],
             stdin: "piped",
-            stdout: "piped",
+            stdout: "inherit",
             stderr: "inherit",
         }).spawn();
 
-        const writer = task.stdin.getWriter();
-        const reader = task.stdout.pipeThrough(new TextDecoderStream()).getReader();
-
-        this.daemon = { task, writer, reader };
+        this.daemon = task;
     }
 
     /**
      * Shuts down the daemon and cleans up.
      */
     public static shutdown(): void {
-        this.daemon?.task?.kill();
+        this.daemon?.kill();
         this.daemon = undefined;
     }
     
@@ -62,16 +59,17 @@ export class ModuleManager {
         if (!this.daemon) throw new Error(`Failed to spawn Daemon before processing "${script}"`);
 
         script = script.replaceAll("\\", "/");
-        await this.daemon.writer.write(new TextEncoder().encode(JSON.stringify({script, options})));
 
-        const {value} = await this.daemon.reader.read();
-        if (!value) return [];
+        const response = await fetch(`http://localhost:${this.port}`, {
+            method: "POST",
+            body: JSON.stringify({script, options}),
+        });
 
-        try {
-            const response = JSON.parse(value) as ModuleResponse<T>[];
-            return response;
-        } catch (_error) {
-            throw value.replace(/\?t=\d+/g, "");
+        switch (response.status) {
+            case 200:
+                return await response.json();        
+            default:
+                throw (await response.json()).message;
         }
     }
 
@@ -82,7 +80,7 @@ export class ModuleManager {
     private static getEncodedScript(): string {
         return "data:application/typescript;base64," + btoa(`
             self.writeables = [];
-            ${ModuleWriter.toString()}
+            ${ModuleWriter.toString().replaceAll("PORT", String(this.port))}
             ModuleWriter.start();
         `);
     }
@@ -99,6 +97,7 @@ export interface WriteableModule<T, U> {
 export class ModuleWriter {
     // Pins writeables array to globalthis object so it can be accessed by all modules
     private static writeables: WriteableModule<unknown, unknown>[] = (self as any).writeables;
+    private static server?: Deno.HttpServer<Deno.NetAddr>;
 
     /**
      * Register a Writeable Module to the Writer.
@@ -108,40 +107,46 @@ export class ModuleWriter {
         this.writeables.push(writeable);
     }
 
-    private static broadcast(options: unknown): void {
-        if (!this.writeables.length) {
-            // Do not interact with the server if there is nothing to do.
-            return;
-        };
+    private static async run(data: { script: string, options: unknown }): Promise<ModuleResponse<unknown>[]> {
+        const url = new URL("file://" + data.script + `?t=${Date.now()}`);
+        await import(url.toString());
 
         const responses: ModuleResponse<unknown>[] = [];
 
         for (const worker of this.writeables) {
-            responses.push(worker.generate(options));
+            responses.push(worker.generate(data.options));
         }
-        
-        Deno.stdout.write(new TextEncoder().encode(JSON.stringify(responses)));
-        this.writeables.length = 0; // Clear the registry after broadcasting
+
+        this.writeables.length = 0; // Clear the registry before next run
+        return responses;
     }
 
-    private static async run(data: {script: string, options: unknown}): Promise<void> {
-        try {
-            const url = new URL("file://" + data.script + `?t=${Date.now()}`);
-            await import(url.toString());
-            this.broadcast(data.options);
-        } catch (error) {
-            Deno.stdout.write(new TextEncoder().encode(String(error)));
-        }
-    }
+    protected static start(): void {
+        if (!this.server) {
+            this.server = Deno.serve(
+                {
+                    port: Number("PORT"),
+                    hostname: "localhost",
+                    onListen: () => {}, // Suppress startup message
+                },
+                async (req: Request) => {
+                    switch (req.method) {
+                        case "POST": {
+                            const data = await req.json();
+                            if (!data.script) return new Response(JSON.stringify({ message: "Malformed request" }), { status: 400 });
 
-    protected static async start(): Promise<void> {
-        const decoder = new TextDecoder();
-
-        for await (const chunk of Deno.stdin.readable) {
-            const value = decoder.decode(chunk).trim();
-            if (!value) continue;
-
-            this.run(JSON.parse(value));
+                            try {
+                                return new Response(JSON.stringify(await this.run(data)), { status: 200 });
+                            } catch (error) {
+                                return new Response(JSON.stringify({ message: String(error) }), { status: 500 });
+                            }
+                        }
+                        default: {
+                            return new Response(JSON.stringify({ message: "Method not allowed" }), { status: 405 });
+                        }
+                    }
+                }
+            );
         }
     }
 }
