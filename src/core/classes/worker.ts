@@ -94,7 +94,7 @@ export interface WriteableModule<T, U> {
  */
 export class ModuleWriter {
     // Pins writeables array to globalthis object so it can be accessed by all modules
-    private static writeables: WriteableModule<unknown, unknown>[] = (self as any).writeables;
+    private static writeables: WriteableModule<unknown, unknown>[] = (self as any).writeables ?? [];
     private static server?: Deno.HttpServer<Deno.NetAddr>;
 
     /**
