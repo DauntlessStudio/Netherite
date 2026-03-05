@@ -177,7 +177,10 @@ export class Config {
         const namespaceParts = this.Options.namespace.split("_");
 
         if (namespaceParts.length !== 2) {
-            throw new Error("Namespace must be in the format of 'author_name'");
+            Logger.warn(`Mojang recommends your namespace use <studio_name>_<pack_name>. Your namespace is: ${this.Options.namespace}`);
+            this.packName = this.Options.namespace;
+            this.studioName = "";
+            return;
         }
 
         this.studioName = namespaceParts[0];
