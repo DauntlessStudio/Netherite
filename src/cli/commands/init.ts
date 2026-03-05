@@ -172,13 +172,13 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectOption
     if (args.options.type) {
         buildOptions.type = args.options.type;
     } else {
-        let val = prompt("Please enter the type of the project (world, add-on, skin-pack) [default: world]:");
-        if (val === null || !["world", "add-on", "skin-pack"].includes(val)) val = "world";
+        let val = prompt("Please enter the type of the project (world, add-on, skin-pack) [default: add-on]:");
+        if (val === null || !["world", "add-on", "skin-pack"].includes(val)) val = "add-on";
 
         buildOptions.type = val as ProjectType;
     }
 
-    if (buildOptions.type === "world" || buildOptions.type === "add-on") {
+    if (buildOptions.type === "world") {
         if (args.options.skinpack) {
             buildOptions.include_skin_pack = args.options.skinpack;
         } else {
