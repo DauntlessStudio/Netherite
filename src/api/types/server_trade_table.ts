@@ -9,7 +9,7 @@ interface ServerTradeTableTierGroups {
     groups: {
         num_to_select?: number;
         trades: ServerTradeTableTrade[];
-    }
+    }[];
 }
 
 export interface ServerTradeTableTrade {
