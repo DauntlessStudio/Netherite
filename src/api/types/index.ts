@@ -10,6 +10,7 @@ export * from "./server_block_components.ts";
 export * from "./server_item.ts";
 export * from "./server_item_components.ts";
 export * from "./server_recipe.ts";
+export * from "./server_loot_table.ts";
 export * from "./server_trade_table.ts";
 export * from "./client_attachable.ts";
 export * from "./client_animation_controller.ts";
