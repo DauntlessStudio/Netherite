@@ -107,7 +107,10 @@ export class Module {
             for (const { endpoint, response } of result) {
                 // Add entry to filemap
                 const entry: WriteData = {
-                    outputPath: endpoint.replace("BP", Config.Paths.bp.root).replace("RP", Config.Paths.rp.root),
+                    outputPath: endpoint
+                        .replace("BP", Config.Paths.bp.root)
+                        .replace("RP", Config.Paths.rp.root)
+                        .replace("PATH", path.join(Config.StudioName, Config.PackName)),
                     content: response.data,
                 };
                 this.filemap.get(filepath)?.set(entry.outputPath, entry.content);
