@@ -3,6 +3,7 @@ export * from "./server_item.ts";
 export * from "./server_entity.ts";
 export * from "./server_block.ts";
 export * from "./server_recipe.ts";
+export * from "./server_trade_tables.ts";
 export * from "./client_entity.ts";
 export * from "./client_geometry.ts";
 export * from "./client_attachable.ts";
