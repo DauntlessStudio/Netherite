@@ -19,10 +19,10 @@ interface ClientEntityDescription {
 }
 
 interface ClientEntityScripts {
-    scale?: Molang;
-    scalex?: Molang;
-    scaley?: Molang;
-    scalez?: Molang;
+    scale?: Molang|number;
+    scalex?: Molang|number;
+    scaley?: Molang|number;
+    scalez?: Molang|number;
     variables?: {
         [key: string]: "public";
     };
@@ -30,8 +30,8 @@ interface ClientEntityScripts {
     initialize?: string[];
     parent_setup?: string;
     pre_animation?: string[];
-    should_update_effects_offscreen?: boolean;
-    should_update_bones_and_effects_offscreen?: boolean;
+    should_update_effects_offscreen?: boolean|Molang|number;
+    should_update_bones_and_effects_offscreen?: boolean|Molang|number;
 }
 
 interface ClientEntitySpawnEggColor {

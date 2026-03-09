@@ -1,6 +1,6 @@
-import { type WorkerResponse, type ModuleWriteable, type ModuleResponse, WorkerWriter, deepMerge } from "../../core/core.ts";
+import { type WriteableResponse, type ModuleWriteable, ModuleWriter, deepMerge, type ModuleResponse } from "../../core/core.ts";
 
-export abstract class MinecraftWriteable<Loose extends object, Strict extends Loose> implements ModuleWriteable {
+export abstract class MinecraftWriteable<Loose extends object, Strict extends Loose> {
     protected minecraftObj: Loose;
 
     public abstract get Identifier() : string;
@@ -11,7 +11,7 @@ export abstract class MinecraftWriteable<Loose extends object, Strict extends Lo
     
     constructor(obj: Loose) {
         this.minecraftObj = obj;
-        WorkerWriter.register(this);
+        ModuleWriter.register(this as unknown as ModuleWriteable); // Type conversion to exposed protected generate to worker.
     }
 
     public modify(target: Loose): this {
@@ -19,12 +19,11 @@ export abstract class MinecraftWriteable<Loose extends object, Strict extends Lo
         return this;
     }
 
-    public encode(): number[] {
+    protected encode(): number[] {
         let content = JSON.stringify(this.validate(), null, "\t");
         content = content.replace(/IDENTIFIER/g, this.Identifier);
         content = content.replace(/SHORTNAME/g, this.Shortname);
-
-        // TODO: Handle Floats
+        content = content.replace(/"__FLOAT__(-?\d+\.0)"/g, "$1");
 
         return Array.from(new TextEncoder().encode(content));
     }
@@ -37,5 +36,5 @@ export abstract class MinecraftWriteable<Loose extends object, Strict extends Lo
     /**
      * Generates a WorkerResponse, can also add Language or other such entries.
      */
-    public abstract generate(): WorkerResponse<ModuleResponse>;
+    protected abstract generate(): WriteableResponse<ModuleResponse>;
 }

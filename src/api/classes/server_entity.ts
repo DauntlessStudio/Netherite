@@ -1,4 +1,5 @@
-import { Language, type WorkerResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { Language, type WriteableResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { Float } from "../types/float.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -62,7 +63,11 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
     }
 
     // #endregion
-
+    
+    public get Entity() : ServerEntityLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.minecraftObj["minecraft:entity"].description?.identifier ?? "NAMESPACE:SHORTNAME";
     }
@@ -86,6 +91,17 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
             });
         }
 
+        const properties = this.minecraftObj["minecraft:entity"].description.properties;
+        if (properties) {
+            for (const value of Object.values(properties)) {
+                if (value.type === "float") {
+                    value.default = Float(value.default);
+                    value.range[0] = Float(value.range[0]);
+                    value.range[1] = Float(value.range[1]);
+                }
+            }
+        }
+
         const baseline: ServerEntityStrict = {
             format_version: "FORMATVERSION",
             "minecraft:entity": {
@@ -103,7 +119,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
         return deepMerge(baseline, this.minecraftObj);
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
             endpoint: `BP/entities/${this.Shortname}.json`,
             response: {

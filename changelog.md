@@ -1,4 +1,32 @@
 # Changelog
+## [0.8.0] - 03/9/2026
+- Added `MinecraftServerBlock.createItem` which would modify the block and add a `MinecraftServerItem` block placer.
+- Added `ServerTradeTable` to API.
+- Added `ServerLootTable` to API.
+- Improved `MinecraftWriteable` performance and stability.
+- Improved error feedback.
+- Changed Mod files (`*.mod.ts`) to now work anywhere, not just in `modules/` directories.
+- Changed build time message to seconds instead of milliseconds.
+- Changed default init option to add-on.
+- Removed fatal error that occured when using a namespace that didnt' follow the `<author>_<pack>` convention. It now gives a best practice warning but builds anyway.
+- Removed `MinecraftWriteable`'s `encode` and `generate` methods which should only be called internally by the framework, from the API.
+- Removed skin pack prompt when initializing add-on.
+- Fixed issue where entity float properties deserialized as whole numbers, causing an error in Minecraft.
+- Fixed issue where text processing wasn't applied to `*.material` files, preventing the NAMESPACE keyword from working in materials.
+- Fixed some `MinecraftClientEntity` properties not accepting all valid value types.
+---
+## [0.7.0] - 02/23/2026
+- Added `MinecraftServerBlock` to API.
+- Added `MinecraftServerRecipe` to API.
+- Added `MinecraftClientTerrainTexture` to API.
+---
+## [0.6.0] - 01/28/2026
+### Changes
+- Fixed issue where lang entries could duplicate across multiple categories.
+- Fixed issue where modules were ingested after project files, preventing project specific overrides.
+- Fixed issue where changing git branches could corrupt the build process resulting in missing files in the dist.
+- Fixed issue where the `animate` field for `MinecraftClientAttachable` didn't accept key value pairs.
+---
 ## [0.5.1] - 01/12/2026
 ### Changes
 - Fixed issue where `netherite build --watch` was terminating after a successful build rather that awaiting file changes. Now `build --watch` will prompt the user "Press any key to exit..." for the signal to terminate the program.

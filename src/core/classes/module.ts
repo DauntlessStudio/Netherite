@@ -1,7 +1,6 @@
 import * as path from "@std/path";
-import { debounce } from "@std/async/debounce";
 import { writeBufferToDist } from "../utils/fileIO.ts";
-import { WorkerManager, type WorkerWriteable, type ProjectOptions, composites } from "./index.ts";
+import { ModuleManager, type WriteableModule, type ProjectOptions, composites } from "./index.ts";
 import { Config } from "./config.ts";
 import { Logger } from "../utils/index.ts";
 
@@ -10,23 +9,21 @@ export interface ModuleResponse {
     data: number[];
 }
 
-export interface ModuleWriteable extends WorkerWriteable<ProjectOptions, ModuleResponse> {}
+export interface ModuleWriteable extends WriteableModule<ProjectOptions, ModuleResponse> {}
 
 interface WriteData {
     outputPath: string;
     content: number[];
 }
 
-type ModuleSubdirectory = "bp"|"rp"|"skin_pack"|"root";
-
 export class Module {
-    private static readonly moduleDir: string = path.join(Deno.cwd(), "src/modules");
-    private static readonly queue: Map<string, Map<string, number[]>> = new Map();
+    private static readonly srcDir: string = path.join(Deno.cwd(), "src");
+    private static readonly filemap: Map<string, Map<string, number[]>> = new Map();
     private static endWatchCallback: () => void;
 
-    public static async build(watch?: boolean): Promise<void> {
+    public static async build(): Promise<void> {
         try {
-            Deno.statSync(this.moduleDir);
+            Deno.statSync(this.srcDir);
         } catch (_error) {
             return;
         }
@@ -36,20 +33,16 @@ export class Module {
                 await this.process(filepath, true);
             }
         });
-
-        if (watch) {
-            this.watch();
-        }
     }
 
     public static endWatch(): void {
         if (this.endWatchCallback) this.endWatchCallback();
-        this.queue.clear();
+        this.filemap.clear();
     }
 
     public static async iterate(callback: (filepath: string) => Promise<void>): Promise<void> {
         const iterator = async (dirpath: string) => {
-            dirpath = dirpath ?? this.moduleDir;
+            dirpath = dirpath ?? this.srcDir;
 
             for (const dirEntry of Deno.readDirSync(dirpath)) {
                 const entryPath = path.join(dirpath, dirEntry.name);
@@ -62,134 +55,112 @@ export class Module {
             }
         }
 
-        await iterator(this.moduleDir);
+        await iterator(this.srcDir);
     }
 
-    public static isInModuleDirectory(directory: string, subdirectory: ModuleSubdirectory): boolean {
-        const absoluteModuleDir = path.isAbsolute(this.moduleDir) ? this.moduleDir : path.resolve(Deno.cwd(), this.moduleDir);
-        const absoluteDirectory = path.isAbsolute(directory) ? directory : path.resolve(Deno.cwd(), directory);
-    
-        if (!absoluteDirectory.startsWith(absoluteModuleDir)) {
-            return false;
-        }
-    
-        const directorySegments = absoluteDirectory.replace(absoluteModuleDir, "").split(path.SEPARATOR_PATTERN).filter(Boolean);
-    
-        return RegExp(subdirectory, "i").test(directorySegments.at(1) ?? "") || absoluteDirectory === absoluteModuleDir;
-    }
-
-    private static async watch(): Promise<void> {
-        const ingest = debounce(async (event: Deno.FsEvent) => {
-            if (!event.paths[0].endsWith(".mod.ts")) return;
-
-            switch (event.kind) {
+    public static async watch(filepath: string, event: Deno.FsEvent["kind"]): Promise<void> {
+        switch (event) {
                 case "modify": {
                     try {
-                        await this.process(event.paths[0]);
+                        await this.process(filepath);
                     } catch (e) {
-                        console.error(`Error loading module: ${event.paths[0]}`);
+                        console.error(`Error loading module: ${filepath}`);
                         console.error(e);
                     }
                     break;
                 }
                 case "remove": {
-                    const cache = this.queue.get(event.paths[0]);
-
-                    if (cache) {
-                        for (const file of cache.keys()) {
-                            Deno.removeSync(file);
-                        }
-
-                        this.queue.delete(event.paths[0]);
-                    }
+                    this.remove(filepath);
                     break;
                 }
-                case "rename": {
-                    const cache = this.queue.get(event.paths[0]);
-
-                    if (cache && event.paths[1]) {
-                        this.queue.delete(event.paths[0]);
-                        this.queue.set(event.paths[1], cache);
-                    }
-                    break;
-                }
-                default: return;                    
-            }
-        }, 200);
-
-        const watcher = Deno.watchFs(this.moduleDir);
-        this.endWatchCallback = () => watcher.close();
-
-        for await (const event of watcher) {
-            ingest(event);
+                default: return;
         }
     }
 
-    private static async process(file: string, silent?: boolean): Promise<void> {
-        if (!file.endsWith(".mod.ts")) return;
+    private static async process(filepath: string, silent?: boolean): Promise<void> {
+        if (!filepath.endsWith(".mod.ts")) return;
 
         try {
-            const stat = Deno.statSync(file);
+            const stat = Deno.statSync(filepath);
             if (stat.isDirectory) return;
         } catch (_error) {
             // Do Nothing
         }
 
         try {
-            const result = await WorkerManager.run<ModuleResponse>(file, Config.Options);
+            // Run module file
+            const result = await ModuleManager.run<ModuleResponse>(filepath, Config.Options);
+            if (!silent) Logger.log(`[${Logger.Colors.brightGreen("mode write")}] ${filepath}`);
 
-            if (result.length > 0) {
-                if (!this.queue.has(file)) {
-                    this.queue.set(file, new Map());
+            // Create new filemap entry if needed
+            if (!this.filemap.has(filepath)) {
+                this.filemap.set(filepath, new Map());
+            }
+
+            // Create cache of currently mapped output files
+            const cachedFiles = this.filemap.get(filepath)?.keys().toArray() ?? [];
+
+            // Prepare composites for writing
+            const modifiedComposites = new Set<keyof typeof composites>();
+
+            // Iterate through responses
+            for (const { endpoint, response } of result) {
+                // Add entry to filemap
+                const entry: WriteData = {
+                    outputPath: endpoint
+                        .replace("BP", Config.Paths.bp.root)
+                        .replace("RP", Config.Paths.rp.root)
+                        .replace("PATH", path.join(Config.StudioName, Config.PackName)),
+                    content: response.data,
+                };
+                this.filemap.get(filepath)?.set(entry.outputPath, entry.content);
+
+                // If output is a composite add it to list, otherwise write file
+                if (entry.outputPath in composites) {
+                    const compositeKey = entry.outputPath as keyof typeof composites;
+                    modifiedComposites.add(compositeKey);
+                    composites[compositeKey].ingestData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))));
+                } else {
+                    writeBufferToDist(entry.outputPath, new Uint8Array(entry.content));
+                    if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(entry.outputPath)}`);
                 }
 
-                const cachedFiles = this.queue.get(file)?.keys().toArray() ?? [];
-
-                for (const {endpoint, response} of result) {
-                    const entry: WriteData = {
-                        outputPath: endpoint.replace("BP", Config.Paths.bp.root).replace("RP", Config.Paths.rp.root),
-                        content: response.data,
-                    };
-
-                    if (entry) {
-                        this.queue.get(file)?.set(entry.outputPath, entry.content);
-
-                        if (cachedFiles.includes(entry.outputPath)) {
-                            cachedFiles.splice(cachedFiles.indexOf(entry.outputPath), 1);
-                        }
-                    }
+                // Remove any outputs from cache list
+                if (cachedFiles.includes(entry.outputPath)) {
+                    cachedFiles.splice(cachedFiles.indexOf(entry.outputPath), 1);
                 }
+            }
 
-                for (const cachedFile of cachedFiles) {
-                    Deno.removeSync(cachedFile);
-                    this.queue.get(file)?.delete(cachedFile);
-                    if (!silent) Logger.log(`[${Logger.Colors.red("remove")}] ${path.resolve(cachedFile)}`);
-                }
+            // Update composite files
+            modifiedComposites.forEach(mod => {
+                composites[mod].build();
+                if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(composites[mod].OutPath)}`);
+            });
+
+            // Delete cached files
+            for (const cachedFile of cachedFiles) {
+                Deno.removeSync(cachedFile);
+                this.filemap.get(filepath)?.delete(cachedFile);
+                if (!silent) Logger.log(`[${Logger.Colors.red("remove")}] ${path.resolve(cachedFile)}`);
+
+                // TODO: handled removed composite entries?
             }
         } catch (error) {
-            Logger.error(`Error processing module: ${file}`);
-            Logger.error(String(error));
+            Logger.error(`Cannot run "${filepath}". [${error}]`);
         }
+    }
 
-        const modifiedComposites = new Set<keyof typeof composites>();
+    private static remove(filepath: string, silent?: boolean): void {
+        if (!silent) Logger.log(`[${Logger.Colors.brightRed("mode remove")}] "${filepath}"`);
+        const cache = this.filemap.get(filepath);
 
-        for (const module of this.queue.values()) {
-            for (const [key, data] of module) {
-                if (key in composites) {
-                    const compositeKey = key as keyof typeof composites;
-                    modifiedComposites.add(compositeKey);
-                    composites[compositeKey].ingestData(JSON.parse(new TextDecoder().decode(new Uint8Array(data))));
-                    continue;
-                }
-
-                writeBufferToDist(key, new Uint8Array(data));
-                if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(key)}`);
+        if (cache) {
+            for (const file of cache.keys()) {
+                Deno.removeSync(file);
+                if (!silent) Logger.log(`[${Logger.Colors.red("remove")}] ${path.resolve(file)}`);
             }
-        }
 
-        modifiedComposites.forEach(mod => {
-            composites[mod].build();
-            if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(composites[mod].OutPath)}`);
-        });
+            this.filemap.delete(filepath);
+        }
     }
 }

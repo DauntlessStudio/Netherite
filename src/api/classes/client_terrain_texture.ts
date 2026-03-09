@@ -1,8 +1,12 @@
-import type { WorkerResponse, ModuleResponse } from "../../core/core.ts";
+import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientTerrainTexture } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftClientTerrainTexture extends MinecraftWriteable<Partial<ClientTerrainTexture>, ClientTerrainTexture> {
+    public get TerrainTexture() : Partial<ClientTerrainTexture> {
+        return this.minecraftObj;
+    }
+    
     public override get Identifier(): string {
         return ""
     }
@@ -17,7 +21,7 @@ export class MinecraftClientTerrainTexture extends MinecraftWriteable<Partial<Cl
         return this.minecraftObj as ClientTerrainTexture;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
             endpoint: `terrain_texture`,
             response: {

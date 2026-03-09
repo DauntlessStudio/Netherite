@@ -1,8 +1,12 @@
-import type { WorkerResponse, ModuleResponse } from "../../core/core.ts";
+import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientBlocks } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
 export class MinecraftClientBlocks extends MinecraftWriteable<ClientBlocks, ClientBlocks> {
+    public get Blocks() : ClientBlocks {
+        return this.minecraftObj;
+    }
+    
     public override get Identifier(): string {
         return ""
     }
@@ -11,7 +15,7 @@ export class MinecraftClientBlocks extends MinecraftWriteable<ClientBlocks, Clie
         return this.minecraftObj;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
             endpoint: `blocks`,
             response: {

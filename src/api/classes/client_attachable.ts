@@ -1,4 +1,4 @@
-import { type WorkerResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { type WriteableResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
 import type { ClientAttachableStrict, ClientAttachableLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -79,7 +79,11 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
             }
         });
     }
-
+    
+    public get Attachable() : ClientAttachableLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.minecraftObj["minecraft:attachable"].description.identifier ?? "NAMESPACE:SHORTNAME";
     }
@@ -115,7 +119,7 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
         return deepMerge(baseline, this.minecraftObj);
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WriteableResponse<ModuleResponse> {
         const data = this.encode();
 
         return {

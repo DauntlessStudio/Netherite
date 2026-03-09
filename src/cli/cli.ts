@@ -1,4 +1,4 @@
-import { Logger } from "../core/core.ts";
+import { Logger, ModuleManager } from "../core/core.ts";
 import { Command } from "./command.ts";
 import "./commands/index.ts";
 
@@ -10,5 +10,7 @@ Command.parseCommands(Deno.args).then(result => {
     }
 }).catch(error => {
     Logger.error(error);
+}).finally(async () => {
+    await ModuleManager.shutdown();
     Deno.exit(1);
-});
+}); 

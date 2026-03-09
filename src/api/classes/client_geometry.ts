@@ -1,4 +1,4 @@
-import type { WorkerResponse, ModuleResponse } from "../../core/core.ts";
+import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientGeometryLoose, ClientGeometryStrict } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
@@ -388,7 +388,11 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
             ]
         }, name, "entity/player");
     }
-
+    
+    public get Geometry() : ClientGeometryLoose {
+        return this.minecraftObj;
+    }
+    
     public get Identifier() : string {
         return this.name;
     }
@@ -401,7 +405,7 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
         return this.minecraftObj as ClientGeometryStrict;
     }
 
-    public generate(): WorkerResponse<ModuleResponse> {
+    protected generate(): WriteableResponse<ModuleResponse> {
         return {
             endpoint: `RP/models/${this.subpath}/${this.name}.geo.json`,
             response: {

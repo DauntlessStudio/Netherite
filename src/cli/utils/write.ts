@@ -7,6 +7,7 @@ export interface SourceWriteOptions {
 }
 
 export function minecraftWriteableToSource(writeable: MinecraftWriteable<object, object>, options: SourceWriteOptions): void {
+    //@ts-ignore Access Protected Method Hidden From API
     const {endpoint, response} = writeable.generate();
     const path = endpoint.replace("BP", "./src/behavior_pack").replace("RP", "./src/resource_pack");
 

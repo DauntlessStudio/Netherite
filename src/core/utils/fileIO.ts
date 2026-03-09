@@ -112,7 +112,7 @@ export function writeTextToSrc(dest: string, content: string, overwrite: boolean
 }
 
 export function isTextFile(filename: string): boolean {
-    const textFileExtensions = [".ts", ".js", ".json", ".txt", ".md", ".lang", ".mcfunction"];
+    const textFileExtensions = [".ts", ".js", ".json", ".txt", ".md", ".lang", ".mcfunction", ".material"];
     return textFileExtensions.some(ext => filename.endsWith(ext));
 }
 
