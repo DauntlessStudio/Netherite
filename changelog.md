@@ -1,4 +1,7 @@
 # Changelog
+## [0.9.0] - 03/25/2026
+- Added `MinecraftClientLanguge` for dynamic lang file additions.
+---
 ## [0.8.1] - 03/25/2026
 - Fixed issue where `MinecraftServerRecipe` didn't support `minecraft:recipe_furnace` or `minecraft:recipe_brewing_mix`.
 ---
