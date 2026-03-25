@@ -1,6 +1,13 @@
 import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
-import type { ServerRecipe, ServerRecipeShaped, ServerRecipeShapeless } from "../types/index.ts";
+import type { ServerRecipe, ServerRecipeBrewingMix, ServerRecipeFurnace, ServerRecipeShaped, ServerRecipeShapeless } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
+
+const RecipeTypes = [
+    "minecraft:recipe_shaped",
+    "minecraft:recipe_shapeless",
+    "minecraft:recipe_furnace",
+    "minecraft:recipe_brewing_mix",
+];
 
 export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerRecipe>, ServerRecipe> {
     public get Recipe() : Partial<ServerRecipe> {
@@ -10,12 +17,14 @@ export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerReci
     public get Identifier() : string {
         return (this.minecraftObj as ServerRecipeShaped)["minecraft:recipe_shaped"]?.description?.identifier
         ?? (this.minecraftObj as ServerRecipeShapeless)["minecraft:recipe_shapeless"]?.description?.identifier
+        ?? (this.minecraftObj as ServerRecipeFurnace)["minecraft:recipe_furnace"]?.description?.identifier
+        ?? (this.minecraftObj as ServerRecipeBrewingMix)["minecraft:recipe_brewing_mix"]?.description?.identifier
         ?? "NAMESPACE:SHORTNAME";
     }
 
     protected override validate(): ServerRecipe {
-        if (!("minecraft:recipe_shaped" in this.minecraftObj) && !("minecraft:recipe_shapeless" in this.minecraftObj)) {
-            throw new Error("Recipe must include either `minecraft:recipe_shaped` or `minecraft:recipe_shapeless`");
+        if (RecipeTypes.every(value => !(value in this.minecraftObj))) {
+            throw new Error(`Recipe must include one of ${RecipeTypes.join(", ")}`);
         }
 
         this.minecraftObj.format_version = this.minecraftObj.format_version ?? "FORMATVERSION";
