@@ -1,4 +1,7 @@
 # Changelog
+## [0.8.1] - 03/25/2026
+- Fixed issue where `MinecraftServerRecipe` didn't support `minecraft:recipe_furnace` or `minecraft:recipe_brewing_mix`.
+---
 ## [0.8.0] - 03/9/2026
 - Added `MinecraftServerBlock.createItem` which would modify the block and add a `MinecraftServerItem` block placer.
 - Added `ServerTradeTable` to API.
