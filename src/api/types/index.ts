@@ -23,5 +23,6 @@ export * from "./client_sounds.ts";
 export * from "./client_entity.ts";
 export * from "./client_geometry.ts";
 export * from "./client_render_controller.ts";
+export * from "./client_language.ts";
 export * from "./skins.ts";
 export * from "./float.ts";

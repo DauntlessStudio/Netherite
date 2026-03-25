@@ -1,5 +1,5 @@
 import type { ProjectConfig, WriteableResponse, WriteableModule } from "../core/classes/index.ts";
-import { ModuleWriter } from "../core/classes/worker.ts";
+import { ModuleWriter } from "../core/classes/build/worker.ts";
 
 class OptionsGenerator implements WriteableModule<void, ProjectConfig> {
     private options: ProjectConfig;

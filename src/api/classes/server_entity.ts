@@ -128,12 +128,6 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
             },
         };
 
-        Language.addPlaceholderEntry("entities", `entity.${this.Identifier}.name`, this.Shortname);
-
-        if (this.minecraftObj["minecraft:entity"].description?.is_spawnable) {
-            Language.addPlaceholderEntry("spawn eggs", `item.spawn_egg.entity.${this.Identifier}.spawn`, `Spawn ${this.Shortname}`);
-        }
-
         return response;
     }
 }
