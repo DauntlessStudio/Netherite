@@ -1,8 +1,8 @@
 import * as path from "@std/path";
-import { writeBufferToDist } from "../utils/fileIO.ts";
-import { ModuleManager, type WriteableModule, type ProjectOptions, composites, Language } from "./index.ts";
-import { Config } from "./config.ts";
-import { Logger } from "../utils/index.ts";
+import { writeBufferToDist } from "../../utils/fileIO.ts";
+import { ModuleManager, type WriteableModule, type ProjectOptions, composites, Language } from "../index.ts";
+import { Config } from "../config.ts";
+import { Logger } from "../../utils/index.ts";
 
 export interface ModuleResponse {
     name: string;
