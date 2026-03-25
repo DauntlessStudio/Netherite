@@ -1,41 +1,38 @@
 import * as path from "@std/path";
-import { formatText } from "../../utils/text.ts";
 import { writeTextToDist } from "../../utils/fileIO.ts";
 import { Config } from "../config.ts";
 import { Logger, sendToDist, writeTextToSrc } from "../../utils/index.ts";
+import type { ClientLanguage, LangType } from "../../../api/types/index.ts";
 
-export type LangType = "en_US" | "en_GB" | "de_DE" | "es_ES" | "es_MX" | "fr_FR" | "fr_CA" | "it_IT" | "ja_JP" | "ko_KR" | "pt_BR" | "pt_PT" | "ru_RU" | "zh_CN" | "zh_TW" | "nl_NL" | "bg_BG" | "cs_CZ" | "da_DK" | "el_GR" | "fi_FI" | "hu_HU" | "id_ID" | "nb_NO" | "pl_PL" | "sk_SK" | "sv_SE" | "tr_TR" | "uk_UA";
-type LangEntries = Map<string, {category: string, value: string}>;
+
+type LangEntries = Map<string, string>;
 
 export class Language {
     /**
-     * A map structured as Language/Key/{Category&Value}
+     * A map structured as Language/Key/Value
      */
     private static readonly langMap: Map<LangType, LangEntries> = new Map();
     private static readonly langFileRefs: Set<string> = new Set();
 
-    public static addLangEntry(lang: LangType, category: string, key: string, value: string): void {
-        if (!category) category = "misc";
+    // Required because modules process before the build files are ingested
+    private static readonly pendingCallbacks: Set<() => void> = new Set();
+    private static finishedFirstBuild: boolean = false;
+
+    public static addLangEntry(lang: LangType, key: string, value: string, lowPriority?: boolean): void {
         if (!value) return;
 
-        category = category.toLowerCase().trim();
         value = value.trim();
+        key = key.trim();
 
         // Get map for lang file
         if (!this.langMap.has(lang)) {
             this.langMap.set(lang, new Map());
         }
 
+        // Only adds entry if this is high priority (src static file) or the entry is unique
+        // This prevents modules from overwriting src files
         const langEntries = this.langMap.get(lang)!;
-        langEntries.set(key, {category, value});
-    }
-
-    public static addPlaceholderEntry(category: string, key: string, value: string): void {
-        value = formatText(value, [/_/g]);
-
-        for (const lang of this.langMap.keys()) {
-            this.addLangEntry(lang, category, key, value);
-        }
+        if (!lowPriority || !langEntries.has(key)) langEntries.set(key, value);
     }
 
     public static ingestLangFiles(dirPath: string): void {
@@ -47,6 +44,25 @@ export class Language {
 
         for (const entry of Deno.readDirSync(dirPath)) {
             this.ingestFile(path.join(dirPath, entry.name));
+        }
+    }
+
+    public static ingestLangData(data: ClientLanguage, langs: LangType[]|"all"): void {
+        const defaultCallback = () => {
+            const useLangs = langs === "all" ? [...this.langMap.keys()] : langs;
+
+            for (const lang of useLangs) {
+                for (const [key, value] of Object.entries(data)) {
+                    this.addLangEntry(lang, key, value, true);
+                }
+            }
+        }
+
+        if (this.finishedFirstBuild) {
+            defaultCallback();
+            this.build(false);
+        } else {
+            this.pendingCallbacks.add(defaultCallback);
         }
     }
 
@@ -69,23 +85,16 @@ export class Language {
 
         const fileContent = Deno.readTextFileSync(filePath);
 
-        const categoryGroups = fileContent.split(/(?=(#+ .+ =+))/g);
+        const lines = fileContent
+        .split("\n")
+        .map(line => line.trim())
+        .filter(line => line.length > 0 && !line.startsWith("#"));
 
-        for (const category of categoryGroups) {
-            const lines = category
-                .split("\n")
-                .filter(line => line.length > 0)
-                .map(line => line.trim())
-                .filter(line => line.length > 0);
+        if (lines.length === 0) return;
 
-            if (lines.length === 0) continue;
-
-            const categoryName = (lines.shift() ?? "misc").replace(/#+ | =+/g, "").toLowerCase().trim();
-
-            for (const line of lines) {
-                const [key, value] = line.split("=");
-                this.addLangEntry(langKey, categoryName, key, value);
-            }
+        for (const line of lines) {
+            const [key, value] = line.split("=");
+            this.addLangEntry(langKey, key, value);
         }
 
         this.langFileRefs.add(filePath);
@@ -93,27 +102,17 @@ export class Language {
 
     private static buildContents(langEntries: LangEntries): string {
         let contents = "";
-        const categoryEntries: Map<string, Map<string, string>> = new Map();
 
-        langEntries.entries().forEach(([key, entry]) => {
-            if (!categoryEntries.has(entry.category)) categoryEntries.set(entry.category, new Map());
-            categoryEntries.get(entry.category)?.set(key, entry.value);
+        langEntries.entries().forEach(([key, value]) => {
+            contents += `${key}=${value}\n`;
         });
-
-        for (const [category, keys] of categoryEntries) {
-            contents += `## ${category.toUpperCase()} ${"=".repeat(117 - category.length)}\n`;
-
-            for (const [key, value] of keys) {
-                contents += `${key}=${value}\n`;
-            }
-
-            contents += "\n";
-        }
 
         return contents.trim();
     }
 
-    public static build(): void {
+    public static build(silent: boolean = true): void {
+        if (!this.finishedFirstBuild) this.pendingCallbacks.forEach(cb => cb());
+
         if (Config.Options.type !== "skin-pack") {
             for (const [lang, langEntries] of this.langMap) {
                 const langFile = path.join(path.join(Config.Paths.rp.root, "texts"), `${lang}.lang`);
@@ -121,9 +120,17 @@ export class Language {
             }
     
             writeTextToDist(path.join(path.join(Config.Paths.rp.root, "texts"), "languages.json"), JSON.stringify([...this.langMap.keys()], null, "\t"));
+
+            if (!silent) {
+                Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(path.join(path.join(Config.Paths.rp.root, "texts"), "languages.json"))}`);
+                for (const lang of this.langMap.keys()) {
+                    Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(path.join(path.join(Config.Paths.rp.root, "texts"), `${lang}.lang`))}`);
+                }
+            }
         }
 
         this.buildNonResourceLanguages();
+        this.finishedFirstBuild = true;
     }
 
     public static buildSource(): void {
@@ -191,11 +198,7 @@ export class Language {
                     return;
             }
 
-            this.build();
-            Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(path.join(path.join(Config.Paths.rp.root, "texts"), "languages.json"))}`);
-            for (const lang of this.langMap.keys()) {
-                Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(path.join(path.join(Config.Paths.rp.root, "texts"), `${lang}.lang`))}`);
-            }
+            this.build(false);
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             Logger.error(`Failed to read ${filepath} [${message}]`);

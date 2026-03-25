@@ -14,3 +14,4 @@ export * from "./client_render_controller.ts";
 export * from "./client_terrain_texture.ts";
 export * from "./client_item_texture.ts";
 export * from "./client_blocks.ts";
+export * from "./client_language.ts";

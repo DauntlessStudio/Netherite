@@ -123,8 +123,6 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
             },
         };
 
-        Language.addPlaceholderEntry("items", `item.${this.Identifier}.name`, this.Shortname);
-
         return response;
     }
 }

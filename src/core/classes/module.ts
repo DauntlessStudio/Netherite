@@ -1,6 +1,6 @@
 import * as path from "@std/path";
 import { writeBufferToDist } from "../utils/fileIO.ts";
-import { ModuleManager, type WriteableModule, type ProjectOptions, composites } from "./index.ts";
+import { ModuleManager, type WriteableModule, type ProjectOptions, composites, Language } from "./index.ts";
 import { Config } from "./config.ts";
 import { Logger } from "../utils/index.ts";
 
@@ -111,15 +111,17 @@ export class Module {
                         .replace("BP", Config.Paths.bp.root)
                         .replace("RP", Config.Paths.rp.root)
                         .replace("PATH", path.join(Config.StudioName, Config.PackName)),
-                    content: response.data,
+                    content: response.data
                 };
                 this.filemap.get(filepath)?.set(entry.outputPath, entry.content);
 
-                // If output is a composite add it to list, otherwise write file
+                // If output is a composite add it to list, if lang add entries, otherwise write file
                 if (entry.outputPath in composites) {
                     const compositeKey = entry.outputPath as keyof typeof composites;
                     modifiedComposites.add(compositeKey);
                     composites[compositeKey].ingestData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))));
+                } if (entry.outputPath === "language") {
+                    Language.ingestLangData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))), JSON.parse(response.name));
                 } else {
                     writeBufferToDist(entry.outputPath, new Uint8Array(entry.content));
                     if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(entry.outputPath)}`);
@@ -143,7 +145,7 @@ export class Module {
                 this.filemap.get(filepath)?.delete(cachedFile);
                 if (!silent) Logger.log(`[${Logger.Colors.red("remove")}] ${path.resolve(cachedFile)}`);
 
-                // TODO: handled removed composite entries?
+                // TODO: handled removed composite/lang entries?
             }
         } catch (error) {
             Logger.error(`Cannot run "${filepath}". [${error}]`);
