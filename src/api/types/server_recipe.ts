@@ -22,7 +22,7 @@ export interface ServerRecipeShapedData {
         item?: string;
         data?: number;
         context?: string | "PlayerInWater";
-    };
+    }[];
     result?: (string | ItemReference)[];
 }
 
