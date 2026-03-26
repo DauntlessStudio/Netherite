@@ -9,7 +9,7 @@ type CraftingTag = "crafting_table" | "stonecutter" | "smithing_table";
 type FurnaceTag = "furnace" | "blast_furnace" | "smoker" | "campfire" | "soul_campfire";
 type BrewingTag = "brewing_stand";
 
-interface ServerRecipeShapedData {
+export interface ServerRecipeShapedData {
     description?: {
         identifier?: string;
     };
@@ -26,7 +26,7 @@ interface ServerRecipeShapedData {
     result?: (string | ItemReference)[];
 }
 
-interface ServerRecipeShapelessData {
+export interface ServerRecipeShapelessData {
     description?: {
         identifier?: string;
     };
@@ -36,7 +36,7 @@ interface ServerRecipeShapelessData {
     output?: ItemReference;
 }
 
-interface ServerRecipeFurnaceData {
+export interface ServerRecipeFurnaceData {
     description?: {
         identifier?: string;
     };
@@ -46,7 +46,7 @@ interface ServerRecipeFurnaceData {
     output?: ItemReference;
 }
 
-interface ServerRecipeBrewingMixData {
+export interface ServerRecipeBrewingMixData {
     description?: {
         identifier?: string;
     };
