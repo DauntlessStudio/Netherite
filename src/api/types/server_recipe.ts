@@ -32,8 +32,13 @@ export interface ServerRecipeShapelessData {
     };
     group?: string;
     tags?: CraftingTag[];
-    input?: string;
-    output?: ItemReference;
+    ingredients?: ItemReference[];
+    unlock?: {
+        item?: string;
+        data?: number;
+        context?: string | "PlayerInWater";
+    };
+    result?: (string | ItemReference)[];
 }
 
 export interface ServerRecipeFurnaceData {
