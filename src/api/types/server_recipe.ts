@@ -37,7 +37,7 @@ export interface ServerRecipeShapelessData {
         item?: string;
         data?: number;
         context?: string | "PlayerInWater";
-    };
+    }[];
     result?: (string | ItemReference)[];
 }
 
