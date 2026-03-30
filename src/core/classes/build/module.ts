@@ -115,6 +115,7 @@ export class Module {
 
             // Prepare composites for writing
             const modifiedComposites = new Set<keyof typeof composites>();
+            let langDirty = false;
 
             // Iterate through responses
             for (const { endpoint, response } of result) {
@@ -134,7 +135,8 @@ export class Module {
                     modifiedComposites.add(compositeKey);
                     composites[compositeKey].ingestData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))));
                 } if (entry.outputPath === "language") {
-                    Language.ingestLangData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))), JSON.parse(response.name));
+                    Language.ingestLangData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))), filepath, JSON.parse(response.name));
+                    langDirty = true;
                 } else {
                     writeBufferToDist(entry.outputPath, new Uint8Array(entry.content));
                     if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(entry.outputPath)}`);
@@ -143,6 +145,9 @@ export class Module {
                 // Remove any outputs from cache list
                 if (cachedFiles.includes(entry.outputPath)) {
                     cachedFiles.splice(cachedFiles.indexOf(entry.outputPath), 1);
+                }
+                if (langDirty) {
+                    Language.buildFromVirtual();
                 }
 
                 // Broadcast warnings from modules
@@ -161,7 +166,7 @@ export class Module {
                 this.filemap.get(filepath)?.delete(cachedFile);
                 if (!silent) Logger.log(`[${Logger.Colors.red("remove")}] ${path.resolve(cachedFile)}`);
 
-                // TODO: handled removed composite/lang entries?
+                // TODO: handled removed composite entries?
             }
         } catch (error) {
             Logger.error(`Cannot run "${filepath}". [${error}]`);
@@ -174,8 +179,13 @@ export class Module {
 
         if (cache) {
             for (const file of cache.keys()) {
-                Deno.removeSync(file);
-                if (!silent) Logger.log(`[${Logger.Colors.red("remove")}] ${path.resolve(file)}`);
+                if (file === "language") {
+                    Language.deleteLangData(filepath);
+                    Language.buildFromVirtual();
+                } else {
+                    Deno.removeSync(file);
+                    if (!silent) Logger.log(`[${Logger.Colors.red("remove")}] ${path.resolve(file)}`);
+                }
             }
 
             this.filemap.delete(filepath);
