@@ -4,9 +4,22 @@ import { ModuleManager, type WriteableModule, type ProjectOptions, composites, L
 import { Config } from "../config.ts";
 import { Logger } from "../../utils/index.ts";
 
+/**
+ * The response that returns from a mod file.
+ */
 export interface ModuleResponse {
+    /**
+     * The name of the object.
+     */
     name: string;
+    /**
+     * The encoded data.
+     */
     data: number[];
+    /**
+     * Warnings from the generation. Must be added after encoding/validation.
+     */
+    warnings?: string[];
 }
 
 export interface ModuleWriteable extends WriteableModule<ProjectOptions, ModuleResponse> {}
@@ -131,6 +144,9 @@ export class Module {
                 if (cachedFiles.includes(entry.outputPath)) {
                     cachedFiles.splice(cachedFiles.indexOf(entry.outputPath), 1);
                 }
+
+                // Broadcast warnings from modules
+                response.warnings?.forEach(warning => Logger.warn(`Warning in ${filepath}: ${warning}`));
             }
 
             // Update composite files

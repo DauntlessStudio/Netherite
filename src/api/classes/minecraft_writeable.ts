@@ -2,6 +2,7 @@ import { type WriteableResponse, type ModuleWriteable, ModuleWriter, deepMerge, 
 
 export abstract class MinecraftWriteable<Loose extends object, Strict extends Loose> {
     protected minecraftObj: Loose;
+    protected warnings?: string[];
 
     public abstract get Identifier() : string;
     
@@ -17,6 +18,11 @@ export abstract class MinecraftWriteable<Loose extends object, Strict extends Lo
     public modify(target: Loose): this {
         this.minecraftObj = deepMerge(this.minecraftObj, target);
         return this;
+    }
+
+    protected addWarning(warning: string): void {
+        this.warnings ||= [];
+        this.warnings.push(warning);
     }
 
     protected encode(): number[] {

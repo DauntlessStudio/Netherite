@@ -1,4 +1,4 @@
-import { Language, type WriteableResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { type WriteableResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
 import { Float } from "../types/float.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
@@ -31,10 +31,6 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
                     "minecraft:physics": {
                         has_collision: false,
                         has_gravity: false,
-                    },
-                    "minecraft:pushable": {
-                        is_pushable: false,
-                        is_pushable_by_piston: false,
                     },
                     "minecraft:damage_sensor": {
                         triggers: [
@@ -102,6 +98,18 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
             }
         }
 
+        // component upgrades
+        if (this.minecraftObj["minecraft:entity"].components?.["minecraft:pushable"]?.is_pushable) {
+            this.minecraftObj["minecraft:entity"].components["minecraft:pushable_by_entity"] = {};
+            this.addWarning(`${this.Identifier} using deprectated "minecraft:pushable", replaced with "minecraft:pushable_by_entity"`);
+        }
+        if (this.minecraftObj["minecraft:entity"].components?.["minecraft:pushable"]?.is_pushable_by_piston) {
+            this.minecraftObj["minecraft:entity"].components["minecraft:pushable_by_block"] = {}
+            this.addWarning(`${this.Identifier} using deprectated "minecraft:pushable", replaced with "minecraft:pushable_by_block"`);
+        }
+        delete this.minecraftObj["minecraft:entity"].components?.["minecraft:pushable"];
+
+        // Merge baseline
         const baseline: ServerEntityStrict = {
             format_version: "FORMATVERSION",
             "minecraft:entity": {
@@ -125,6 +133,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
             response: {
                 name: `${this.Shortname}`,
                 data: this.encode(),
+                warnings: this.warnings,
             },
         };
 
