@@ -1,7 +1,7 @@
 import * as path from "@std/path";
 import { writeTextToDist } from "../../utils/fileIO.ts";
 import { Config } from "../config.ts";
-import { formatText, Logger, sendToDist, writeTextToSrc } from "../../utils/index.ts";
+import { formatText, Logger, sendToDist } from "../../utils/index.ts";
 import type { ClientLanguage, LangType } from "../../../api/types/index.ts";
 
 

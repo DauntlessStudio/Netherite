@@ -131,10 +131,11 @@ export class Module {
 
                 // If output is a composite add it to list, if lang add entries, otherwise write file
                 if (entry.outputPath in composites) {
+                    console.log(entry.outputPath)
                     const compositeKey = entry.outputPath as keyof typeof composites;
                     modifiedComposites.add(compositeKey);
                     composites[compositeKey].ingestData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))));
-                } if (entry.outputPath === "language") {
+                } else if (entry.outputPath === "language") {
                     Language.ingestLangData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))), filepath, JSON.parse(response.name));
                     langDirty = true;
                 } else {
