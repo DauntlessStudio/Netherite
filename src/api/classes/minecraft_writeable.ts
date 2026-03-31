@@ -42,5 +42,5 @@ export abstract class MinecraftWriteable<Loose extends object, Strict extends Lo
     /**
      * Generates a WorkerResponse, can also add Language or other such entries.
      */
-    protected abstract generate(): WriteableResponse<ModuleResponse>;
+    protected abstract generate(): WriteableResponse<ModuleResponse>|Promise<WriteableResponse<ModuleResponse>>;
 }
