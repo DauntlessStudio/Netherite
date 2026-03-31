@@ -29,13 +29,13 @@ export class Language {
     public static addLangEntry(inputFile: string, lang: LangType|"all", key: string, value: string): void {
         if (!value) return;
 
-        const outputMap = this.langData.getOrInsert(inputFile, new Map());
+        const outputMap = this.langData.get(inputFile) ?? new Map();
         value = value.trim();
         key = key.trim();
         
         if (lang !== "all") this.languageList.add(lang);
 
-        const langEntries = outputMap.getOrInsert(lang, new Map());
+        const langEntries = outputMap.get(lang) ?? new Map();
         langEntries.set(key, value);
 
         outputMap.set(lang, langEntries);
@@ -142,8 +142,9 @@ export class Language {
                 entry.forEach((entries, langKey) => {
                     const languages = langKey === "all" ? this.languageList : new Set<LangType>([langKey]);
                     languages.forEach(language => {
-                        const outEntries = outData.getOrInsert(language, new Map());
+                        const outEntries = outData.get(language) ?? new Map();
                         entries.forEach((value, key) => outEntries.set(key, value));
+                        outData.set(language, outEntries);
                     });
                 });
             }
