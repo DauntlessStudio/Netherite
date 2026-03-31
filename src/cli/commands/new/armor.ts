@@ -84,10 +84,6 @@ export default new Command<ArmorCommandData>({
         return true;
     },
     action(_args) {
-        if (_args.options.lang !== false) {;
-            Language.ingestLangFiles("./src/resource_pack/texts/");
-        }
-
         const pieces: string[] = _args.options.piece ? [_args.options.piece] : Object.keys(ArmorTypeMap);
         const protection = _args.options.piece ? _args.options.protection : Math.floor((_args.options.protection ?? 0) / 4);
 
@@ -98,6 +94,7 @@ export default new Command<ArmorCommandData>({
                 const item = MinecraftServerItem.armor(useName, ArmorTypeMap[piece as ArmorPiece], protection);
                 minecraftWriteableToSource(item, {overwrite: _args.options.overwrite});
                 writeImage(`PATH/items/${useName}`, "image_x16.png", {..._args.options, addToItem: true});
+                if (_args.options.lang !== false) Language.addToSource("items", `item.NAMESPACE:${useName}.name`, useName);
 
                 const attachable = MinecraftClientAttachable.armor(useName, piece);
                 minecraftWriteableToSource(attachable, _args.options);
@@ -106,10 +103,6 @@ export default new Command<ArmorCommandData>({
             const geo = MinecraftClientGeometry.armor((name as string));
             minecraftWriteableToSource(geo, {overwrite: _args.options.overwrite});
             writeImage(`PATH/attachables/${name}`, "armor_uv_texture.png", _args.options);
-        }
-        
-        if (_args.options.lang !== false) {
-            Language.buildSource();
         }
     },
 });

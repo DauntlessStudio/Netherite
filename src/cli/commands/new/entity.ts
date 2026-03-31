@@ -48,13 +48,10 @@ export default new Command<EntityCommandData>({
         return true;
     },
     action(_args) {
-        if (_args.options.lang !== false) {;
-            Language.ingestLangFiles("./src/resource_pack/texts/");
-        }
-
         for (const name of _args.arguments) {
             const server = MinecraftServerEntity.dummy((name as string));
             minecraftWriteableToSource(server, _args.options);
+            if (_args.options.lang !== false) Language.addToSource("entities", `entity.NAMESPACE:${name}.name`, name as string);
 
             const client = MinecraftClientEntity.dummy((name as string));
             minecraftWriteableToSource(client, _args.options);
@@ -63,10 +60,6 @@ export default new Command<EntityCommandData>({
             minecraftWriteableToSource(geo, _args.options);
 
             writeImage(`PATH/entity/${name}/default`, "uv_medium_texture.png", _args.options);
-        }
-        
-        if (_args.options.lang !== false) {
-            Language.buildSource();
         }
     },
 });

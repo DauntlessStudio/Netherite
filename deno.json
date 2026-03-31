@@ -1,6 +1,6 @@
 {
   "name": "@coldiron/netherite",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "tasks": {
     "dev": "deno run --allow-read --allow-write --allow-run --allow-env src/cli/cli.ts",
     "encode": "deno run -A src/templates/encode.ts",
@@ -15,6 +15,7 @@
     "./api": "./src/api/api.ts"
   },
   "imports": {
+    "@cross/image": "jsr:@cross/image@^0.4.3",
     "@deno-library/compress": "jsr:@deno-library/compress@^0.5.5",
     "@jonasschiano/kia": "jsr:@jonasschiano/kia@^0.0.120",
     "@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader@^0.11.1",

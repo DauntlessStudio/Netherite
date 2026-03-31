@@ -2,7 +2,7 @@ import * as path from "@std/path";
 import { Logger, sendToDist } from "../../utils/index.ts";
 import { Config } from "../index.ts";
 import { Script } from "./script.ts";
-import { Module } from "../module.ts";
+import { Module } from "./module.ts";
 import { Language } from "./language.ts";
 import { CompositeJSON, composites } from "./composite.ts";
 import { Project } from "../project.ts";

@@ -85,7 +85,7 @@ export class ModuleManager {
 }
 
 export interface WriteableModule<T, U> {
-    generate(options: T): WriteableResponse<U>;
+    generate(options: T): WriteableResponse<U>|Promise<WriteableResponse<U>>;
 }
 
 /**
@@ -112,7 +112,7 @@ export class ModuleWriter {
         const responses: WriteableResponse<unknown>[] = [];
 
         for (const worker of this.writeables) {
-            responses.push(worker.generate(data.options));
+            responses.push(await worker.generate(data.options));
         }
 
         this.writeables.length = 0; // Clear the registry before next run

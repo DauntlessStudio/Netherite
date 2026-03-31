@@ -1,12 +1,25 @@
 import * as path from "@std/path";
-import { writeBufferToDist } from "../utils/fileIO.ts";
-import { ModuleManager, type WriteableModule, type ProjectOptions, composites } from "./index.ts";
-import { Config } from "./config.ts";
-import { Logger } from "../utils/index.ts";
+import { writeBufferToDist } from "../../utils/fileIO.ts";
+import { ModuleManager, type WriteableModule, type ProjectOptions, composites, Language } from "../index.ts";
+import { Config } from "../config.ts";
+import { Logger } from "../../utils/index.ts";
 
+/**
+ * The response that returns from a mod file.
+ */
 export interface ModuleResponse {
+    /**
+     * The name of the object.
+     */
     name: string;
+    /**
+     * The encoded data.
+     */
     data: number[];
+    /**
+     * Warnings from the generation. Must be added after encoding/validation.
+     */
+    warnings?: string[];
 }
 
 export interface ModuleWriteable extends WriteableModule<ProjectOptions, ModuleResponse> {}
@@ -102,6 +115,7 @@ export class Module {
 
             // Prepare composites for writing
             const modifiedComposites = new Set<keyof typeof composites>();
+            let langDirty = false;
 
             // Iterate through responses
             for (const { endpoint, response } of result) {
@@ -111,15 +125,19 @@ export class Module {
                         .replace("BP", Config.Paths.bp.root)
                         .replace("RP", Config.Paths.rp.root)
                         .replace("PATH", path.join(Config.StudioName, Config.PackName)),
-                    content: response.data,
+                    content: response.data
                 };
                 this.filemap.get(filepath)?.set(entry.outputPath, entry.content);
 
-                // If output is a composite add it to list, otherwise write file
+                // If output is a composite add it to list, if lang add entries, otherwise write file
                 if (entry.outputPath in composites) {
+                    console.log(entry.outputPath)
                     const compositeKey = entry.outputPath as keyof typeof composites;
                     modifiedComposites.add(compositeKey);
                     composites[compositeKey].ingestData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))));
+                } else if (entry.outputPath === "language") {
+                    Language.ingestLangData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))), filepath, JSON.parse(response.name));
+                    langDirty = true;
                 } else {
                     writeBufferToDist(entry.outputPath, new Uint8Array(entry.content));
                     if (!silent) Logger.log(`[${Logger.Colors.green("write")}] ${path.resolve(entry.outputPath)}`);
@@ -129,6 +147,12 @@ export class Module {
                 if (cachedFiles.includes(entry.outputPath)) {
                     cachedFiles.splice(cachedFiles.indexOf(entry.outputPath), 1);
                 }
+                if (langDirty) {
+                    Language.buildFromVirtual();
+                }
+
+                // Broadcast warnings from modules
+                response.warnings?.forEach(warning => Logger.warn(`Warning in ${filepath}: ${warning}`));
             }
 
             // Update composite files
@@ -156,8 +180,13 @@ export class Module {
 
         if (cache) {
             for (const file of cache.keys()) {
-                Deno.removeSync(file);
-                if (!silent) Logger.log(`[${Logger.Colors.red("remove")}] ${path.resolve(file)}`);
+                if (file === "language") {
+                    Language.deleteLangData(filepath);
+                    Language.buildFromVirtual();
+                } else {
+                    Deno.removeSync(file);
+                    if (!silent) Logger.log(`[${Logger.Colors.red("remove")}] ${path.resolve(file)}`);
+                }
             }
 
             this.filemap.delete(filepath);

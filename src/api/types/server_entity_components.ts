@@ -271,7 +271,12 @@ export interface Components {
     "minecraft:physics"?: Physics
     "minecraft:preferred_path"?: PreferredPath
     "minecraft:projectile"?: Projectile
+    /**
+     * @deprecated This component was removed in 1.26.10. It will automatically be replaced by pushable_by_block and pushable_by_entity when validated by Netherite
+     */
     "minecraft:pushable"?: Pushable
+    "minecraft:pushable_by_entity"?: PushableByEntity
+    "minecraft:pushable_by_block"?: PushableByBlock
     "minecraft:raid_trigger"?: RaidTrigger
     "minecraft:rail_movement"?: RailMovement
     "minecraft:rail_sensor"?: RailSensor
@@ -5255,6 +5260,7 @@ export interface Projectile {
 
 /**
  * Defines the entity's ability to be pushed
+ * @deprecated This component was removed in 1.26.10. It will automatically be replaced by `pushable_by_block` and `pushable_by_entity` when validated by Netherite
  */
 export interface Pushable {
     [key: string]: unknown;
@@ -5269,6 +5275,9 @@ export interface Pushable {
      */
     is_pushable_by_piston?: boolean;
 }
+
+export interface PushableByBlock {}
+export interface PushableByEntity {}
 
 /**
  * Attempts to trigger a raid at the entity's location

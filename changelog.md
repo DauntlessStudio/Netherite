@@ -1,4 +1,11 @@
 # Changelog
+## [0.9.0] - 03/31/2026
+- Added `MinecraftClientLanguage` class, allowing for the programmatic addition of lang entries in mod files.
+- Deprecated `MinecraftPushable` type. `MinecraftServerEntity` instances using `minecraft:pushable` will automatically convert to using `minecraft:pushable_by_block` and `minecraft:pushable_by_entity`.
+-  Added `MinecraftClientTexture` class, allowing for the programmatic addition and manipulation of textures in mod files.
+- Fixes and improvements to Recipe related types.
+- Fixed issue where composite file types (item_texture, terrain_texture, etc.) were being written to the project root in addition to their normal output location.
+---
 ## [0.8.1] - 03/25/2026
 - Fixed issue where `MinecraftServerRecipe` didn't support `minecraft:recipe_furnace` or `minecraft:recipe_brewing_mix`.
 ---

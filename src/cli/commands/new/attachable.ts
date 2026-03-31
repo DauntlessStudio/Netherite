@@ -76,14 +76,11 @@ export default new Command<AttachableCommandData>({
         return true;
     },
     action(_args) {
-        if (_args.options.lang !== false) {;
-            Language.ingestLangFiles("./src/resource_pack/texts/");
-        }
-
         for (const name of _args.arguments) {
             const item = MinecraftServerItem.attachable((name as string), _args.options.stack, _args.options.cooldown);
             minecraftWriteableToSource(item, _args.options);
             writeImage(`PATH/items/${name}`, "image_x16.png", {..._args.options, addToItem: true});
+            if (_args.options.lang !== false) Language.addToSource("items", `item.NAMESPACE:${name}.name`, name as string);
 
             const attachable = MinecraftClientAttachable.skeletal((name as string));
             minecraftWriteableToSource(attachable, _args.options);
@@ -97,10 +94,6 @@ export default new Command<AttachableCommandData>({
 
             const controller = MinecraftClientAnimationController.skeletalAttachable((name as string));
             minecraftWriteableToSource(controller, _args.options);
-        }
-        
-        if (_args.options.lang !== false) {
-            Language.buildSource();
         }
     },
 });
