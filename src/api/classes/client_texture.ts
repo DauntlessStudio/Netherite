@@ -6,7 +6,7 @@ const baseImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAA
 /**
  * A class for working with texture data directly.
  */
-export class MinecraftTexture {
+export class MinecraftClientTexture {
     /**
      * Create a blank image with the specified dimensions and color
      * @param width Image width
@@ -47,7 +47,7 @@ export class MinecraftTexture {
     }
 
     /**
-     * The image data associated with this {@link MinecraftTexture}.
+     * The image data associated with this {@link MinecraftClientTexture}.
      */
     public get Texture() : Image {
         return this.image;
