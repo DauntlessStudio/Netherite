@@ -79,15 +79,15 @@ export default new Command<AttachableCommandData>({
         for (const name of _args.arguments) {
             const item = MinecraftServerItem.attachable((name as string), _args.options.stack, _args.options.cooldown);
             minecraftWriteableToSource(item, _args.options);
-            writeImage(`PATH/items/${name}`, "image_x16.png", {..._args.options, addToItem: true});
-            if (_args.options.lang !== false) Language.addToSource("items", `item.NAMESPACE:${name}.name`, name as string);
+            writeImage(`$PATH/items/${name}`, "image_x16.png", {..._args.options, addToItem: true});
+            if (_args.options.lang !== false) Language.addToSource("items", `item.$NAMESPACE:${name}.name`, name as string);
 
             const attachable = MinecraftClientAttachable.skeletal((name as string));
             minecraftWriteableToSource(attachable, _args.options);
 
             const geo = MinecraftClientGeometry.skeletalAttachable((name as string));
             minecraftWriteableToSource(geo, _args.options);
-            writeImage(`PATH/attachables/${name}`, "uv_medium_texture.png", _args.options);
+            writeImage(`$PATH/attachables/${name}`, "uv_medium_texture.png", _args.options);
 
             const anim = MinecraftClientAnimation.skeletalAttachable((name as string));
             minecraftWriteableToSource(anim, _args.options);

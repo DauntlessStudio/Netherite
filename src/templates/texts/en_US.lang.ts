@@ -3,8 +3,8 @@ import { TemplateFile } from "../template.ts";
 
 const contents = () =>
 `## PACK MANIFEST ============================================================================================
-pack.name=NAME
-pack.description=vVERSION by AUTHOR`;
+pack.name=$NAME
+pack.description=v$VERSION by $AUTHOR`;
 
 new TemplateFile({
     type: "text",
@@ -14,7 +14,7 @@ new TemplateFile({
 });
 
 const skinContents = () =>
-`skinpack.${Config.StudioName}=NAME`;
+`skinpack.${Config.StudioName}=$NAME`;
 
 new TemplateFile({
     type: "text",

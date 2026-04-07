@@ -6,18 +6,18 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
     public static dummy(name: string): MinecraftClientEntity {
         return new MinecraftClientEntity(
             {
-                format_version: "FORMATVERSION",
+                format_version: "$FORMATVERSION",
                 "minecraft:client_entity": {
                     description: {
-                        identifier: `NAMESPACE:${name}`,
+                        identifier: `$NAMESPACE:${name}`,
                         materials: {
                             default: "entity_alphatest",
                         },
                         textures: {
-                            default: `textures/PATH/entity/${name}/default`,
+                            default: `textures/$PATH/entity/${name}/default`,
                         },
                         geometry: {
-                            default: `geometry.NAMESPACE.${name}`,
+                            default: `geometry.$NAMESPACE.${name}`,
                         },
                         render_controllers: [
                             "controller.render.default",
@@ -33,7 +33,7 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
     }
     
     public get Identifier() : string {
-        return this.minecraftObj["minecraft:client_entity"].description.identifier ?? "NAMESPACE:SHORTNAME";
+        return this.minecraftObj["minecraft:client_entity"].description.identifier ?? "$NAMESPACE:SHORTNAME";
     }
 
     /**
@@ -52,11 +52,11 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
         }
 
         if (!this.minecraftObj["minecraft:client_entity"].description.identifier.includes(":")) {
-            this.minecraftObj["minecraft:client_entity"].description.identifier = `NAMESPACE:${this.minecraftObj["minecraft:client_entity"].description.identifier}`;
+            this.minecraftObj["minecraft:client_entity"].description.identifier = `$NAMESPACE:${this.minecraftObj["minecraft:client_entity"].description.identifier}`;
         }
 
         const baseline: ClientEntityStrict = {
-            format_version: "FORMATVERSION",
+            format_version: "$FORMATVERSION",
             "minecraft:client_entity": {
                 description: {
                     identifier: "",

@@ -10,17 +10,17 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
             format_version: "1.10.0",
             "minecraft:attachable": {
                 description: {
-                    identifier: `NAMESPACE:${name}`,
+                    identifier: `$NAMESPACE:${name}`,
                     materials: {
                         default: "armor",
                         enchanted: "armor_enchanted",
                     },
                     textures: {
-                        default: `textures/PATH/attachables/${setName}`,
+                        default: `textures/$PATH/attachables/${setName}`,
                         enchanted: "textures/misc/enchanted_item_glint"
                     },
                     geometry: {
-                        default: `geometry.NAMESPACE.player.${setName}.${piece}`
+                        default: `geometry.$NAMESPACE.player.${setName}.${piece}`
                     },
                     scripts: {
                         initialize: [
@@ -45,24 +45,24 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
             format_version: "1.10.0",
             "minecraft:attachable": {
                 description: {
-                    identifier: `NAMESPACE:${name}`,
+                    identifier: `$NAMESPACE:${name}`,
                     materials: {
                         default: "entity_alphatest",
                         enchanted: "entity_alphatest_glint",
                     },
                     textures: {
-                        default: `textures/PATH/attachables/${name}`,
+                        default: `textures/$PATH/attachables/${name}`,
                         enchanted: "textures/misc/enchanted_item_glint"
                     },
                     geometry: {
-                        default: `geometry.NAMESPACE.player.${name}`
+                        default: `geometry.$NAMESPACE.player.${name}`
                     },
                     animations: {
-                        [`ctrl.${name}`]: `controller.animation.NAMESPACE.item.custom_items.${name}`,
-                        [`${name}.idle.first_person`]: `animation.NAMESPACE.item.${name}.idle.first_person`,
-                        [`${name}.idle.third_person`]: `animation.NAMESPACE.item.${name}.idle.third_person`,
-                        [`${name}.attack.first_person`]: `animation.NAMESPACE.item.${name}.attack.first_person`,
-                        [`${name}.attack.third_person`]: `animation.NAMESPACE.item.${name}.attack.third_person`,
+                        [`ctrl.${name}`]: `controller.animation.$NAMESPACE.item.custom_items.${name}`,
+                        [`${name}.idle.first_person`]: `animation.$NAMESPACE.item.${name}.idle.first_person`,
+                        [`${name}.idle.third_person`]: `animation.$NAMESPACE.item.${name}.idle.third_person`,
+                        [`${name}.attack.first_person`]: `animation.$NAMESPACE.item.${name}.attack.first_person`,
+                        [`${name}.attack.third_person`]: `animation.$NAMESPACE.item.${name}.attack.third_person`,
                     },
                     scripts: {
                         pre_animation: [
@@ -85,7 +85,7 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
     }
     
     public get Identifier() : string {
-        return this.minecraftObj["minecraft:attachable"].description.identifier ?? "NAMESPACE:SHORTNAME";
+        return this.minecraftObj["minecraft:attachable"].description.identifier ?? "$NAMESPACE:SHORTNAME";
     }
     
     protected validate(): ClientAttachableStrict {
@@ -94,7 +94,7 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
         }
 
         if (!this.minecraftObj["minecraft:attachable"].description.identifier.includes(":")) {
-            this.minecraftObj["minecraft:attachable"].description.identifier = `NAMESPACE:${this.minecraftObj["minecraft:attachable"].description.identifier}`;
+            this.minecraftObj["minecraft:attachable"].description.identifier = `$NAMESPACE:${this.minecraftObj["minecraft:attachable"].description.identifier}`;
         }
 
         const baseline: ClientAttachableStrict = {

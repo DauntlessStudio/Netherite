@@ -18,9 +18,9 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                 },
                 components: {
                     "minecraft:display_name": {
-                        value: `item.NAMESPACE:${identifier}.name`
+                        value: `item.$NAMESPACE:${identifier}.name`
                     },
-                    "minecraft:icon": "NAMESPACE:" + identifier,
+                    "minecraft:icon": "$NAMESPACE:" + identifier,
                     "minecraft:max_stack_size": stack_size,
                     "minecraft:cooldown": cooldownComp,
                 },
@@ -41,9 +41,9 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                 },
                 components: {
                     "minecraft:display_name": {
-                        value: `item.NAMESPACE:${identifier}.name`
+                        value: `item.$NAMESPACE:${identifier}.name`
                     },
-                    "minecraft:icon": "NAMESPACE:" + identifier,
+                    "minecraft:icon": "$NAMESPACE:" + identifier,
                     "minecraft:max_stack_size": stack_size ?? 1,
                     "minecraft:cooldown": cooldownComp,
                     "minecraft:use_modifiers": {
@@ -66,9 +66,9 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                 },
                 components: {
                     "minecraft:display_name": {
-                        value: `item.NAMESPACE:${identifier}.name`
+                        value: `item.$NAMESPACE:${identifier}.name`
                     },
-                    "minecraft:icon": "NAMESPACE:" + identifier,
+                    "minecraft:icon": "$NAMESPACE:" + identifier,
                     "minecraft:max_stack_size": 1,
                     "minecraft:wearable": {
                         protection,
@@ -86,7 +86,7 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
     }
     
     public get Identifier() : string {
-        return this.minecraftObj["minecraft:item"].description?.identifier ?? "NAMESPACE:SHORTNAME";
+        return this.minecraftObj["minecraft:item"].description?.identifier ?? "$NAMESPACE:SHORTNAME";
     }
 
     protected override validate(): ServerItemStrict {
@@ -95,11 +95,11 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
         }
 
         if (!this.minecraftObj["minecraft:item"].description.identifier.includes(":")) {
-            this.minecraftObj["minecraft:item"].description.identifier = `NAMESPACE:${this.minecraftObj["minecraft:item"].description.identifier}`;
+            this.minecraftObj["minecraft:item"].description.identifier = `$NAMESPACE:${this.minecraftObj["minecraft:item"].description.identifier}`;
         }
 
         const baseline: ServerItemStrict = {
-            format_version: "FORMATVERSION",
+            format_version: "$FORMATVERSION",
             "minecraft:item": {
                 description: {
                     identifier: "",

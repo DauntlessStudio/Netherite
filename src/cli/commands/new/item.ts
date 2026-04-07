@@ -68,8 +68,8 @@ export default new Command<ItemCommandData>({
         for (const name of _args.arguments) {
             const writeable = MinecraftServerItem.dummy((name as string), _args.options.stack, _args.options.cooldown);
             minecraftWriteableToSource(writeable, {overwrite: _args.options.overwrite});
-            writeImage(`PATH/items/${name}`, "image_x16.png", {..._args.options, addToItem: true});
-            if (_args.options.lang !== false) Language.addToSource("items", `item.NAMESPACE:${name}.name`, name as string);
+            writeImage(`$PATH/items/${name}`, "image_x16.png", {..._args.options, addToItem: true});
+            if (_args.options.lang !== false) Language.addToSource("items", `item.$NAMESPACE:${name}.name`, name as string);
         }
     },
 });

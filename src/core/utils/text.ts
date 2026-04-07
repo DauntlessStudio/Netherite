@@ -20,13 +20,13 @@ export function keywordReplacer(content: string, options: ProjectOptions): strin
     const path = options.namespace.replace(/_/, "/");
 
     const modifiedContent = content
-    .replace(/FORMATVERSION/g, options.format_version)
-    .replace(/ENVIRONMENT/g, options.environment)
-    .replace(/NAMESPACE/g, options.namespace)
-    .replace(/VERSION/g, options.version)
-    .replace(/AUTHOR/g, options.author)
-    .replace(/NAME/g, options.name)
-    .replace(/PATH/g, path)
+    .replace(/\$FORMATVERSION/g, options.format_version)
+    .replace(/\$ENVIRONMENT/g, options.environment)
+    .replace(/\$NAMESPACE/g, options.namespace)
+    .replace(/\$VERSION/g, options.version)
+    .replace(/\$AUTHOR/g, options.author)
+    .replace(/\$NAME/g, options.name)
+    .replace(/\$PATH/g, path)
 
     return modifiedContent;
 }

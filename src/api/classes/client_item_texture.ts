@@ -12,7 +12,7 @@ export class MinecraftClientItemTexture extends MinecraftWriteable<Partial<Clien
     }
 
     protected override validate(): ClientItemTexture {
-        this.minecraftObj.resource_pack_name = "NAMESPACE";
+        this.minecraftObj.resource_pack_name = "$NAMESPACE";
         this.minecraftObj.texture_name = "atlas.items";
         this.minecraftObj.texture_data = this.minecraftObj.texture_data ?? {};
 
