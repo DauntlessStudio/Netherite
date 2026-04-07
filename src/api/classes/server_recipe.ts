@@ -19,7 +19,7 @@ export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerReci
         ?? (this.minecraftObj as ServerRecipeShapeless)["minecraft:recipe_shapeless"]?.description?.identifier
         ?? (this.minecraftObj as ServerRecipeFurnace)["minecraft:recipe_furnace"]?.description?.identifier
         ?? (this.minecraftObj as ServerRecipeBrewingMix)["minecraft:recipe_brewing_mix"]?.description?.identifier
-        ?? "NAMESPACE:SHORTNAME";
+        ?? "$NAMESPACE:SHORTNAME";
     }
 
     protected override validate(): ServerRecipe {
@@ -27,7 +27,7 @@ export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerReci
             throw new Error(`Recipe must include one of ${RecipeTypes.join(", ")}`);
         }
 
-        this.minecraftObj.format_version = this.minecraftObj.format_version ?? "FORMATVERSION";
+        this.minecraftObj.format_version = this.minecraftObj.format_version ?? "$FORMATVERSION";
 
         return this.minecraftObj as ServerRecipe;
     }

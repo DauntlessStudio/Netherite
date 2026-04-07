@@ -7,7 +7,7 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
         return new MinecraftClientRenderController({
                 format_version: "1.10.0",
                 render_controllers: {
-                    [`controller.render.NAMESPACE.${name}`]: {
+                    [`controller.render.$NAMESPACE.${name}`]: {
                         geometry: "Geometry.default",
                         materials: [
                             { "*": "Material.default" },
@@ -25,7 +25,7 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
     }
     
     public get Identifier() : string {
-        return `NAMESPACE:${this.name}`;
+        return `$NAMESPACE:${this.name}`;
     }
 
     constructor(obj: ClientRenderControllerLoose, protected readonly name: string) {

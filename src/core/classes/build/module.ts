@@ -124,14 +124,13 @@ export class Module {
                     outputPath: endpoint
                         .replace("BP", Config.Paths.bp.root)
                         .replace("RP", Config.Paths.rp.root)
-                        .replace("PATH", path.join(Config.StudioName, Config.PackName)),
+                        .replace("$PATH", path.join(Config.StudioName, Config.PackName)),
                     content: response.data
                 };
                 this.filemap.get(filepath)?.set(entry.outputPath, entry.content);
 
                 // If output is a composite add it to list, if lang add entries, otherwise write file
                 if (entry.outputPath in composites) {
-                    console.log(entry.outputPath)
                     const compositeKey = entry.outputPath as keyof typeof composites;
                     modifiedComposites.add(compositeKey);
                     composites[compositeKey].ingestData(JSON.parse(new TextDecoder().decode(new Uint8Array(entry.content))));

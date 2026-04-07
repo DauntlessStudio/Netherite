@@ -24,7 +24,7 @@ export class MinecraftServerTradeTable extends MinecraftWriteable<ServerTradeTab
 
     protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
-            endpoint: `BP/trading/PATH/${this.Identifier}.json`,
+            endpoint: `BP/trading/$PATH/${this.Identifier}.json`,
             response: {
                 name: `${this.Identifier}`,
                 data: this.encode(),

@@ -7,7 +7,7 @@ import { MinecraftServerItem } from "./server_item.ts";
 export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, ServerBlockStrict> {
     // #region Static
     public static dummy(identifier: string): MinecraftServerBlock {
-        if (!identifier.includes(":")) identifier = "NAMESPACE:" + identifier;
+        if (!identifier.includes(":")) identifier = "$NAMESPACE:" + identifier;
 
         return new MinecraftServerBlock({
             "minecraft:block": {
@@ -32,7 +32,7 @@ export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, S
     }
     
     public get Identifier() : string {
-        return this.minecraftObj["minecraft:block"]?.description?.identifier ?? "NAMESPACE:SHORTNAME";
+        return this.minecraftObj["minecraft:block"]?.description?.identifier ?? "$NAMESPACE:SHORTNAME";
     }
 
     /**
@@ -68,11 +68,11 @@ export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, S
         }
 
         if (!this.minecraftObj["minecraft:block"].description.identifier.includes(":")) {
-            this.minecraftObj["minecraft:block"].description.identifier = `NAMESPACE:${this.minecraftObj["minecraft:block"].description.identifier}`;
+            this.minecraftObj["minecraft:block"].description.identifier = `$NAMESPACE:${this.minecraftObj["minecraft:block"].description.identifier}`;
         }
 
         const baseline: ServerBlockStrict = {
-            format_version: "FORMATVERSION",
+            format_version: "$FORMATVERSION",
             "minecraft:block": {
                 description: {
                     identifier: "",
