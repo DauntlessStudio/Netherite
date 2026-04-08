@@ -24,7 +24,7 @@ export class MinecraftServerLootTable extends MinecraftWriteable<ServerLootTable
 
     protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
-            endpoint: `BP/loot_tables/PATH/${this.Identifier}.json`,
+            endpoint: `BP/loot_tables/$PATH/${this.Identifier}.json`,
             response: {
                 name: `${this.Identifier}`,
                 data: this.encode(),

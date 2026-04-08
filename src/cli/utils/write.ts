@@ -21,7 +21,7 @@ export interface SourceImageOptions {
 }
 
 export function writeImage<T extends keyof typeof encoded>(subpath: string, sourceKey: T, options: SourceImageOptions): void {
-    const name = "NAMESPACE:" + (subpath.split("/").at(-1) ?? "undefined");
+    const name = "$NAMESPACE:" + (subpath.split("/").at(-1) ?? "undefined");
     const contents = Uint8Array.from(atob(encoded[sourceKey]), c => c.charCodeAt(0));
     
     writeBufferToSrc(`./src/resource_pack/textures/${subpath}.png`, contents, options.overwrite);
@@ -29,7 +29,7 @@ export function writeImage<T extends keyof typeof encoded>(subpath: string, sour
     if (options.addToItem) {
         composites.item_texture.ingestDir("./src/resource_pack/textures/");
         composites.item_texture.ingestData({
-            resource_pack_name: "NAMESPACE",
+            resource_pack_name: "$NAMESPACE",
             texture_name: "atlas.items",
             texture_data: {
                 [name]: {

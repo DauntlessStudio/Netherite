@@ -95,8 +95,8 @@ We can see an example of that file processing with in `src/resource_pack/texts/e
 
 ```lang
 ## PACK MANIFEST ============================================================================================
-pack.name=NAME
-pack.description=vVERSION by AUTHOR
+pack.name=$NAME
+pack.description=v$VERSION by $AUTHOR
 ```
 
 If you compare that to the output file in `dist/` you'll see:
@@ -108,11 +108,13 @@ pack.description=v1.0.0 by Me
 ```
 
 This is because one element of the file processing involves keyword replacement, specific words are dynamically replaced based on your project's config. This means that if you rename your project, update the version, etc. you just need to update the config and the rest of the project automatically updates. Netherite uses the following reserved keywords (note that these are always in all-caps):
-- `FORMATVERSION`: The format version of your project, generally this should be the newest Minecraft version.
-- `NAMESPACE`: The namespace of your project, generally in the format of `<team_name>_<project_id>` i.e. `me_demo`.
-- `VERSION`: The current version of your project, starting with `1.0.0`.
-- `AUTHOR`: The author of your project.
-- `NAME`: The display name of your project.
+- `$FORMATVERSION`: The format version of your project, generally this should be the newest Minecraft version.
+- `$ENVIRONMENT`: The build target for your project. Will be dynamically converted to `development` or `production` depending on whether the `netherite build` or `netherite export` command was used.
+- `$NAMESPACE`: The namespace of your project, generally in the format of `<team_name>_<project_id>` i.e. `me_demo`.
+- `$VERSION`: The current version of your project, starting with `1.0.0`.
+- `$AUTHOR`: The author of your project.
+- `$NAME`: The display name of your project.
+- `$PATH`: The namespace formatted as `<team_name>/<project_id>`. Can be used as a directory name and dynamically converts to the expanded path when building.
 
 These values are assigned in our project's config file, `netherite.config.ts`, ours should look like this (Your project will have a different `uuid` and may have a newer `format_version`):
 ```ts
@@ -132,7 +134,7 @@ netherite.config({
 ```
 
 ### Adding Content
-Now that you understand the relationship between the `src/` and `dist/`, let's add some content to the project. Generally, any files you create in the behavior or resource packs will be processed and sent to the output. You can create an item, block, or entity as normal with the exceptions of using `NAMESPACE:my_cool_entity` instead of `me_demo:my_cool_entity` and `format_version: "FORMATVERSION"` wherever you'd normally use the latest Minecraft version.
+Now that you understand the relationship between the `src/` and `dist/`, let's add some content to the project. Generally, any files you create in the behavior or resource packs will be processed and sent to the output. You can create an item, block, or entity as normal with the exceptions of using `$NAMESPACE:my_cool_entity` instead of `me_demo:my_cool_entity` and `format_version: "$FORMATVERSION"` wherever you'd normally use the latest Minecraft version.
 
 Once you've made some changes and are ready to see them in-game, run the command:
 ```
@@ -182,7 +184,7 @@ modules/
     └── netherite.package.json
 ```
 
-As mentioned, a module is basically a small project. So within the `Blocky/` directory you can create subdirectories called `BP/` and `RP/` and anything you make in those folders will be dynamically merged into the output of your final project. Including sound definitions, lang entries, terrain and item textures, etc. And since Netherite automatically converts keywords like `NAMESPACE`, if you download your new `Blocky` package into a different Netherite project, you wouldn't need to make any updates before seeing your package contents in-game. It's important to note that your **core project always takes priority** over modules, meaning if you make a lang entry in `Blocky/RP/texts/en_US.lang` saying `entity.NAMESPACE.blocky:name=Blocky` but your core project has an entry at `src/resource_pack/texts/en_US.lang` saying `entity.NAMESPACE:blocky.name=Blocko`, the output in your dist will be `Blocko`. This prioritization is important, since a module may get used in multiple projects and you want to be able to make minor changes to it without needing to update your module for each project.
+As mentioned, a module is basically a small project. So within the `Blocky/` directory you can create subdirectories called `BP/` and `RP/` and anything you make in those folders will be dynamically merged into the output of your final project. Including sound definitions, lang entries, terrain and item textures, etc. And since Netherite automatically converts keywords like `$NAMESPACE`, if you download your new `Blocky` package into a different Netherite project, you wouldn't need to make any updates before seeing your package contents in-game. It's important to note that your **core project always takes priority** over modules, meaning if you make a lang entry in `Blocky/RP/texts/en_US.lang` saying `entity.$NAMESPACE.blocky:name=Blocky` but your core project has an entry at `src/resource_pack/texts/en_US.lang` saying `entity.$NAMESPACE:blocky.name=Blocko`, the output in your dist will be `Blocko`. This prioritization is important, since a module may get used in multiple projects and you want to be able to make minor changes to it without needing to update your module for each project.
 
 #### Minecraft Scripting in Modules
 You can create scripting libraries in modules too, which can be really convenient way to share useful functions between multiple projects. As an example, let's make a simple utility script at `Blocky/scripts/utility.ts`. Inside that script you can use the following code:
@@ -270,7 +272,7 @@ import * as netherite from "@coldiron/netherite/api";
 new netherite.MinecraftServerEntity({
     "minecraft:entity": {
         description: {
-            identifier: "NAMESPACE:blocky"
+            identifier: "$NAMESPACE:blocky"
         }
     }
 });
@@ -284,7 +286,7 @@ import * as netherite from "@coldiron/netherite/api";
 const blocky = new netherite.MinecraftServerEntity({
     "minecraft:entity": {
         description: {
-            identifier: "NAMESPACE:blocky"
+            identifier: "$NAMESPACE:blocky"
         }
     }
 });

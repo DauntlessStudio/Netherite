@@ -7,7 +7,7 @@ export class MinecraftClientAnimationController extends MinecraftWriteable<Clien
         return new MinecraftClientAnimationController({
             format_version: "1.10.0",
             animation_controllers: {
-                [`controller.animation.NAMESPACE.item.custom_items.${name}`]: {
+                [`controller.animation.$NAMESPACE.item.custom_items.${name}`]: {
                     initial_state: 'idle',
                     states: {
                         idle: {

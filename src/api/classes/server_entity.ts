@@ -65,7 +65,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
     }
     
     public get Identifier() : string {
-        return this.minecraftObj["minecraft:entity"].description?.identifier ?? "NAMESPACE:SHORTNAME";
+        return this.minecraftObj["minecraft:entity"].description?.identifier ?? "$NAMESPACE:SHORTNAME";
     }
 
     protected override validate(): ServerEntityStrict {
@@ -74,14 +74,14 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
         }
 
         if (!this.minecraftObj["minecraft:entity"].description.identifier.includes(":")) {
-            this.minecraftObj["minecraft:entity"].description.identifier = `NAMESPACE:${this.minecraftObj["minecraft:entity"].description.identifier}`;
+            this.minecraftObj["minecraft:entity"].description.identifier = `$NAMESPACE:${this.minecraftObj["minecraft:entity"].description.identifier}`;
         }
 
         const family = this.minecraftObj["minecraft:entity"].components?.["minecraft:type_family"]?.family
         if (family) {
             this.minecraftObj["minecraft:entity"]!.components!["minecraft:type_family"]!.family = family.map((f: string) => {
                 if (!f.includes(":")) {
-                    return `NAMESPACE:${f}`;
+                    return `$NAMESPACE:${f}`;
                 }
                 return f;
             });
@@ -111,7 +111,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
 
         // Merge baseline
         const baseline: ServerEntityStrict = {
-            format_version: "FORMATVERSION",
+            format_version: "$FORMATVERSION",
             "minecraft:entity": {
                 description: {
                     identifier: "",
