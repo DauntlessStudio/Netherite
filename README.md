@@ -109,10 +109,12 @@ pack.description=v1.0.0 by Me
 
 This is because one element of the file processing involves keyword replacement, specific words are dynamically replaced based on your project's config. This means that if you rename your project, update the version, etc. you just need to update the config and the rest of the project automatically updates. Netherite uses the following reserved keywords (note that these are always in all-caps):
 - `$FORMATVERSION`: The format version of your project, generally this should be the newest Minecraft version.
+- `$ENVIRONMENT`: The build target for your project. Will be dynamically converted to `development` or `production` depending on whether the `netherite build` or `netherite export` command was used.
 - `$NAMESPACE`: The namespace of your project, generally in the format of `<team_name>_<project_id>` i.e. `me_demo`.
 - `$VERSION`: The current version of your project, starting with `1.0.0`.
 - `$AUTHOR`: The author of your project.
 - `$NAME`: The display name of your project.
+- `$PATH`: The namespace formatted as `<team_name>/<project_id>`. Can be used as a directory name and dynamically converts to the expanded path when building.
 
 These values are assigned in our project's config file, `netherite.config.ts`, ours should look like this (Your project will have a different `uuid` and may have a newer `format_version`):
 ```ts

@@ -34,7 +34,7 @@ export async function sendToDist(src: string, dest: string, excludeGlob: string[
     }
     
     dest = dest.replace("$PATH", path.join(Config.StudioName, Config.PackName));
-    dest = dest.replace("$$NAMESPACE", Config.Options.namespace);
+    dest = dest.replace("$NAMESPACE", Config.Options.namespace);
     
     try {
         const stat = Deno.statSync(src);

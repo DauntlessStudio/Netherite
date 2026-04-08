@@ -1,4 +1,9 @@
 # Changelog
+## [0.10.0] - 04/08/2026
+- Changed all reserved keywords to use a `$` prefix. The keyword list is: `$FORMATVERSION, $ENVIRONMENT, $NAMESPACE, $VERSION, $AUTHOR, $NAME, $PATH`.
+- Fixed some type issues with `ServerEntityComponents`.
+- Added `$NAMESPACE` support to file paths. The filepath `structures/$NAMESPACE/example.mcfunction` will now export to `structures/my_project/example.mcfunction` for example.
+---
 ## [0.9.0] - 03/31/2026
 - Added `MinecraftClientLanguage` class, allowing for the programmatic addition of lang entries in mod files.
 - Deprecated `MinecraftPushable` type. `MinecraftServerEntity` instances using `minecraft:pushable` will automatically convert to using `minecraft:pushable_by_block` and `minecraft:pushable_by_entity`.
