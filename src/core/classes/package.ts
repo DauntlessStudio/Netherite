@@ -71,7 +71,7 @@ on:
       - 'netherite.manifest.json'
 
 jobs:
-  update-wiki-changelog:
+  handle-pull-request:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
@@ -103,10 +103,12 @@ jobs:
             --generate-notes
 `;
 
-const prTemplate = "### Fixes\n" +
-	"- Add fixes here or delete section.\n" +
-	"### Changes\n" +
-	"- Add new features and changes here or delete section.\n";
+const prTemplate = 
+`### Fixes
+    - Add fixes here or delete section.
+### Changes
+    - Add new features and changes here or delete section.
+`;
 
 export class Package {
     // Initial Setup, should only run once
