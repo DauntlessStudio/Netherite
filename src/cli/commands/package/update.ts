@@ -2,27 +2,27 @@ import { Command, type CommandData } from "../../command.ts";
 import { Package } from "../../../core/classes/index.ts";
 import { Logger } from "../../../core/utils/index.ts";
 
-interface PublishCommandData extends CommandData {
+interface UpdateCommandData extends CommandData {
     options: {
         package?: string|number;
         version?: string;
     }
 }
 
-export default new Command<PublishCommandData>({
-    name: "publish",
+export default new Command<UpdateCommandData>({
+    name: "update",
     usage: {
-        description: "Publishes a local package update. Requires the package to have been created correctly with a valid GitHub repository.",
+        description: "Updates a local package to another version.",
         usage: "[--package <name|index> --version <tag>]",
         flags: {
             package: {
                 type: "string|number",
-                description: "The name or index of the package to publish",
+                description: "The name or index of the package to update",
                 optional: true,
             },
             version: {
                 type: "string",
-                description: "The new version number of the package, i.e. `1.0.0`",
+                description: "The version number of the package to install, i.e. `1.0.0`",
                 optional: false,
             },
         },
@@ -50,7 +50,8 @@ export default new Command<PublishCommandData>({
         }
 
         const nPackage = await Package.getLoadedPackage(_args.options.package);
-        await Package.publish(nPackage, getVersionData(_args));
+        const manifest = await Package.install(nPackage.package.url, getVersionData(_args));
+        await Package.load(manifest.manifest.name);
     },
 });
 
@@ -76,11 +77,11 @@ async function getPackageData(): Promise<string|number> {
     }
 }
 
-function getVersionData(args: PublishCommandData): string {
+function getVersionData(args: UpdateCommandData): string {
     if (args.options.version) {
         return args.options.version;
     } else {
-        const val = prompt("Please enter the new version of the package in SemVer (i.e. 1.0.0):");
+        const val = prompt("Please enter the version of the package to switch to (i.e. 1.0.0):", "latest");
         if (val === null || val === "") Deno.exit(1);
 
         return val;

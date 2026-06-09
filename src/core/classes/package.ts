@@ -121,7 +121,7 @@ export class Package {
     // Installs a package from a git repository into .netherite/packages
     public static async install(url: string, tag: string = "latest"): Promise<{dir: string, manifest: NetheriteManifest}> {
         this.init();
-
+        if (tag === "latest") tag = "main";
         const packageName = url.split("/").pop()!.replace(".git", "");
 
         Logger.Spinner.start(`Installing ${Logger.Colors.green(packageName)}...`);
@@ -148,9 +148,8 @@ export class Package {
             return foundPackage;
         }
 
-        const install = tag === "latest"
-        ? await new Deno.Command("git", {args: ["clone", url]}).output()
-        : await new Deno.Command("git", {args: ["clone", "--branch", tag, url]}).output();
+        const install = await new Deno.Command("git", {args: ["clone", "--branch", tag, url]}).output();
+        await commandWrap(new Deno.Command("git", {args: ["pull"]}));
 
         Deno.chdir(cwd);
 
@@ -216,27 +215,21 @@ export class Package {
     }
 
     // Loads an installed package into the current project
-    public static async load(value: number|string, version?: string): Promise<void> {
+    public static async load(value: number|string): Promise<void> {
         const nPackage = await this.getGlobalPackage(value);
 
         Logger.Spinner.start(`Loading ${Logger.Colors.green(nPackage.manifest.name)}...`);
 
-        if (version && !nPackage.manifest.versions[version]) {
-            Logger.Spinner.fail(`Invalid ${nPackage.manifest.name} package version`);
-            Deno.exit(1);
-        }
-
-        const useVersion = version ? version : nPackage.manifest.versions.latest;
-
         try {
-            Deno.statSync(path.join(nPackage.dir, "versions", useVersion));
+            Deno.statSync(path.join(nPackage.dir, "src"));
         } catch (_error) {
-            Logger.Spinner.fail(`Failed to load ${nPackage.manifest.name} package, missing version ${useVersion}`);
+            Logger.Spinner.fail(`Failed to load ${nPackage.manifest.name} package`);
             Deno.exit(1);
         }
 
         const outPath = path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name);
-        copyDirSync(path.join(nPackage.dir, "versions", useVersion), outPath);
+        emptyDirectorySync(outPath);
+        copyDirSync(path.join(nPackage.dir, "src"), outPath);
 
         // Get imported package information
         const packageInfo: NetheritePackage = JSONCParse(Deno.readTextFileSync(path.join(outPath, "netherite.package.json")));
