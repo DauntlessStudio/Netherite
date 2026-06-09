@@ -58,7 +58,7 @@ export default new Command<UninstallCommandData>({
 });
 
 async function getPromptData(): Promise<string|number> {
-    const packages = await Package.list();
+    const packages = await Package.listGlobal();
 
     for (let i = 0; i < packages.length; i++) {
         Logger.log(`[${Logger.Colors.green(i.toString())}]: ${Logger.Colors.green(packages[i].manifest.name)}`);

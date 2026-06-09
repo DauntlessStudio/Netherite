@@ -5,7 +5,7 @@ import { Logger } from "../../../core/utils/index.ts";
 interface PublishCommandData extends CommandData {
     options: {
         package?: string|number;
-        force?: boolean;
+        version: string;
     }
 }
 
@@ -17,32 +17,31 @@ export default new Command<PublishCommandData>({
         flags: {
             package: {
                 type: "string|number",
-                description: "The name or index of the package to uninstall",
+                description: "The name or index of the package to publish",
                 optional: true,
             },
-            force: {
-                type: "boolean",
-                description: "Attempts to push directly to main instead of creating a Pull Request. This is not recommended for most use cases.",
-                optional: true,
+            version: {
+                type: "string",
+                description: "The new version number of the package, i.e. `1.0.0`",
+                optional: false,
             },
         },
     },
     parse: {
-        boolean: ["force"],
-        string: ["package"],
+        string: ["package", "version"],
         alias: {
             force: "f",
-            package: "p",
+            v: "v",
         }
     },
     validateArgs(_args) {
         const pack = _args.options["package"] === undefined || typeof _args.options["package"] === "string" || typeof _args.options["package"] === "number";
-        const force = _args.options["force"] === undefined || typeof _args.options["force"] === "boolean";
-        return pack && force;
+        const version = _args.options["version"] === undefined || typeof _args.options["version"] === "string";
+        return pack && version;
     },
     async action(_args) {
         if (!_args.options.package) {
-            _args.options.package = await getPromptData();
+            _args.options.package = await getPackageData();
         } else if (typeof _args.options.package === "string") {
             const asNum = parseInt(_args.options.package);
             if (!isNaN(asNum)) {
@@ -51,12 +50,12 @@ export default new Command<PublishCommandData>({
         }
 
         const nPackage = await Package.getLoadedPackage(_args.options.package);
-        await Package.publish(nPackage, _args.options.force);
+        await Package.publish(nPackage, getVersionData(_args));
     },
 });
 
-async function getPromptData(): Promise<string|number> {
-    const packages = await Package.listLoaded();
+async function getPackageData(): Promise<string|number> {
+    const packages = await Package.listLocal();
 
     for (let i = 0; i < packages.length; i++) {
         Logger.log(`[${Logger.Colors.green(i.toString())}]: ${Logger.Colors.green(packages[i].package.name)}`);
@@ -74,5 +73,16 @@ async function getPromptData(): Promise<string|number> {
         return val;
     } else {
         return asNum;
+    }
+}
+
+function getVersionData(args: PublishCommandData): string {
+    if (args.options.version) {
+        return args.options.version;
+    } else {
+        const val = prompt("Please enter the new version of the package in SemVer (i.e. 1.0.0):");
+        if (val === null || val === "") Deno.exit(1);
+
+        return val;
     }
 }
