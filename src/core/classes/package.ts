@@ -2,6 +2,7 @@ import * as path from "@std/path";
 import { Config } from "./config.ts";
 import { copyDirSync, JSONCParse, Logger } from "../utils/index.ts";
 import { publishToGitHub } from "../../cli/utils/github.ts";
+import { doesPathExist, emptyDirectorySync, sleep } from "../core.ts";
 
 interface NetheritePackage {
     /**
@@ -20,6 +21,10 @@ interface NetheritePackage {
      * A description of the Netherite package.
      */
     description: string;
+    /**
+     * The GitHub repository address.
+     */
+    url: string;
     /**
      * An optional deno import map for the package's scripts.
      */
@@ -46,96 +51,68 @@ interface NetheriteManifest {
     };
 }
 
+export type LocalPackage = {dir: string, package: NetheritePackage};
+export type GlobalPackage = {dir: string, manifest: NetheriteManifest};
+
 interface PublishOptions {
     owner: string;
 }
 
-const action = "name: Publish\n" +
-	"\n" +
-	"permissions:\n" +
-	"  contents: write\n" +
-	"\n" +
-	"on:\n" +
-	"  pull_request:\n" +
-	"    types:\n" +
-	"      - closed\n" +
-	"    branches:\n" +
-	"      - main\n" +
-	"    paths:\n" +
-	"      - 'netherite.manifest.json'\n" +
-	"\n" +
-	"jobs:\n" +
-	"  update-wiki-changelog:\n" +
-	"    runs-on: ubuntu-latest\n" +
-	"    if: github.event.pull_request.merged == true\n" +
-	"    steps:\n" +
-	"      - name: Checkout base repo\n" +
-	"        uses: actions/checkout@v3\n" +
-	"        with:\n" +
-	"          token: ${{ secrets.GITHUB_TOKEN }}\n" +
-	"\n" +
-	"      - name: Add changelog entry\n" +
-	"        run: |\n" +
-	"          echo '## ${{ github.event.pull_request.title }}' >> CHANGELOG.md\n" +
-	"          echo '${{ github.event.pull_request.body }}' >> CHANGELOG.md\n" +
-	"\n" +
-	"      - name: Commit and push changelog\n" +
-	"        run: |\n" +
-	"          git config user.name \"github-actions\"\n" +
-	"          git config user.email \"github-actions@github.com\"\n" +
-	"          git add CHANGELOG.md\n" +
-	"          git commit -m \"${{ github.event.pull_request.title }}\"\n" +
-	"          git push\n";
+const action = 
+`name: Publish
 
-const prTemplate = "### Fixes\n" +
-	"- Add fixes here or delete section.\n" +
-	"### Changes\n" +
-	"- Add new features and changes here or delete section.\n";
+permissions:
+  contents: write
 
-const changelog = "## 0.0.1\n" +
-	"### Changes\n" +
-	"- Published initial version!\n";
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+    paths:
+      - 'netherite.manifest.json'
+
+jobs:
+  handle-pull-request:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout base repo
+        uses: actions/checkout@v3
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add changelog entry
+        run: |
+          echo '## \${{ github.event.pull_request.title }}' >> CHANGELOG.md
+          echo '\${{ github.event.pull_request.body }}' >> CHANGELOG.md
+
+      - name: Commit and push changelog
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add CHANGELOG.md
+          git commit -m "\${{ github.event.pull_request.title }}"
+          git push
+    
+      - name: Update Tag
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "\${{ github.event.pull_request.title }}" --repo="$GITHUB_REPOSITORY" --title="Release \${{ github.event.pull_request.title }}" --generate-notes
+`;
+
+const prTemplate = 
+`### Fixes
+- Add fixes here or delete section.
+### Changes
+- Add new features and changes here or delete section.
+`;
 
 export class Package {
-    private static latestVanillaVersion: string = "1.21.70";
-
-    public static get LatestVanillaVersion() : string {
-        try {
-            const version = JSONCParse(Deno.readTextFileSync(path.join(Config.NetheriteDirectory, "bedrock-samples", "version.json")));
-            const latest = (version.latest.version as string).split(".");
-            latest.length = 3;
-            return latest.join(".");
-        } catch (_error) {
-            Logger.error(`Failed to get latest vanilla version, defaulting to ${this.latestVanillaVersion}`);
-            return this.latestVanillaVersion;
-        }
-    }
-    
     // Initial Setup, should only run once
-    public static async init(): Promise<void> {
-        try {
-            Deno.statSync(Config.NetheriteDirectory);
-            Deno.statSync(path.join(Config.NetheriteDirectory, "bedrock-samples"));
-        } catch (_error) {
-            Logger.Spinner.start("Performing one-time inital setup...");
-            const cwd = Deno.cwd();
-
-            Deno.mkdirSync(Config.NetheriteDirectory, {recursive: true});
-            Deno.mkdirSync(path.join(Config.NetheriteDirectory, "packages"));
-
-            Deno.chdir(Config.NetheriteDirectory);
-
-            const install = await new Deno.Command("git", {args: ["clone", "https://github.com/Mojang/bedrock-samples.git"]}).output();
-
-            if (!install.success) {
-                Logger.Spinner.fail("Failed to install bedrock-samples, is git installed and are you connected to the internet?");
-                Deno.exit(1);
-            }
-
-            Deno.chdir(cwd);
-            Logger.Spinner.succeed("One-time inital setup complete!");
-        }
-
+    public static init(): void {
         try {
             Deno.statSync(path.join(Config.NetheriteDirectory, "packages"));
         } catch (_error) {
@@ -143,27 +120,10 @@ export class Package {
         }
     }
 
-    // Vanilla validation, uses git to check if .netherite/bedrock-samples exists and is up to date
-    public static async vanillaUpdate(): Promise<void> {
-        await this.init();
-
-        const cwd = Deno.cwd();
-        Deno.chdir(path.join(Config.NetheriteDirectory, "bedrock-samples"));
-
-        const update = await new Deno.Command("git", {args: ["pull"]}).output();
-
-        if (!update.success) {
-            Logger.error(`Failed to update bedrock-samples, is git installed and are you connected to the internet?`);
-            Logger.error(`Latest version defaulting to ${this.latestVanillaVersion}`);
-        }
-
-        Deno.chdir(cwd);
-    }
-
     // Installs a package from a git repository into .netherite/packages
-    public static async install(url: string): Promise<{dir: string, manifest: NetheriteManifest}> {
-        await this.init();
-
+    public static async install(url: string, tag: string = "latest"): Promise<GlobalPackage> {
+        this.init();
+        if (tag === "latest") tag = "main";
         const packageName = url.split("/").pop()!.replace(".git", "");
 
         Logger.Spinner.start(`Installing ${Logger.Colors.green(packageName)}...`);
@@ -171,35 +131,37 @@ export class Package {
         const cwd = Deno.cwd();
         Deno.chdir(path.join(Config.NetheriteDirectory, "packages"));
 
-        const cached = await this.list();
+        const cached = await this.listGlobal();
 
         const foundPackage = cached.find((item) => item.manifest.name === packageName);
         if (foundPackage) {
-            Logger.Spinner.update("Package already installed, updating to latest version...");
+            Logger.Spinner.update(`Package already installed, switching to ${tag} version...`);
             Deno.chdir(path.join(Config.NetheriteDirectory, "packages", packageName));
-            const update = await new Deno.Command("git", {args: ["pull"]}).output();
-        
-            if (!update.success) {
+
+            try {
+                await commandWrap(new Deno.Command("git", {args: ["checkout", tag]}));
+                if (tag === "latest") await commandWrap(new Deno.Command("git", {args: ["pull"]}));
+            } catch (error) {
                 Logger.Spinner.fail("Failed to update package, is git installed and are you connected to the internet?");
+                Logger.error((error as Error).message);
                 Deno.exit(1);
             }
 
             Deno.chdir(cwd);
 
-            Logger.Spinner.succeed(`Installed ${Logger.Colors.green(foundPackage.manifest.name)}!`);
+            Logger.Spinner.succeed(`Updated ${Logger.Colors.green(foundPackage.manifest.name)} to ${tag}!`);
             return foundPackage;
         }
 
-        const install = await new Deno.Command("git", {args: ["clone", url]}).output();
-
-        Deno.chdir(cwd);
-
-        if (!install.success) {
+        try {
+            await commandWrap(new Deno.Command("git", {args: ["clone", "--branch", tag, url]}));
+        } catch (error) {
             Logger.Spinner.fail("Failed to install package, is git installed and are you connected to the internet?");
+            Logger.error((error as Error).message);
             Deno.exit(1);
         }
 
-        const newPackage = (await this.list()).find((item) => !cached.find((cache) => cache.manifest.uuid === item.manifest.uuid));
+        const newPackage = (await this.listGlobal()).find((item) => !cached.find((cache) => cache.manifest.uuid === item.manifest.uuid));
 
         if (!newPackage) {
             Logger.Spinner.fail("Failed to install package, missing netherite.manifest.json");
@@ -207,12 +169,14 @@ export class Package {
         }
 
         Logger.Spinner.succeed(`Installed ${Logger.Colors.green(newPackage.manifest.name)}!`);
+        Deno.chdir(cwd);
+
         return newPackage;
     }
 
     // Uninstalls a package from .netherite/packages
-    public static async uninstall(value: number|string): Promise<{dir: string, manifest: NetheriteManifest}> {
-        const manifest = await this.getInstalledPackage(value);
+    public static async uninstall(value: number|string): Promise<GlobalPackage> {
+        const manifest = await this.getGlobalPackage(value);
 
         Logger.Spinner.start(`Uninstalling ${Logger.Colors.green(manifest.manifest.name)}...`);
         Deno.removeSync(manifest.dir, {recursive: true});
@@ -222,10 +186,10 @@ export class Package {
     }
 
     // Lists all installed packages
-    public static async list(): Promise<{dir: string, manifest: NetheriteManifest}[]> {
-        const packages: {dir: string, manifest: NetheriteManifest}[] = [];
+    public static async listGlobal(): Promise<GlobalPackage[]> {
+        const packages: GlobalPackage[] = [];
 
-        await this.iterateInstalledPackages((dir) => {
+        await this.iterateGlobalPackages((dir) => {
             const subpath = path.join(dir, "netherite.manifest.json");
 
             try {
@@ -244,10 +208,10 @@ export class Package {
     }
 
     // Lists all installed packages
-    public static async listLoaded(): Promise<{dir: string, package: NetheritePackage}[]> {
-        const packages: {dir: string, package: NetheritePackage}[] = [];
+    public static async listLocal(): Promise<LocalPackage[]> {
+        const packages: LocalPackage[] = [];
 
-        await this.iterateLoadedPackages((dir) => {
+        await this.iterateLocalPackages((dir) => {
             const nPackage: NetheritePackage = JSONCParse(Deno.readTextFileSync(path.join(dir, "netherite.package.json")));
             packages.push({dir, package: nPackage});
         });
@@ -256,27 +220,20 @@ export class Package {
     }
 
     // Loads an installed package into the current project
-    public static async load(value: number|string, version?: string): Promise<void> {
-        const nPackage = await this.getInstalledPackage(value);
+    public static async load(value: number|string): Promise<void> {
+        const nPackage = await this.getGlobalPackage(value);
 
         Logger.Spinner.start(`Loading ${Logger.Colors.green(nPackage.manifest.name)}...`);
 
-        if (version && !nPackage.manifest.versions[version]) {
-            Logger.Spinner.fail(`Invalid ${nPackage.manifest.name} package version`);
-            Deno.exit(1);
-        }
-
-        const useVersion = version ? version : nPackage.manifest.versions.latest;
-
-        try {
-            Deno.statSync(path.join(nPackage.dir, "versions", useVersion));
-        } catch (_error) {
-            Logger.Spinner.fail(`Failed to load ${nPackage.manifest.name} package, missing version ${useVersion}`);
-            Deno.exit(1);
+        if (!doesPathExist(path.join(nPackage.dir, "src"))) {
+            Logger.Spinner.fail(`Failed to validate ${nPackage.manifest.name} package, attempting recovery`);
+            await this.convert(nPackage);
+            Logger.Spinner.start(`Finished recovery, reloading ${Logger.Colors.green(nPackage.manifest.name)}...`);
         }
 
         const outPath = path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name);
-        copyDirSync(path.join(nPackage.dir, "versions", useVersion), outPath);
+        emptyDirectorySync(outPath);
+        copyDirSync(path.join(nPackage.dir, "src"), outPath);
 
         // Get imported package information
         const packageInfo: NetheritePackage = JSONCParse(Deno.readTextFileSync(path.join(outPath, "netherite.package.json")));
@@ -301,7 +258,7 @@ export class Package {
     }
 
     // Unloads a package from the current project
-    public static async unload(value: number|string): Promise<{dir: string, package: NetheritePackage}> {
+    public static async unload(value: number|string): Promise<LocalPackage> {
         const nPackage = await this.getLoadedPackage(value);
         Deno.removeSync(nPackage.dir, {recursive: true});
 
@@ -309,73 +266,85 @@ export class Package {
     }
 
     // Publishes a loaded package to a git repository
-    public static async publish(loadedPackage: {dir: string, package: NetheritePackage}, force?: boolean): Promise<void> {
-        const installedPackage = await this.getInstalledPackage(loadedPackage.package.name);
-        
-        Logger.Spinner.start(`Publishing ${Logger.Colors.green(loadedPackage.package.name)}...`);
+    public static async publish(localPackage: {dir: string, package: NetheritePackage}, version: string, ignoreVersionCollision?: boolean): Promise<void> {
+        const globalPackage = await this.getGlobalPackage(localPackage.package.name);
+        localPackage.package.version = version;
 
-        if (!installedPackage.manifest.repository) {
+        Deno.writeTextFileSync(path.join(localPackage.dir, "netherite.package.json"), JSON.stringify(localPackage.package, null, "\t"));
+        
+        Logger.Spinner.start(`Publishing ${Logger.Colors.green(localPackage.package.name)} ${version}...`);
+
+        if (!globalPackage.manifest.repository) {
             Logger.Spinner.fail("Failed to publish package, missing repository in netherite.manifest.json");
             Deno.exit(1);
         }
 
         const cwd = Deno.cwd();
-        Deno.chdir(installedPackage.dir);
+        Deno.chdir(globalPackage.dir);
 
-        const status = await new Deno.Command("git", {args: ["status"]}).output();
-
-        if (!status.success) {
-            Logger.Spinner.fail(`${installedPackage.manifest.name} repository is not a git repository, cannot publish`);
-            Logger.error(`You may need to remove the package and re-install it`);
-            Deno.exit(1);
+        try {
+            await commandWrap(new Deno.Command("git", {args: ["fetch", "origin"]}));
+            await commandWrap(new Deno.Command("git", {args: ["status"]}));
+            await commandWrap(new Deno.Command("git", {args: ["checkout", "-B", "main", "origin/main"]}));
+            await commandWrap(new Deno.Command("git", {args: ["pull"]}));
+        } catch (error) {
+            Logger.Spinner.fail(`Failed to pull the latest package data`);
+            Logger.error((error as Error).message);
+            return;
         }
 
-        await new Deno.Command("git", {args: ["pull"]}).output();
-        installedPackage.manifest = JSONCParse(Deno.readTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json")));
-        let url = Deno.readTextFileSync(path.join(installedPackage.dir, ".git", "config"))
-        .split("\n")
-        .find(line => line.includes("url = "))?.split(" = ")[1].trim().replace(/\.git$/, "");
+        globalPackage.manifest = JSONCParse(Deno.readTextFileSync(path.join(globalPackage.dir, "netherite.manifest.json")));
+        let url = globalPackage.manifest.repository;
 
-        const loadedVersion = parseInt(loadedPackage.package.version.replace(/\./g, ""));
-        const lastestVersion = parseInt(installedPackage.manifest.versions.latest.replace(/\./g, ""));
+        const newVersion = parseInt(version.replace(/\./g, ""));
+        const latestVersion = parseInt(globalPackage.manifest.versions.latest.replace(/\./g, ""));
         
-        if (loadedVersion <= lastestVersion) {
-            Logger.Spinner.fail(`Failed to publish package, version ${loadedPackage.package.version} is not greater than ${installedPackage.manifest.versions.latest}`);
-            Deno.exit(1);
+        if (newVersion <= latestVersion && !ignoreVersionCollision) {
+            Logger.Spinner.fail(`Cannot publish package, version ${version} is not greater than ${globalPackage.manifest.versions.latest}`);
+            return;
         }
 
-        copyDirSync(loadedPackage.dir, path.join(installedPackage.dir, "versions", loadedPackage.package.version));
+        emptyDirectorySync(path.join(globalPackage.dir, "src"))
+        copyDirSync(localPackage.dir, path.join(globalPackage.dir, "src"));
 
-        installedPackage.manifest.versions[loadedPackage.package.version] = loadedPackage.package.version;
-        installedPackage.manifest.versions.latest = loadedPackage.package.version;
+        globalPackage.manifest.versions[version] = version;
+        globalPackage.manifest.versions.latest = version;
 
-        Deno.writeTextFileSync(path.join(installedPackage.dir, "netherite.manifest.json"), JSON.stringify(installedPackage.manifest, null, "\t"));
+        Deno.writeTextFileSync(path.join(globalPackage.dir, "netherite.manifest.json"), JSON.stringify(globalPackage.manifest, null, "\t"));
 
-        if (!force) {
-            Logger.Spinner.update(`Creating branch ${Logger.Colors.green(loadedPackage.package.version)}...`);
-            await new Deno.Command("git", {args: ["checkout", "-b", loadedPackage.package.version]}).output();
-            await new Deno.Command("git", {args: ["push", "-u", "origin", loadedPackage.package.version]}).output();
+        Logger.Spinner.update(`Creating branch ${Logger.Colors.green(version)}...`);
+        try {
+            await commandWrap(new Deno.Command("git", {args: ["checkout", "-b", version]}));
+            await commandWrap(new Deno.Command("git", {args: ["push", "-u", "origin", version]}));
+        } catch (error) {
+            Logger.Spinner.fail(`Failed to create a version entry`);
+            Logger.error((error as Error).message);
+            return;
         }
 
-        Logger.Spinner.update(`Pushing ${Logger.Colors.green(loadedPackage.package.version)} changes...`);
-        await new Deno.Command("git", {args: ["add", "."]}).output();
-        await new Deno.Command("git", {args: ["commit", "-m", loadedPackage.package.version]}).output();
-        await new Deno.Command("git", {args: ["push"]}).output();
-
-        if (!force) {
-            Logger.Spinner.update(`Creating pull request for ${Logger.Colors.green(loadedPackage.package.version)}...`);
-            const result = await new Deno.Command("gh", {args: ["pr", "create", "--assignee=@me", `--title=${loadedPackage.package.version}`, `--body=${prTemplate}`], stdout: "piped"}).output();
-            await new Deno.Command("git", {args: ["checkout", "main"]}).output();
-
-            if (result.success) {
-                url = new TextDecoder().decode(result.stdout);
-            }
+        Logger.Spinner.update(`Pushing ${Logger.Colors.green(version)} changes...`);
+        try {
+            await commandWrap(new Deno.Command("git", {args: ["add", "."]}));
+            await commandWrap(new Deno.Command("git", {args: ["commit", "-m", version]}));
+            await commandWrap(new Deno.Command("git", {args: ["push"]}));
+        } catch (error) {
+            Logger.Spinner.fail(`Failed to publish the new version`);
+            Logger.error((error as Error).message);
+            return;
         }
 
+        Logger.Spinner.update(`Creating pull request for ${Logger.Colors.green(version)}...`);
+        const result = await new Deno.Command("gh", {args: ["pr", "create", "--assignee=@me", `--title=${version}`, `--body=${prTemplate}`], stdout: "piped"}).output();
+
+        if (result.success) {
+            url = new TextDecoder().decode(result.stdout);
+            Logger.Spinner.succeed(`Created pull request at ${url} ${Logger.Colors.green(version)} for ${Logger.Colors.green(localPackage.package.name)}!`);
+        } else {
+            Logger.Spinner.fail(`Failed to create pull request ${Logger.Colors.green(version)} for ${Logger.Colors.green(localPackage.package.name)}`)
+        }
+
+        await commandWrap(new Deno.Command("git", {args: ["checkout", "main"]}));
         Deno.chdir(cwd);
-
-        if (force) Logger.Spinner.succeed(`Published at ${url} ${Logger.Colors.green(loadedPackage.package.name)} version ${Logger.Colors.green(loadedPackage.package.version)}!`);
-        else Logger.Spinner.succeed(`Created Pull Request at ${url} ${Logger.Colors.green(loadedPackage.package.version)} for ${Logger.Colors.green(loadedPackage.package.name)}!`);
     }
 
     // Creates a new package in the current project, allows for publishing to a git repository on creation
@@ -385,15 +354,6 @@ export class Package {
         const dir = path.join(Deno.cwd(), "src", "modules", name);
         Deno.mkdirSync(dir, {recursive: true});
 
-        const nPackage: NetheritePackage = {
-            name,
-            description,
-            uuid: crypto.randomUUID(),
-            version: "0.0.1"
-        };
-
-        Deno.writeTextFileSync(path.join(Deno.cwd(), "src", "modules", name, "netherite.package.json"), JSON.stringify(nPackage, null, "\t"));
-
         if (publish) {
             const cwd = Deno.cwd();
             const installDir = path.join(Config.NetheriteDirectory, "packages", name);
@@ -401,8 +361,20 @@ export class Package {
             Deno.mkdirSync(installDir, {recursive: true});
             Deno.chdir(installDir);
 
+            const finishedPublishing = Promise.withResolvers<void>();
+            let nPackage: NetheritePackage;
+
             try {
                 await publishToGitHub({owner: publish.owner, name, description}, (repository) => {
+                    nPackage = {
+                        name,
+                        description,
+                        uuid: crypto.randomUUID(),
+                        version: "0.0.0",
+                        url: repository,
+                    };
+
+                    Deno.writeTextFileSync(path.join(dir, "netherite.package.json"), JSON.stringify(nPackage, null, "\t"));
                     Deno.writeTextFileSync(path.join(installDir, "netherite.manifest.json"), JSON.stringify({
                         name,
                         description,
@@ -413,27 +385,112 @@ export class Package {
 
                     Deno.mkdirSync(path.join(installDir, ".github/workflows"), {recursive: true});
                     Deno.writeTextFileSync(path.join(installDir, ".github/workflows/pull_request.yml"), action);
-                    Deno.writeTextFileSync(path.join(installDir, "CHANGELOG.md"), changelog);
-                });
+                    Deno.writeTextFileSync(path.join(installDir, "CHANGELOG.md"), "");
     
-                copyDirSync(dir, path.join(installDir, "versions", nPackage.version));
-                await this.publish({dir, package: nPackage}, true);
+                });
+
+                this.publish({dir, package: nPackage!}, "0.0.0", true).then(finishedPublishing.resolve).catch(finishedPublishing.reject);
             } catch (error) {
                 Logger.error(String(error));
                 Deno.exit(1);
             }
 
+            await finishedPublishing.promise;
             Deno.chdir(cwd);
         }
     }
 
-    private static async iterateInstalledPackages(callback: (path: string) => Promise<void>|void): Promise<void> {
+    /**
+     * Converts an older, folder-based package to a modern, tag-based format.
+     * @param pack The package to convert.
+     */
+    public static async convert(pack: GlobalPackage): Promise<void> {
+        Logger.log(`Updating ${pack.manifest.name} to tag-based structure`);
+        const cacheDir = Deno.cwd();
+
+        pack = await this.install(pack.manifest.repository);
+        if (doesPathExist(path.join(pack.dir, "src"))) {
+            Logger.log(`Finished updating ${pack.manifest.name}`);
+            return;
+        }
+
+        Logger.Spinner.start(`Performing package conversion`);
+        
+        const tempDir = Deno.makeTempDirSync();
+        Deno.chdir(tempDir);
+        copyDirSync(pack.dir, tempDir);
+        emptyDirectorySync(path.join(tempDir, "versions"));
+
+        Deno.writeTextFileSync(path.join(tempDir, ".github/workflows/pull_request.yml"), action);
+
+        const versions = Object.keys(pack.manifest.versions).filter(v => v !== "latest");
+        pack.manifest.versions = {latest: ""};
+
+        for (const version of versions) {
+            Logger.Spinner.update(`Preparing tag ${version}`);
+
+            emptyDirectorySync(path.join(tempDir, "src"));
+            copyDirSync(path.join(pack.dir, "versions", version), path.join(tempDir, "src"));
+
+            pack.manifest.versions.latest = version;
+            pack.manifest.versions[version] = version;
+            Deno.writeTextFileSync(path.join(tempDir, "netherite.manifest.json"), JSON.stringify(pack.manifest, null, "\t"));
+
+            const packageData: NetheritePackage = JSONCParse(Deno.readTextFileSync(path.join(tempDir, "src", "netherite.package.json")));
+            packageData.url = pack.manifest.repository;
+            Deno.writeTextFileSync(path.join(tempDir, "src", "netherite.package.json"), JSON.stringify(packageData, null, "\t"));
+
+            try {
+                await commandWrap(new Deno.Command("git", {args: ["add", "."]}));
+                await commandWrap(new Deno.Command("git", {args: ["commit", "-m", version]}));
+                await commandWrap(new Deno.Command("git", {args: ["push"]}));
+            } catch (error) {
+                Logger.error(`${version} ${(error as Error).message}`);
+            }
+
+            while (true) {
+                try {
+                    await commandWrap(new Deno.Command("gh", {args: ["release", "create", version, "--title", `Release ${version}`, "--generate-notes"]}));
+                    break;
+                } catch (_error) {
+                    Logger.Spinner.update(`Failed to generate tagged release ${version}, trying again in 5 seconds`);
+                    await sleep(5000);
+                    Logger.Spinner.update(`Retrying ${version} release`);
+                }
+            }
+
+            Logger.Spinner.update(`Converted tag ${version}`);
+        }
+
+        Logger.Spinner.update(`Cleaning up...`);
+        emptyDirectorySync(tempDir);
+        Deno.chdir(pack.dir);
+
+        try {
+            await commandWrap(new Deno.Command("git", {args: ["checkout", "main"]}));
+            await commandWrap(new Deno.Command("git", {args: ["pull"]}));
+        } catch (error) {
+            Logger.Spinner.fail(`Fatal ${(error as Error).message}`);
+            Deno.exit(1);
+        }
+
+        if (doesPathExist(path.join(pack.dir, "src"))) {
+            Deno.chdir(cacheDir);
+            Logger.Spinner.succeed(`Converted ${pack.manifest.name}`);
+            return;
+        } else {
+            Logger.Spinner.fail(`Could not convert ${pack.manifest.name}`);
+            Deno.exit(1);
+        }
+    }
+
+    private static async iterateGlobalPackages(callback: (path: string) => Promise<void>|void): Promise<void> {
         const dir = path.join(Config.NetheriteDirectory, "packages");
 
         try {
             Deno.statSync(dir);
         } catch (_error) {
-            await this.vanillaUpdate();
+            this.init();
         }
 
         for (const entry of Deno.readDirSync(dir)) {
@@ -449,8 +506,8 @@ export class Package {
         };
     }
 
-    public static async getInstalledPackage(value: number|string): Promise<{dir: string, manifest: NetheriteManifest}> {
-        const packages = await this.list();
+    public static async getGlobalPackage(value: number|string): Promise<GlobalPackage> {
+        const packages = await this.listGlobal();
 
         if (typeof value === "number") {
             if (value < 0 || value >= packages.length) {
@@ -471,7 +528,7 @@ export class Package {
         }
     }
 
-    private static async iterateLoadedPackages(callback: (path: string) => Promise<void>|void): Promise<void> {
+    private static async iterateLocalPackages(callback: (path: string) => Promise<void>|void): Promise<void> {
         const dir = path.join(Deno.cwd(), "src", "modules");
 
         try {
@@ -493,8 +550,8 @@ export class Package {
         };
     }
 
-    public static async getLoadedPackage(value: number|string): Promise<{dir: string, package: NetheritePackage}> {
-        const packages = await this.listLoaded();
+    public static async getLoadedPackage(value: number|string): Promise<LocalPackage> {
+        const packages = await this.listLocal();
 
         if (typeof value === "number") {
             if (value < 0 || value >= packages.length) {
@@ -514,4 +571,14 @@ export class Package {
             return packageValue;
         }
     }
+}
+
+async function commandWrap(command: Deno.Command): Promise<void> {
+    const result = await command.output();
+    if (result.success) return;
+
+    const err = new TextDecoder().decode(result.stderr);
+    const out = new TextDecoder().decode(result.stdout);
+
+    throw new Error(out + err);
 }

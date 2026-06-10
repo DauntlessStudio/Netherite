@@ -2,27 +2,21 @@ import { Command, type CommandData } from "../../command.ts";
 import { Package } from "../../../core/classes/index.ts";
 import { Logger } from "../../../core/utils/index.ts";
 
-interface UninstallCommandData extends CommandData {
+interface ValidateCommandData extends CommandData {
     options: {
         package?: string|number;
-        "no-unload"?: boolean;
     }
 }
 
-export default new Command<UninstallCommandData>({
-    name: "uninstall",
+export default new Command<ValidateCommandData>({
+    name: "validate",
     usage: {
-        description: "Uninstalls a package from the Netherite cache, and unloads it from the project",
-        usage: "[--package <name|index> --no-unload]",
+        description: "Validates a package from the Netherite cache",
+        usage: "[--package <name|index>]",
         flags: {
             package: {
                 type: "string|number",
-                description: "The name or index of the package to uninstall",
-                optional: true,
-            },
-            "no-unload": {
-                type: "boolean",
-                description: "Does not load the package into the project",
+                description: "The name or index of the package to validate",
                 optional: true,
             },
         },
@@ -36,8 +30,7 @@ export default new Command<UninstallCommandData>({
     },
     validateArgs(_args) {
         const pack = _args.options["package"] === undefined || typeof _args.options["package"] === "string" || typeof _args.options["package"] === "number";
-        const noLoad = _args.options["no-unload"] === undefined || typeof _args.options["no-unload"] === "boolean";
-        return pack && noLoad;
+        return pack;
     },
     async action(_args) {
         if (!_args.options.package) {
@@ -49,11 +42,7 @@ export default new Command<UninstallCommandData>({
             }
         }
 
-        const manifest = await Package.uninstall(_args.options.package);
-
-        if (!_args.options["no-unload"]) {
-            await Package.unload(manifest.manifest.name);
-        }
+        await Package.convert(await Package.getGlobalPackage(_args.options.package!));
     },
 });
 
@@ -64,7 +53,7 @@ async function getPromptData(): Promise<string|number> {
         Logger.log(`[${Logger.Colors.green(i.toString())}]: ${Logger.Colors.green(packages[i].manifest.name)}`);
     }
     
-    const val = prompt("Enter the name or index of the package to uninstall:");
+    const val = prompt("Enter the name or index of the package to validate:");
 
     if (val === null) {
         Logger.error("No package specified.");
