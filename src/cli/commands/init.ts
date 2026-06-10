@@ -119,7 +119,7 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectOption
         version: "1.0.0",
     };
 
-    await Package.vanillaUpdate();
+    const latestVersion: string = (await ((await fetch("https://raw.githubusercontent.com/Mojang/bedrock-samples/refs/heads/main/version.json")).json())).latest.version
 
     if (args.options.name) {
         buildOptions.name = args.options.name;
@@ -150,13 +150,13 @@ async function getProjectBuildData(args: InitCommandData): Promise<ProjectOption
 
     if (args.options.format_version) {
         if (args.options.format_version === "latest") {
-            args.options.format_version = Package.LatestVanillaVersion;
+            args.options.format_version = latestVersion;
         }
 
         buildOptions.format_version = args.options.format_version;
     } else {
-        let val = prompt(`Please enter the format version of the project [default: ${Package.LatestVanillaVersion}]:`);
-        if (val === null || val === "") val = Package.LatestVanillaVersion;
+        let val = prompt(`Please enter the format version of the project [default: ${latestVersion}]:`);
+        if (val === null || val === "") val = latestVersion;
 
         buildOptions.format_version = val;
     }

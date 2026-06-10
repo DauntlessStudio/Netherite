@@ -132,7 +132,7 @@ export class Static {
     }
 
     private static async watch(): Promise<void> {
-        let debounceHandler: number | undefined;
+        let debounceHandler: NodeJS.Timeout | undefined;
         const changedPaths = new Set<string>();
 
         let currentBranchRef = this.getBranchRef() ;
