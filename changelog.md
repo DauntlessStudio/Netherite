@@ -1,4 +1,8 @@
 # Changelog
+## [1.0.0] - 06/10/2026
+- Updated `package create` and `package publish` to work around git tags instead of versioned folders.
+- Added `package update` command
+- Updated Install Requirements
 ## [0.10.0] - 04/08/2026
 - Changed all reserved keywords to use a `$` prefix. The keyword list is: `$FORMATVERSION, $ENVIRONMENT, $NAMESPACE, $VERSION, $AUTHOR, $NAME, $PATH`.
 - Fixed some type issues with `ServerEntityComponents`.
