@@ -3,6 +3,7 @@ import Create from "./create.ts";
 import Publish from "./publish.ts";
 import Install from "./install.ts";
 import Update from "./update.ts";
+import Validate from "./validate.ts";
 import Uninstall from "./uninstall.ts";
 
 export default new Command<CommandData>({
@@ -19,4 +20,5 @@ export default new Command<CommandData>({
 .addSubCommand(Publish)
 .addSubCommand(Install)
 .addSubCommand(Update)
+.addSubCommand(Validate)
 .addSubCommand(Uninstall);
