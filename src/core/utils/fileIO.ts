@@ -28,6 +28,15 @@ export function copyDirSync(src: string, dest: string): void {
     }
 }
 
+export function doesPathExist(path: string): boolean {
+    try {
+        Deno.statSync(path);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
 export async function sendToDist(src: string, dest: string, excludeGlob: string[] = []): Promise<void> {
     if (excludeGlob.some(glob => path.globToRegExp(glob).test(src))) {
         return;

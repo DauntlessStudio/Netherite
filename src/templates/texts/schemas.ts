@@ -9,6 +9,10 @@ const contents = () => JSON.stringify({
             "type": "string",
             "description": "The name of the Netherite package."
         },
+        "url": {
+            "type": "string",
+            "description": "The URL of the GitHub repository hosting the Netherite package."
+        },
         "uuid": {
             "type": "string",
             "description": "The UUID of the Netherite package."
