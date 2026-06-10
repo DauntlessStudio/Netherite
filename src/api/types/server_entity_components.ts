@@ -497,10 +497,14 @@ export interface Strength {
 
 // #region Behaviors
 
+export interface BaseBehavior {
+    priority: number;
+}
+
 /**
  * Can cause entity to admire items configured as admireable, requires {@link AdmireItem}
  */
-export interface BehaviorAdmireItem {
+export interface BehaviorAdmireItem extends BaseBehavior {
     [key: string]: unknown;
     /**
      * The sound event to play when admiring the item
@@ -515,7 +519,7 @@ export interface BehaviorAdmireItem {
 /**
  * Can cause this entity to avoid certain blocks
  */
-export interface BehaviorAvoidBlock {
+export interface BehaviorAvoidBlock extends BaseBehavior {
     [key: string]: unknown;
     /**
      * The sound event to play when avoiding the block
@@ -569,7 +573,7 @@ export interface BehaviorAvoidBlock {
 /**
  * Can cause the entity to run away from other entities that match the criteria
  */
-export interface BehaviorAvoidMobType {
+export interface BehaviorAvoidMobType extends BaseBehavior {
     [key: string]: unknown;
     /**
      * The sound event to play when avoiding the mob
@@ -643,12 +647,12 @@ export interface BehaviorAvoidMobType {
 /**
  * Can cause the entity to barter. Requires {@link Barter}
  */
-export interface BehaviorBarter {}
+export interface BehaviorBarter extends BaseBehavior {}
 
 /**
  * Can cause the entity to look at and follow a player holding certain items
  */
-export interface BehaviorBeg {
+export interface BehaviorBeg extends BaseBehavior {
     [key: string]: unknown;
     /**
      * List of items the mob likes
@@ -669,12 +673,12 @@ export interface BehaviorBeg {
 /**
  * Can cause the entity to break doors
  */
-export interface BehaviorBreakDoor {}
+export interface BehaviorBreakDoor extends BaseBehavior {}
 
 /**
  * Can cause the entity to breed. Requires {@link Breedable}
  */
-export interface BehaviorBreed {
+export interface BehaviorBreed extends BaseBehavior {
     [key: string]: unknown;
     /**
      * Multiplier for movement speed
@@ -686,7 +690,7 @@ export interface BehaviorBreed {
 /**
  * Can cause the entity to celebrate surviving a raid with sounds and jumping
  */
-export interface BehaviorCelebrate {
+export interface BehaviorCelebrate extends BaseBehavior {
     [key: string]: unknown;
     /**
      * The sound event to play when celebrating
@@ -716,7 +720,7 @@ export interface BehaviorCelebrate {
 /**
  * Can cause the entity to celebrate surviving a raid by shooting fireworks
  */
-export interface BehaviorCelebrateSurvive {
+export interface BehaviorCelebrateSurvive extends BaseBehavior {
     [key: string]: unknown;
     /**
      * Duration in seconds that the celebration lasts
@@ -737,7 +741,7 @@ export interface BehaviorCelebrateSurvive {
 /**
  * Can cause the entity to damage a target by using a charging attack
  */
-export interface BehaviorChargeAttack {
+export interface BehaviorChargeAttack extends BaseBehavior {
     [key: string]: unknown;
     /**
      * The max distance the entity can be from its target to start this behavior
@@ -764,7 +768,7 @@ export interface BehaviorChargeAttack {
 /**
  * Can cause the entity to charge and use their held item
  */
-export interface BehaviorChargeHeldItem {
+export interface BehaviorChargeHeldItem extends BaseBehavior {
     [key: string]: unknown;
     items?: string[];
 }
@@ -772,7 +776,7 @@ export interface BehaviorChargeHeldItem {
 /**
  * Causes an entity to circle around an anchor point placed near a point or target
  */
-export interface BehaviorCircleAroundAnchor {
+export interface BehaviorCircleAroundAnchor extends BaseBehavior {
     [key: string]: unknown;
     /**
      * Number of degrees to change this entity's facing by when it selects its next anchor point
@@ -827,7 +831,7 @@ export interface BehaviorCircleAroundAnchor {
 /**
  * Can cause the entity to be controlled by the player using an item. Requires {@link Rideable} and {@link ItemControllable}
  */
-export interface BehaviorControlledByPlayer {
+export interface BehaviorControlledByPlayer extends BaseBehavior {
     [key: string]: unknown;
     /**
      * The entity will attempt to rate to face where the player is facing each tick, a normalized range where 1 matches the player's facing exactly
@@ -849,7 +853,7 @@ export interface BehaviorControlledByPlayer {
 /**
  * Can cause the entity to croak at a random inverval
  */
-export interface BehaviorCroak {
+export interface BehaviorCroak extends BaseBehavior {
     [key: string]: unknown;
     /**
      * Random duration in seconds after which croaking stops
@@ -870,7 +874,7 @@ export interface BehaviorCroak {
 /**
  * Can cause the entity to target another entity that hurts an entity it trusts
  */
-export interface BehaviorDefendTrustedTarget {
+export interface BehaviorDefendTrustedTarget extends BaseBehavior {
     [key: string]: unknown;
     /**
      * Sound event to play while defending
@@ -909,7 +913,7 @@ export interface BehaviorDefendTrustedTarget {
 /**
  * Can cause the entity to stay in a village and defend it from aggressors
  */
-export interface BehaviorDefendVillageTarget {
+export interface BehaviorDefendVillageTarget extends BaseBehavior {
     [key: string]: unknown;
     /**
      * Percent chance of attacking aggressors, where 0 is 0% and 1 is 100%
@@ -921,7 +925,7 @@ export interface BehaviorDefendVillageTarget {
 /**
  * Can cause the entity to attack while delaying the damage dealing in order to sync it with an animation
  */
-export interface BehaviorDelayedAttack {
+export interface BehaviorDelayedAttack extends BaseBehavior {
     [key: string]: unknown;
     attack_duration?: number;
     attack_once?: boolean;
@@ -952,7 +956,7 @@ export interface BehaviorDelayedAttack {
 /**
  * Can cause the entity to dig into the ground before despawning
  */
-export interface BehaviorDig {
+export interface BehaviorDig extends BaseBehavior {
     [key: string]: unknown;
     allow_dig_when_named?: boolean;
     digs_in_daylight?: boolean;
@@ -966,12 +970,12 @@ export interface BehaviorDig {
 /**
  * Can cause the enity to open and close doors
  */
-export interface BehaviorDoorInteract {}
+export interface BehaviorDoorInteract extends BaseBehavior {}
 
 /**
  * Can cause the entity to attack by charging. Can only be used by `minecraft:ender_dragon`
  */
-export interface BehaviorDragonChargePlayer {
+export interface BehaviorDragonChargePlayer extends BaseBehavior {
     [key: string]: unknown;
     active_speed?: number;
     continue_charge_threshold_time?: number;
@@ -983,32 +987,32 @@ export interface BehaviorDragonChargePlayer {
 /**
  * Can cause the entity to use a special death animation. Can only be used by `minecraft:ender_dragon`
  */
-export interface BehaviorDragonDeath {}
+export interface BehaviorDragonDeath extends BaseBehavior {}
 
 /**
  * Can cause the entity to shoot flame-breath. Can only be used by `minecraft:ender_dragon`
  */
-export interface BehaviorDragonFlaming {}
+export interface BehaviorDragonFlaming extends BaseBehavior {}
 
 /**
  * Can cause the entity to circle in a holding platform. Can only be used by `minecraft:ender_dragon`
  */
-export interface BehaviorDragonHoldingPattern {}
+export interface BehaviorDragonHoldingPattern extends BaseBehavior {}
 
 /**
  * Can cause the entity to transition into perch. Can only be used by `minecraft:ender_dragon`
  */
-export interface BehaviorDragonLanding {}
+export interface BehaviorDragonLanding extends BaseBehavior {}
 
 /**
  * Can cause the entity to look for a player while perched. Can only be used by `minecraft:ender_dragon`
  */
-export interface BehaviorDragonScanning {}
+export interface BehaviorDragonScanning extends BaseBehavior {}
 
 /**
  * Can cause the entity to look for player while flying. Can only be used by `minecraft:ender_dragon`
  */
-export interface BehaviorDragonStrafePlayer {
+export interface BehaviorDragonStrafePlayer extends BaseBehavior {
     [key: string]: unknown;
     active_speed?: number;
     fireball_range?: number;
@@ -1023,12 +1027,12 @@ export interface BehaviorDragonStrafePlayer {
 /**
  * Can cause the entity to transition out of perch. Can only be used by `minecraft:ender_dragon`
  */
-export interface BehaviorDragonTakeOff {}
+export interface BehaviorDragonTakeOff extends BaseBehavior {}
 
 /**
  * Can cause the entity to drink milk under certain conditions
  */
-export interface BehaviorDrinkMilk {
+export interface BehaviorDrinkMilk extends BaseBehavior {
     [key: string]: unknown;
     cooldown_seconds?: number;
     filters?: ServerFilters|ServerFilters[];
@@ -1037,7 +1041,7 @@ export interface BehaviorDrinkMilk {
 /**
  * Can cause the entity to drink potions under certain conditions
  */
-export interface BehaviorDrinkPotion {
+export interface BehaviorDrinkPotion extends BaseBehavior {
     [key: string]: unknown;
     potions?: {
         chance?: number;
@@ -1050,7 +1054,7 @@ export interface BehaviorDrinkPotion {
 /**
  * Can cause the entity to move towards a target and drop an item near them
  */
-export interface BehaviorDropItemFor {
+export interface BehaviorDropItemFor extends BaseBehavior {
     [key: string]: unknown;
     cooldown?: number;
     drop_item_chance?: number;
@@ -1074,7 +1078,7 @@ export interface BehaviorDropItemFor {
 /**
  * Can cause the entity to consume a block, replacing it with another block
  */
-export interface BehaviorEatBlock {
+export interface BehaviorEatBlock extends BaseBehavior {
     [key: string]: unknown;
     eat_and_replace_block_pairs?: {
         eat_block?: string;
@@ -1088,7 +1092,7 @@ export interface BehaviorEatBlock {
 /**
  * Can cause the entity to eat food it is carrying
  */
-export interface BehaviorEatCarriedItem {
+export interface BehaviorEatCarriedItem extends BaseBehavior {
     [key: string]: unknown;
     delay_before_eating?: number;
 }
@@ -1096,7 +1100,7 @@ export interface BehaviorEatCarriedItem {
 /**
  * Can cause the entity to eat another entity
  */
-export interface BehaviorEatMob {
+export interface BehaviorEatMob extends BaseBehavior {
     [key: string]: unknown;
     eat_animation_time?: number;
     eat_mob_sound?: string;
@@ -1109,7 +1113,7 @@ export interface BehaviorEatMob {
 /**
  * Can cause the entity to emerge from the ground
  */
-export interface BehaviorEmerge {
+export interface BehaviorEmerge extends BaseBehavior {
     [key: string]: unknown;
     cooldown_time?: number;
     duration?: number;
@@ -1119,22 +1123,22 @@ export interface BehaviorEmerge {
 /**
  * Can cause the entity to leave blocks. Can only be used by `minecraft:enderman`
  */
-export interface BehaviorEndermanLeaveBlock {}
+export interface BehaviorEndermanLeaveBlock extends BaseBehavior {}
 
 /**
  * Can cause the entity to take blocks. Can only be used by `minecraft:enderman`
  */
-export interface BehaviorEndermanTakeBlock {}
+export interface BehaviorEndermanTakeBlock extends BaseBehavior {}
 
 /**
  * Can cause the entity to put on desired equipment
  */
-export interface BehaviorEquipItem {}
+export interface BehaviorEquipItem extends BaseBehavior {}
 
 /**
  * Can cause the entity to first travel to a random point on the village outskirts. Requires {@link Dweller} and {@link SharedNavigation}
  */
-export interface BehaviorExploreOutskirts {
+export interface BehaviorExploreOutskirts extends BaseBehavior {
     [key: string]: unknown;
     dist_from_boundary?: [number, number, number];
     explore_dist?: number;
@@ -1152,7 +1156,7 @@ export interface BehaviorExploreOutskirts {
 /**
  * Can cause the entity to search wiehin an area for growable crops that they will fertilize
  */
-export interface BehaviorFertilizeFarmBlock {
+export interface BehaviorFertilizeFarmBlock extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     max_fertilizer_usage?: number;
@@ -1166,7 +1170,7 @@ export interface BehaviorFertilizeFarmBlock {
 /**
  * Can cause the entity to seek shade
  */
-export interface BehaviorFindCover {
+export interface BehaviorFindCover extends BaseBehavior {
     [key: string]: unknown;
     cooldown_time?: number;
     speed_multiplier?: number;
@@ -1175,7 +1179,7 @@ export interface BehaviorFindCover {
 /**
  * Can cause the entity to look for a mount
  */
-export interface BehaviorFindMount {
+export interface BehaviorFindMount extends BaseBehavior {
     [key: string]: unknown;
     avoid_water?: boolean;
     mount_distance?: number;
@@ -1187,7 +1191,7 @@ export interface BehaviorFindMount {
 /**
  * Can cause the entity to move towards the nearest underwater ruin or shipwreck
  */
-export interface BehaviorFindUnderwaterTreasure {
+export interface BehaviorFindUnderwaterTreasure extends BaseBehavior {
     [key: string]: unknown;
     search_range?: number;
     speed_multiplier?: number;
@@ -1197,7 +1201,7 @@ export interface BehaviorFindUnderwaterTreasure {
 /**
  * Can cause the entity to attack by firing a shot with a delay
  */
-export interface BehaviorFireAtTarget {
+export interface BehaviorFireAtTarget extends BaseBehavior {
     [key: string]: unknown;
     attack_cooldown?: number;
     attack_range?: [number, number];
@@ -1217,7 +1221,7 @@ export interface BehaviorFireAtTarget {
 /**
  * Can cause the entity to run from direct sunlight and seek shade
  */
-export interface BehaviorFleeSun {
+export interface BehaviorFleeSun extends BaseBehavior {
     [key: string]: unknown;
     speed_multiplier?: number;
 }
@@ -1225,7 +1229,7 @@ export interface BehaviorFleeSun {
 /**
  * Can cause the mob to stay afloat while swimming
  */
-export interface BehaviorFloat {
+export interface BehaviorFloat extends BaseBehavior {
     [key: string]: unknown;
     sink_with_passengers?: boolean;
 }
@@ -1233,7 +1237,7 @@ export interface BehaviorFloat {
 /**
  * Can cause the mob to float like a Ghast
  */
-export interface BehaviorFloatWander {
+export interface BehaviorFloatWander extends BaseBehavior {
     [key: string]: unknown;
     float_duration?: [number, number];
     must_reach?: boolean;
@@ -1246,7 +1250,7 @@ export interface BehaviorFloatWander {
 /**
  * Can cause the entity to follow a caravan
  */
-export interface BehaviorFollowCaravan {
+export interface BehaviorFollowCaravan extends BaseBehavior {
     [key: string]: unknown;
     entity_count?: number;
     entity_types?: EntityType[];
@@ -1256,7 +1260,7 @@ export interface BehaviorFollowCaravan {
 /**
  * Can cause the entity to follow other mobs
  */
-export interface BehaviorFollowMob {
+export interface BehaviorFollowMob extends BaseBehavior {
     [key: string]: unknown;
     search_range?: number;
     speed_multiplier?: number;
@@ -1266,7 +1270,7 @@ export interface BehaviorFollowMob {
 /**
  * Can cause the entity to follow the owning player
  */
-export interface BehaviorFollowOwner {
+export interface BehaviorFollowOwner extends BaseBehavior {
     [key: string]: unknown;
     can_teleport?: boolean;
     ignore_vibration?: boolean;
@@ -1280,7 +1284,7 @@ export interface BehaviorFollowOwner {
 /**
  * Can cause the entity to follow its parent
  */
-export interface BehaviorFollowParent {
+export interface BehaviorFollowParent extends BaseBehavior {
     [key: string]: unknown;
     can_teleport?: boolean;
     ignore_vibration?: boolean;
@@ -1294,7 +1298,7 @@ export interface BehaviorFollowParent {
 /**
  * Can cause the entity to follow its current target captain
  */
-export interface BehaviorFollowTargetCaptain {
+export interface BehaviorFollowTargetCaptain extends BaseBehavior {
     [key: string]: unknown;
     follow_distance?: number;
     within_radius?: number;
@@ -1303,7 +1307,7 @@ export interface BehaviorFollowTargetCaptain {
 /**
  * Can cause the entity to toss the items from its inventory to a recently played Noteblock
  */
-export interface BehaviorGoAndGiveItemsToNoteblock {
+export interface BehaviorGoAndGiveItemsToNoteblock extends BaseBehavior {
     [key: string]: unknown;
     listen_time?: number;
     on_item_throw?: Trigger;
@@ -1317,7 +1321,7 @@ export interface BehaviorGoAndGiveItemsToNoteblock {
 /**
  * Can cause the entity to toss items from its inventory to its owner
  */
-export interface BehaviorGoAndGiveItemsToOwner {
+export interface BehaviorGoAndGiveItemsToOwner extends BaseBehavior {
     [key: string]: unknown;
     on_item_throw?: Trigger;
     reach_block_distance?: number;
@@ -1330,7 +1334,7 @@ export interface BehaviorGoAndGiveItemsToOwner {
 /**
  * Can cause the entity to go to the location where they were spawned. Requires {@link Home}
  */
-export interface BehaviorGoHome {
+export interface BehaviorGoHome extends BaseBehavior {
     [key: string]: unknown;
     calculate_new_path_radius?: number;
     goal_radius?: number;
@@ -1343,7 +1347,7 @@ export interface BehaviorGoHome {
 /**
  * Can cause the entity to use a laser beam attack. Can only be used by `minecraft:guardian` and `minecraft:elder_guardian`
  */
-export interface BehaviorGuardianAttack {
+export interface BehaviorGuardianAttack extends BaseBehavior {
     [key: string]: unknown;
     elder_extra_magic_damage?: number;
     hard_mode_extra_magic_damage?: number;
@@ -1357,7 +1361,7 @@ export interface BehaviorGuardianAttack {
 /**
  * Can cause the entity to search within an area for valid farmland to till. Requires {@link Inventory} and {@link SharedNavigation}
  */
-export interface BehaviorHarvestFarmBlock {
+export interface BehaviorHarvestFarmBlock extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     max_seconds_before_search?: number;
@@ -1372,7 +1376,7 @@ export interface BehaviorHarvestFarmBlock {
 /**
  * Can cause the entity to attempt to move to and hide at a POI
  */
-export interface BehaviorHide {
+export interface BehaviorHide extends BaseBehavior {
     [key: string]: unknown;
     duration?: number;
     poi_type?: string;
@@ -1383,7 +1387,7 @@ export interface BehaviorHide {
 /**
  * Can cause the entity to freeze and look at their target
  */
-export interface BehaviorHoldGround {
+export interface BehaviorHoldGround extends BaseBehavior {
     [key: string]: unknown;
     broadcast?: boolean;
     broadcast_range?: number;
@@ -1394,7 +1398,7 @@ export interface BehaviorHoldGround {
 /**
  * Can cause the entity to target a mob that hurt them
  */
-export interface BehaviorHurtByTarget {
+export interface BehaviorHurtByTarget extends BaseBehavior {
     [key: string]: unknown;
     alert_same_type?: boolean;
     entity_types?: EntityType[];
@@ -1404,7 +1408,7 @@ export interface BehaviorHurtByTarget {
 /**
  * Can cause the entity to inspect bookshelves
  */
-export interface BehaviorInspectBookshelf {
+export interface BehaviorInspectBookshelf extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     search_count?: number;
@@ -1416,7 +1420,7 @@ export interface BehaviorInspectBookshelf {
 /**
  * Can cause the entity to move towards a suspicious position. Requires {@link SuspectTracking}
  */
-export interface BehaviorInvestigateSuspiciousLocation {
+export interface BehaviorInvestigateSuspiciousLocation extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     speed_multiplier?: number;
@@ -1425,7 +1429,7 @@ export interface BehaviorInvestigateSuspiciousLocation {
 /**
  * Can cause the entity to jump around a target
  */
-export interface BehaviorJumpAroundTarget {
+export interface BehaviorJumpAroundTarget extends BaseBehavior {
     [key: string]: unknown;
     check_collision?: boolean;
     entity_bounding_box_scale?: number;
@@ -1446,7 +1450,7 @@ export interface BehaviorJumpAroundTarget {
 /**
  * Can cause the entity to jump to another random block
  */
-export interface BehaviorJumpToBlock {
+export interface BehaviorJumpToBlock extends BaseBehavior {
     [key: string]: unknown;
     cooldown_range?: [number, number];
     forbidden_blocks?: string[];
@@ -1463,7 +1467,7 @@ export interface BehaviorJumpToBlock {
 /**
  * Can cause the entity to perform a damaging knockback attack
  */
-export interface BehaviorKnockbackRoar {
+export interface BehaviorKnockbackRoar extends BaseBehavior {
     [key: string]: unknown;
     attack_time?: number;
     cooldown_time?: number;
@@ -1481,7 +1485,7 @@ export interface BehaviorKnockbackRoar {
 /**
  * Can cause the entity to lay down
  */
-export interface BehaviorLayDown {
+export interface BehaviorLayDown extends BaseBehavior {
     [key: string]: unknown;
     interval?: number;
     random_stop_interval?: number;
@@ -1490,7 +1494,7 @@ export interface BehaviorLayDown {
 /**
  * Can cause the entity to lay egg blocks if pregnant
  */
-export interface BehaviorLayEgg {
+export interface BehaviorLayEgg extends BaseBehavior {
     [key: string]: unknown;
     allow_laying_from_below?: boolean;
     egg_type?: string;
@@ -1509,7 +1513,7 @@ export interface BehaviorLayEgg {
 /**
  * Can cause the entity to jump at and attack their target
  */
-export interface BehaviorLeapAtTarget {
+export interface BehaviorLeapAtTarget extends BaseBehavior {
     [key: string]: unknown;
     must_be_on_ground?: boolean;
     set_persistent?: boolean;
@@ -1519,7 +1523,7 @@ export interface BehaviorLeapAtTarget {
 /**
  * Can cause the entity to look at a nearby entity
  */
-export interface BehaviorLookAtEntity {
+export interface BehaviorLookAtEntity extends BaseBehavior {
     [key: string]: unknown;
     angle_of_view_horizontal?: number;
     angle_of_view_vertical?: number;
@@ -1532,7 +1536,7 @@ export interface BehaviorLookAtEntity {
 /**
  * Can cause the entity to look at a nearby player
  */
-export interface BehaviorLookAtPlayer {
+export interface BehaviorLookAtPlayer extends BaseBehavior {
     [key: string]: unknown;
     angle_of_view_horizontal?: number;
     angle_of_view_vertical?: number;
@@ -1544,7 +1548,7 @@ export interface BehaviorLookAtPlayer {
 /**
  * Can cause the entity to look at a nearby target
  */
-export interface BehaviorLookAtTarget {
+export interface BehaviorLookAtTarget extends BaseBehavior {
     [key: string]: unknown;
     angle_of_view_horizontal?: number;
     angle_of_view_vertical?: number;
@@ -1556,7 +1560,7 @@ export interface BehaviorLookAtTarget {
 /**
  * Can cause the entity to look at a the player they are trading with
  */
-export interface BehaviorLookAtTradingPlayer {
+export interface BehaviorLookAtTradingPlayer extends BaseBehavior {
     [key: string]: unknown;
     angle_of_view_horizontal?: number;
     angle_of_view_vertical?: number;
@@ -1568,12 +1572,12 @@ export interface BehaviorLookAtTradingPlayer {
 /**
  * Allows the entity to look for a mate. Can only be used by `minecraft:villager`
  */
-export interface BehaviorMakeLove {}
+export interface BehaviorMakeLove extends BaseBehavior {}
 
 /**
  * Can cause the entity to perform a melee attack
  */
-export interface BehaviorMeleeAttack {
+export interface BehaviorMeleeAttack extends BaseBehavior {
     [key: string]: unknown;
     attack_once?: boolean;
     attack_types?: string[];
@@ -1603,7 +1607,7 @@ export interface BehaviorMeleeAttack {
 /**
  * Can cause the entity to perform a melee attack based on bounding box calculations
  */
-export interface BehaviorMeleeBoxAttack {
+export interface BehaviorMeleeBoxAttack extends BaseBehavior {
     [key: string]: unknown;
     attack_once?: boolean;
     attack_types?: string[];
@@ -1633,7 +1637,7 @@ export interface BehaviorMeleeBoxAttack {
 /**
  * Can cause the entity to go to the village bell and mingle
  */
-export interface BehaviorMingle {
+export interface BehaviorMingle extends BaseBehavior {
     [key: string]: unknown;
     cooldown_time?: number;
     duration?: number;
@@ -1645,7 +1649,7 @@ export interface BehaviorMingle {
 /**
  * Can cause the entity to move around on its own while mounted seeking a target to attack
  */
-export interface BehaviorMountPathing {
+export interface BehaviorMountPathing extends BaseBehavior {
     [key: string]: unknown;
     speed_multiplier?: number;
     target_dist?: number;
@@ -1655,7 +1659,7 @@ export interface BehaviorMountPathing {
 /**
  * Can cause the entity to move around a target
  */
-export interface BehaviorMoveAroundTarget {
+export interface BehaviorMoveAroundTarget extends BaseBehavior {
     [key: string]: unknown;
     destination_pos_search_spread_degrees?: number;
     destination_position_range?: [number, number];
@@ -1669,7 +1673,7 @@ export interface BehaviorMoveAroundTarget {
 /**
  * Can cause the entity to move indoors
  */
-export interface BehaviorMoveIndoors {
+export interface BehaviorMoveIndoors extends BaseBehavior {
     [key: string]: unknown;
     speed_multiplier?: number;
     timeout_cooldown?: number;
@@ -1678,7 +1682,7 @@ export interface BehaviorMoveIndoors {
 /**
  * Can cause the entity to move outdoors
  */
-export interface BehaviorMoveOutdoors {
+export interface BehaviorMoveOutdoors extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     search_count?: number;
@@ -1691,7 +1695,7 @@ export interface BehaviorMoveOutdoors {
 /**
  * Can cause the entity to move to a block
  */
-export interface BehaviorMoveToBlock {
+export interface BehaviorMoveToBlock extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     on_reach?: Trigger;
@@ -1711,7 +1715,7 @@ export interface BehaviorMoveToBlock {
 /**
  * Can cause the entity to move to ground
  */
-export interface BehaviorMoveToLand {
+export interface BehaviorMoveToLand extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     search_count?: number;
@@ -1723,7 +1727,7 @@ export interface BehaviorMoveToLand {
 /**
  * Can cause the entity to move into lava
  */
-export interface BehaviorMoveToLava {
+export interface BehaviorMoveToLava extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     search_count?: number;
@@ -1735,7 +1739,7 @@ export interface BehaviorMoveToLava {
 /**
  * Can cause the entity to move into a liquid
  */
-export interface BehaviorMoveToLiquid {
+export interface BehaviorMoveToLiquid extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     material_type?: "Any"|"Water"|"Lava";
@@ -1749,7 +1753,7 @@ export interface BehaviorMoveToLiquid {
 /**
  * Can cause the entity to move to a POI
  */
-export interface BehaviorMoveToPOI {
+export interface BehaviorMoveToPOI extends BaseBehavior {
     [key: string]: unknown;
     poi_type?: string;
     speed_multiplier?: number;
@@ -1758,7 +1762,7 @@ export interface BehaviorMoveToPOI {
 /**
  * Can cause the entity to move towards a random block
  */
-export interface BehaviorMoveToRandomBlock {
+export interface BehaviorMoveToRandomBlock extends BaseBehavior {
     [key: string]: unknown;
     block_distance?: number;
     within_radius?: number;
@@ -1767,7 +1771,7 @@ export interface BehaviorMoveToRandomBlock {
 /**
  * Can cause the entity to move to a random location within a village
  */
-export interface BehaviorMoveThroughVillage {
+export interface BehaviorMoveThroughVillage extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     search_count?: number;
@@ -1780,7 +1784,7 @@ export interface BehaviorMoveThroughVillage {
 /**
  * Can cause the entity to move to water
  */
-export interface BehaviorMoveToWater {
+export interface BehaviorMoveToWater extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     search_count?: number;
@@ -1793,7 +1797,7 @@ export interface BehaviorMoveToWater {
 /**
  * Can cause the entity to move towards their dwelling. Requires {@link Dweller} and {@link SharedNavigation}
  */
-export interface BehaviorMoveTowardsDwellingRestriction {
+export interface BehaviorMoveTowardsDwellingRestriction extends BaseBehavior {
     [key: string]: unknown;
     speed_multiplier?: number;
 }
@@ -1801,7 +1805,7 @@ export interface BehaviorMoveTowardsDwellingRestriction {
 /**
  * Can cause the entity to move towards their home. Requires {@link Home} and {@link SharedNavigation}
  */
-export interface BehaviorMoveTowardsHomeRestriction {
+export interface BehaviorMoveTowardsHomeRestriction extends BaseBehavior {
     [key: string]: unknown;
     speed_multiplier?: number;
 }
@@ -1809,7 +1813,7 @@ export interface BehaviorMoveTowardsHomeRestriction {
 /**
  * Can cause the entity to move towards its target
  */
-export interface BehaviorMoveTowardsTarget {
+export interface BehaviorMoveTowardsTarget extends BaseBehavior {
     [key: string]: unknown;
     within_radius?: number;
     speed_multiplier?: number;
@@ -1818,7 +1822,7 @@ export interface BehaviorMoveTowardsTarget {
 /**
  * Can cause the entity to take naps
  */
-export interface BehaviorNap {
+export interface BehaviorNap extends BaseBehavior {
     [key: string]: unknown;
     cooldown_max?: number;
     cooldown_min?: number;
@@ -1829,7 +1833,7 @@ export interface BehaviorNap {
 /**
  * Can cause the entity to attack the closest target that matches the conditions
  */
-export interface BehaviorNearestAttackableTarget {
+export interface BehaviorNearestAttackableTarget extends BaseBehavior {
     [key: string]: unknown;
     attack_interval?: number;
     attack_interval_min?: number;
@@ -1851,7 +1855,7 @@ export interface BehaviorNearestAttackableTarget {
 /**
  * Can cause the entity to attack the highest priority target that matches the conditions
  */
-export interface BehaviorNearestPrioritizedAttackableTarget {
+export interface BehaviorNearestPrioritizedAttackableTarget extends BaseBehavior {
     [key: string]: unknown;
     attack_interval?: number;
     attack_interval_min?: number;
@@ -1873,7 +1877,7 @@ export interface BehaviorNearestPrioritizedAttackableTarget {
 /**
  * Can cause the entity to sit in place like the Ocelot
  */
-export interface BehaviorOcelotSitOnBlock {
+export interface BehaviorOcelotSitOnBlock extends BaseBehavior {
     [key: string]: unknown;
     speed_multiplier?: number;
 }
@@ -1881,7 +1885,7 @@ export interface BehaviorOcelotSitOnBlock {
 /**
  * Can cause the entity to attack by sneaking and pouncing
  */
-export interface BehaviorOcelotAttack {
+export interface BehaviorOcelotAttack extends BaseBehavior {
     [key: string]: unknown;
     cooldown_time?: number;
     max_distance?: number;
@@ -1898,7 +1902,7 @@ export interface BehaviorOcelotAttack {
 /**
  * Can cause the entity to offer a flower to a mob with {@link BehaviorTakeFlower}
  */
-export interface BehaviorOfferFlower {
+export interface BehaviorOfferFlower extends BaseBehavior {
     [key: string]: unknown;
     chance_to_start?: number;
     filters?: ServerFilters|ServerFilters[];
@@ -1911,7 +1915,7 @@ export interface BehaviorOfferFlower {
 /**
  * Can cause the entity to open doors if allowed by their navigation
  */
-export interface BehaviorOpenDoor {
+export interface BehaviorOpenDoor extends BaseBehavior {
     [key: string]: unknown;
     close_door_after?: boolean;
 }
@@ -1919,7 +1923,7 @@ export interface BehaviorOpenDoor {
 /**
  * Can cause the entity to target entities that hurt their owner
  */
-export interface BehaviorOwnerHurtByTarget {
+export interface BehaviorOwnerHurtByTarget extends BaseBehavior {
     [key: string]: unknown;
     entity_types?: EntityType[]|EntityType;
 }
@@ -1927,7 +1931,7 @@ export interface BehaviorOwnerHurtByTarget {
 /**
  * Can cause the entity to target entities that is hurt by their owner
  */
-export interface BehaviorOwnerHurtTarget {
+export interface BehaviorOwnerHurtTarget extends BaseBehavior {
     [key: string]: unknown;
     entity_types?: EntityType[]|EntityType;
 }
@@ -1935,9 +1939,9 @@ export interface BehaviorOwnerHurtTarget {
 /**
  * Can cause the entity to enter a panic state, running form the damage source that made it enter the state
  */
-export interface BehaviorPanic {
+export interface BehaviorPanic extends BaseBehavior {
     [key: string]: unknown;
-    damage_sources?: MobEffect[];
+    damage_sources?: DamageType[];
     force?: boolean;
     ignore_mob_damage?: boolean;
     prefer_water?: boolean;
@@ -1947,7 +1951,7 @@ export interface BehaviorPanic {
 /**
  * Can cause the entity as a pet to sleep in the bed with the owner
  */
-export interface BehaviorPetSleepWithOwner {
+export interface BehaviorPetSleepWithOwner extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     search_height?: number;
@@ -1958,7 +1962,7 @@ export interface BehaviorPetSleepWithOwner {
 /**
  * Can cause the entity to pick up items on the ground
  */
-export interface BehaviorPickupItems {
+export interface BehaviorPickupItems extends BaseBehavior {
     [key: string]: unknown;
     can_pickup_any_item?: boolean;
     can_pickup_to_hand_or_equipment?: boolean;
@@ -1973,7 +1977,7 @@ export interface BehaviorPickupItems {
 /**
  * Can cause the entity to play with other entities by chasing them and moving randomly
  */
-export interface BehaviorPlay {
+export interface BehaviorPlay extends BaseBehavior {
     [key: string]: unknown;
     chance_to_start?: number;
     follow_distance?: number;
@@ -1986,7 +1990,7 @@ export interface BehaviorPlay {
 /**
  * Can cause the entity to pretend to be dead to avoid being attacked
  */
-export interface BehaviorPlayDead {
+export interface BehaviorPlayDead extends BaseBehavior {
     [key: string]: unknown;
     apply_regeneration?: boolean;
     damage_sources?: DamageType[];
@@ -2000,12 +2004,12 @@ export interface BehaviorPlayDead {
 /**
  * Can cause the entity to be ridden by the player after being tamed
  */
-export interface BehaviorPlayerRideTamed {}
+export interface BehaviorPlayerRideTamed extends BaseBehavior {}
 
 /**
  * Can cause the entity to raid crops out of farms while hungry
  */
-export interface BehaviorRaidGarden {
+export interface BehaviorRaidGarden extends BaseBehavior {
     [key: string]: unknown;
     blocks?: string[];
     eat_delay?: number;
@@ -2020,7 +2024,7 @@ export interface BehaviorRaidGarden {
 /**
  * Can cause the entity to attack by ramming
  */
-export interface BehaviorRamAttack {
+export interface BehaviorRamAttack extends BaseBehavior {
     [key: string]: unknown;
     baby_knockback_modifier?: number;
     cooldown_range?: [number, number];
@@ -2038,7 +2042,7 @@ export interface BehaviorRamAttack {
 /**
  * Can cause the entity to randomly breach the surface of water
  */
-export interface BehaviorRandomBreach {
+export interface BehaviorRandomBreach extends BaseBehavior {
     [key: string]: unknown;
     cooldown_time?: number;
     interval?: number;
@@ -2050,7 +2054,7 @@ export interface BehaviorRandomBreach {
 /**
  * Can cause the entity to randomly fly around
  */
-export interface BehaviorRandomFly {
+export interface BehaviorRandomFly extends BaseBehavior {
     [key: string]: unknown;
     can_land_on_trees?: boolean;
     cooldown_time?: number;
@@ -2063,7 +2067,7 @@ export interface BehaviorRandomFly {
 /**
  * Can cause the entity to randomly hover around
  */
-export interface BehaviorRandomHover {
+export interface BehaviorRandomHover extends BaseBehavior {
     [key: string]: unknown;
     can_land_on_trees?: boolean;
     cooldown_time?: number;
@@ -2076,7 +2080,7 @@ export interface BehaviorRandomHover {
 /**
  * Can cause the entity to randomly look around
  */
-export interface BehaviorRandomLookAround {
+export interface BehaviorRandomLookAround extends BaseBehavior {
     [key: string]: unknown;
     look_time?: [number, number];
     max_angle_of_view_horizontal?: number;
@@ -2086,7 +2090,7 @@ export interface BehaviorRandomLookAround {
 /**
  * Can cause the entity to randomly sit and look around
  */
-export interface BehaviorRandomLookAroundAndSit {
+export interface BehaviorRandomLookAroundAndSit extends BaseBehavior {
     [key: string]: unknown;
     continue_if_leashed?: boolean;
     continue_sitting_on_reload?: boolean;
@@ -2103,7 +2107,7 @@ export interface BehaviorRandomLookAroundAndSit {
 /**
  * Can cause the entity to randomly move to a block and dig up an item
  */
-export interface BehaviorRandomSearchAndDig {
+export interface BehaviorRandomSearchAndDig extends BaseBehavior {
     [key: string]: unknown;
     cooldown_range?: [number, number];
     digging_duration_range?: [number, number];
@@ -2128,7 +2132,7 @@ export interface BehaviorRandomSearchAndDig {
 /**
  * Can cause the entity to randomly sit for a duration
  */
-export interface BehaviorRandomSitting {
+export interface BehaviorRandomSitting extends BaseBehavior {
     [key: string]: unknown;
     cooldown_time?: number;
     min_sit_time?: number;
@@ -2139,7 +2143,7 @@ export interface BehaviorRandomSitting {
 /**
  * Can cause the entity to randomly stroll around
  */
-export interface BehaviorRandomStroll {
+export interface BehaviorRandomStroll extends BaseBehavior {
     [key: string]: unknown;
     cooldown_time?: number;
     interval?: number;
@@ -2151,7 +2155,7 @@ export interface BehaviorRandomStroll {
 /**
  * Can cause the entity to randomly swim through water
  */
-export interface BehaviorRandomSwim {
+export interface BehaviorRandomSwim extends BaseBehavior {
     [key: string]: unknown;
     cooldown_time?: number;
     interval?: number;
@@ -2163,7 +2167,7 @@ export interface BehaviorRandomSwim {
 /**
  * Can cause the entity to attack using ranged shots
  */
-export interface BehaviorRangedAttack {
+export interface BehaviorRangedAttack extends BaseBehavior {
     [key: string]: unknown;
     attack_interval?: number;
     attack_interval_max?: number;
@@ -2186,22 +2190,22 @@ export interface BehaviorRangedAttack {
 /**
  * Can cause the entity to stop and mate with another entity. Can only be used by `minecraft:villager`
  */
-export interface BehaviorReceiveLove {}
+export interface BehaviorReceiveLove extends BaseBehavior {}
 
 /**
  * Can cause the entity to stay indoors during night time
  */
-export interface BehaviorRestrictOpenDoor {}
+export interface BehaviorRestrictOpenDoor extends BaseBehavior {}
 
 /**
  * Can cause the entity to avoid the direct sunlight
  */
-export interface BehaviorRestrictSun {}
+export interface BehaviorRestrictSun extends BaseBehavior {}
 
 /**
  * Can cause the entity to stay at a certain level in liquid
  */
-export interface BehaviorRiseToLiquidLevel {
+export interface BehaviorRiseToLiquidLevel extends BaseBehavior {
     [key: string]: unknown;
     liquid_y_offset?: number;
     rise_delta?: number;
@@ -2211,7 +2215,7 @@ export interface BehaviorRiseToLiquidLevel {
 /**
  * Can cause the entity to roar based on {@link AngerLevel}
  */
-export interface BehaviorRoar {
+export interface BehaviorRoar extends BaseBehavior {
     [key: string]: unknown;
     duration?: number;
 }
@@ -2219,7 +2223,7 @@ export interface BehaviorRoar {
 /**
  * Can cause the entity to roll forward
  */
-export interface BehaviorRoll {
+export interface BehaviorRoll extends BaseBehavior {
     [key: string]: unknown;
     probability?: number;
 }
@@ -2227,7 +2231,7 @@ export interface BehaviorRoll {
 /**
  * Can cause the entity to run around aimlessly
  */
-export interface BehaviorRunAroundLikeCrazy {
+export interface BehaviorRunAroundLikeCrazy extends BaseBehavior {
     [key: string]: unknown;
     speed_multiplier?: number;
 }
@@ -2235,7 +2239,7 @@ export interface BehaviorRunAroundLikeCrazy {
 /**
  * Can cause the entity to become scared when the weather is thundering
  */
-export interface BehaviorScared {
+export interface BehaviorScared extends BaseBehavior {
     [key: string]: unknown;
     sound_interval?: number;
 }
@@ -2243,7 +2247,7 @@ export interface BehaviorScared {
 /**
  * Can cause the entity to send an event to another mob
  */
-export interface BehaviorSendEvent {
+export interface BehaviorSendEvent extends BaseBehavior {
     [key: string]: unknown;
     cast_duration?: number;
     look_at_target?: boolean;
@@ -2257,7 +2261,7 @@ export interface BehaviorSendEvent {
 /**
  * Can cause the entity to give its items to others
  */
-export interface BehaviorShareItems {
+export interface BehaviorShareItems extends BaseBehavior {
     [key: string]: unknown;
     entity_types?: EntityType[];
     goal_radius?: number;
@@ -2268,17 +2272,17 @@ export interface BehaviorShareItems {
 /**
  * Can cause the entity to merge into stone. Can only be used by `minecraft:silverfish`
  */
-export interface BehaviorSilverfishMergeWithStone {}
+export interface BehaviorSilverfishMergeWithStone extends BaseBehavior {}
 
 /**
  * Can cause the entity to alert nearby entities in blocks. Can only be used by `minecraft:silverfish`
  */
-export interface BehaviorSilverfishWakeUpFriends {}
+export interface BehaviorSilverfishWakeUpFriends extends BaseBehavior {}
 
 /**
  * Can cause the entity to be horse traps
  */
-export interface BehaviorSkeletonHorseTrap {
+export interface BehaviorSkeletonHorseTrap extends BaseBehavior {
     [key: string]: unknown;
     duration?: number;
     within_radius?: number;
@@ -2287,7 +2291,7 @@ export interface BehaviorSkeletonHorseTrap {
 /**
  * Can cause the entity to move to and sleep in its village bed
  */
-export interface BehaviorSleep {
+export interface BehaviorSleep extends BaseBehavior {
     [key: string]: unknown;
     can_sleep_while_riding?: boolean;
     cooldown_time?: number;
@@ -2301,7 +2305,7 @@ export interface BehaviorSleep {
 /**
  * Can cause the entity to perfom a slime attack
  */
-export interface BehaviorSlimeAttack {
+export interface BehaviorSlimeAttack extends BaseBehavior {
     [key: string]: unknown;
     set_persistent?: boolean;
     speed_multiplier?: number;
@@ -2312,7 +2316,7 @@ export interface BehaviorSlimeAttack {
 /**
  * Can cause the entity to float in water or lava. Can only be used by `minecraft:slime`
  */
-export interface BehaviorSlimeFloat {
+export interface BehaviorSlimeFloat extends BaseBehavior {
     [key: string]: unknown;
     jump_chance_percentage?: number;
     speed_multiplier?: number;
@@ -2321,7 +2325,7 @@ export interface BehaviorSlimeFloat {
 /**
  * Can cause the entity to jump around. Can only be used by `minecraft:slime`
  */
-export interface BehaviorSlimeKeepOnJumping {
+export interface BehaviorSlimeKeepOnJumping extends BaseBehavior {
     [key: string]: unknown;
     speed_multiplier?: number;
 }
@@ -2329,7 +2333,7 @@ export interface BehaviorSlimeKeepOnJumping {
 /**
  * Can cause the entity to move in random directions. Can only be used by `minecraft:slime`
  */
-export interface BehaviorSlimeRandomDirection {
+export interface BehaviorSlimeRandomDirection extends BaseBehavior {
     [key: string]: unknown;
     add_random_time_range?: number;
     min_change_direction_time?: number;
@@ -2339,7 +2343,7 @@ export interface BehaviorSlimeRandomDirection {
 /**
  * Can cause the entity to take a load off and snack on food that it fond nearby
  */
-export interface BehaviorSnacking {
+export interface BehaviorSnacking extends BaseBehavior {
     [key: string]: unknown;
     items?: string[];
     snacking_cooldown?: number;
@@ -2350,7 +2354,7 @@ export interface BehaviorSnacking {
 /**
  * Can cause the entity to stop and sneeze
  */
-export interface BehaviorSneeze {
+export interface BehaviorSneeze extends BaseBehavior {
     [key: string]: unknown;
     cooldown_time?: number;
     drop_item_chance?: number;
@@ -2366,7 +2370,7 @@ export interface BehaviorSneeze {
 /**
  * Can cause the entity to sniff around
  */
-export interface BehaviorSniff {
+export interface BehaviorSniff extends BaseBehavior {
     [key: string]: unknown;
     cooldown_range?: [number, number];
     duration?: number;
@@ -2378,7 +2382,7 @@ export interface BehaviorSniff {
 /**
  * Can cause the entity to perform a sonic boom
  */
-export interface BehaviorSonicBoom {
+export interface BehaviorSonicBoom extends BaseBehavior {
     [key: string]: unknown;
     attack_cooldown?: number;
     attack_damage?: number;
@@ -2397,32 +2401,32 @@ export interface BehaviorSonicBoom {
 /**
  * Can cause the entity to dive. Can only be used by `minecraft:squid`
  */
-export interface BehaviorSquidDive {}
+export interface BehaviorSquidDive extends BaseBehavior {}
 
 /**
  * Allows the entity to swim away. Can only be used by `minecraft:squid`
  */
-export interface BehaviorSquidFlee {}
+export interface BehaviorSquidFlee extends BaseBehavior {}
 
 /**
  * Can cause the entity to swim in place. Can only be used by `minecraft:squid`
  */
-export interface BehaviorSquidIdle {}
+export interface BehaviorSquidIdle extends BaseBehavior {}
 
 /**
  * Can cause the entity to move back to water. Can only be used by `minecraft:squid`
  */
-export interface BehaviorSquidMoveAwayFromGround {}
+export interface BehaviorSquidMoveAwayFromGround extends BaseBehavior {}
 
 /**
  * Can cause the entity to stick to the ground outside water. Can only be used by `minecraft:squid`
  */
-export interface BehaviorSquidOutOfWater {}
+export interface BehaviorSquidOutOfWater extends BaseBehavior {}
 
 /**
  * Can cause the entity to stalk, then pounce on a target
  */
-export interface BehaviorStalkAndPounceOnTarget {
+export interface BehaviorStalkAndPounceOnTarget extends BaseBehavior {
     [key: string]: unknown;
     interest_time?: number;
     leap_distance?: number;
@@ -2438,7 +2442,7 @@ export interface BehaviorStalkAndPounceOnTarget {
 /**
  * Can cause the entity to attempt to toss the items from its inventory to a recently played Noteblock
  */
-export interface BehaviorStayNearNoteblock {
+export interface BehaviorStayNearNoteblock extends BaseBehavior {
     [key: string]: unknown;
     listen_time?: number;
     speed?: number;
@@ -2449,12 +2453,12 @@ export interface BehaviorStayNearNoteblock {
 /**
  * Can cause the entity to stay put while sitting
  */
-export interface BehaviorStayWhileSitting {}
+export interface BehaviorStayWhileSitting extends BaseBehavior {}
 
 /**
  * Can cause the entity to attack using stop AoE damage
  */
-export interface BehaviorStompAttack {
+export interface BehaviorStompAttack extends BaseBehavior {
     [key: string]: unknown;
     attack_once?: boolean;
     attack_types?: string[];
@@ -2485,7 +2489,7 @@ export interface BehaviorStompAttack {
 /**
  * Can cause the entity to stomp turtle eggs
  */
-export interface BehaviorStompTurtleEgg {
+export interface BehaviorStompTurtleEgg extends BaseBehavior {
     [key: string]: unknown;
     goal_radius?: number;
     interval?: number;
@@ -2497,7 +2501,7 @@ export interface BehaviorStompTurtleEgg {
 /**
  * Can cause the entity to move to a random location within a village
  */
-export interface BehaviorStrollTowardsVillage {
+export interface BehaviorStrollTowardsVillage extends BaseBehavior {
     [key: string]: unknown;
     cooldown_time?: number;
     goal_radius?: number;
@@ -2509,7 +2513,7 @@ export interface BehaviorStrollTowardsVillage {
 /**
  * Can cause the entity to summon other entities
  */
-export interface BehaviorSummonEntity {
+export interface BehaviorSummonEntity extends BaseBehavior {
     [key: string]: unknown;
     summon_choices?: {
         cast_duration?: number;
@@ -2541,7 +2545,7 @@ export interface BehaviorSummonEntity {
 /**
  * Can cause the entity to swell when a player is nearby. Can only be used by `minecraft:creeper`
  */
-export interface BehaviorSwell {
+export interface BehaviorSwell extends BaseBehavior {
     [key: string]: unknown;
     start_distance?: number;
     stop_distance?: number;
@@ -2550,7 +2554,7 @@ export interface BehaviorSwell {
 /**
  * Can cause the entity to go idle while swimming
  */
-export interface BehaviorSwimIdle {
+export interface BehaviorSwimIdle extends BaseBehavior {
     [key: string]: unknown;
     idle?: number;
     success_rate?: number;
@@ -2559,7 +2563,7 @@ export interface BehaviorSwimIdle {
 /**
  * Can cause the entity to move to the surface when out of breath. Requires {@link Breathable}
  */
-export interface BehaviorSwimUpForBreath {
+export interface BehaviorSwimUpForBreath extends BaseBehavior {
     [key: string]: unknown;
     material_type?: "any"|"water"|"lava";
     search_height?: number;
@@ -2570,7 +2574,7 @@ export interface BehaviorSwimUpForBreath {
 /**
  * Can cause the entity to wander while swimming
  */
-export interface BehaviorSwimWander {
+export interface BehaviorSwimWander extends BaseBehavior {
     [key: string]: unknown;
     interval?: number;
     look_ahead?: number;
@@ -2581,7 +2585,7 @@ export interface BehaviorSwimWander {
 /**
  * Can cause the entity to follow another swimming entity
  */
-export interface BehaviorSwimWithEntity {
+export interface BehaviorSwimWithEntity extends BaseBehavior {
     [key: string]: unknown;
     catch_up_multiplier?: number;
     catch_up_threshold?: number;
@@ -2598,7 +2602,7 @@ export interface BehaviorSwimWithEntity {
 /**
  * Can cause the entity to perform a swoop attack
  */
-export interface BehaviorSwoopAttack {
+export interface BehaviorSwoopAttack extends BaseBehavior {
     [key: string]: unknown;
     damage_reach?: number;
     delay_range?: [number, number];
@@ -2608,7 +2612,7 @@ export interface BehaviorSwoopAttack {
 /**
  * Can cause the entity to accept flowers from another mob with the {@link BehaviorOfferFlower}
  */
-export interface BehaviorTakeFlower {
+export interface BehaviorTakeFlower extends BaseBehavior {
     [key: string]: unknown;
     filters?: ServerFilters|ServerFilters[];
     max_head_rotation_y?: number;
@@ -2623,7 +2627,7 @@ export interface BehaviorTakeFlower {
 /**
  * Can cause the entity to teleport to its owner
  */
-export interface BehaviorTeleportToOwner {
+export interface BehaviorTeleportToOwner extends BaseBehavior {
     [key: string]: unknown;
     cooldown?: number;
     filters?: ServerFilters|ServerFilters[];
@@ -2632,7 +2636,7 @@ export interface BehaviorTeleportToOwner {
 /**
  * Can cause the entity to be tempted by certain items
  */
-export interface BehaviorTempt {
+export interface BehaviorTempt extends BaseBehavior {
     [key: string]: unknown;
     can_get_scared?: boolean;
     can_tempt_vertically?: boolean;
@@ -2647,7 +2651,7 @@ export interface BehaviorTempt {
 /**
  * Timer based event
  */
-export interface SharedBehaviorTimer {
+export interface SharedBehaviorTimer extends BaseBehavior {
     [key: string]: unknown;
     cooldown_range?: [number, number];
     duration_range?: [number, number];
@@ -2664,7 +2668,7 @@ export interface BehaviorTimerFlag3 extends SharedBehaviorTimer {}
 /**
  * Can cause the entity to look at a player holding a tradeable item
  */
-export interface BehaviorTradeInterest {
+export interface BehaviorTradeInterest extends BaseBehavior {
     [key: string]: unknown;
     carried_item_switch_time?: number;
     cooldown?: number;
@@ -2676,7 +2680,7 @@ export interface BehaviorTradeInterest {
 /**
  * Can cause the entity to trade with a player
  */
-export interface BehaviorTradeWithPlayer {
+export interface BehaviorTradeWithPlayer extends BaseBehavior {
     [key: string]: unknown;
     filters?: ServerFilters|ServerFilters[];
     max_distance_from_player?: number;
@@ -2685,7 +2689,7 @@ export interface BehaviorTradeWithPlayer {
 /**
  * Can cause the entity to target the same entity its owner is targeting
  */
-export interface BehaviorVexCopyOwnerTarget {
+export interface BehaviorVexCopyOwnerTarget extends BaseBehavior {
     [key: string]: unknown;
     entity_types?: EntityType[];
 }
@@ -2693,17 +2697,17 @@ export interface BehaviorVexCopyOwnerTarget {
 /**
  * Can cause the entity to move around randomly like a Vex
  */
-export interface BehaviorVexRandomMove {}
+export interface BehaviorVexRandomMove extends BaseBehavior {}
 
 /**
  * Can cause the entity to launch random attacks. Only used by `minecraft:wither`
  */
-export interface BehaviorWitherRandomAttackPosGoal {}
+export interface BehaviorWitherRandomAttackPosGoal extends BaseBehavior {}
 
 /**
  * Can cause the entity to focus its attack on the entity that's done the most damage to it. Only used by `minecraft:wither`
  */
-export interface BehaviorWitherTargetHighestDamage {
+export interface BehaviorWitherTargetHighestDamage extends BaseBehavior {
     [key: string]: unknown;
     entity_types?: EntityType[];
 }
@@ -2711,7 +2715,7 @@ export interface BehaviorWitherTargetHighestDamage {
 /**
  * Can cause the entity to work at a POI
  */
-export interface BehaviorWork {
+export interface BehaviorWork extends BaseBehavior {
     [key: string]: unknown;
     active_time?: number;
     can_work_in_rain?: boolean;
@@ -2726,7 +2730,7 @@ export interface BehaviorWork {
 /**
  * Can cause the entity use a Composter POI to convert seeds into bone meal
  */
-export interface BehaviorWorkComposter {
+export interface BehaviorWorkComposter extends BaseBehavior {
     [key: string]: unknown;
     active_time?: number;
     block_interaction_max?: number;
@@ -4481,7 +4485,7 @@ export interface Interact {
         /**
          * Event to fire when the interaction occurs
          */
-        on_interact?: string;
+        on_interact?: string|Trigger;
         /**
          * Particle effect triggered at the start of the interaction
          */
@@ -5636,11 +5640,11 @@ export interface Sittable {
     /**
      * Event to fire when the entity enters the "sit" state
      */
-    sit_event?: string;
+    sit_event?: string|Trigger;
     /**
      * Event to fire when the entity exits the "sit" state
      */
-    stand_event?: string;
+    stand_event?: string|Trigger;
 }
 
 /**
