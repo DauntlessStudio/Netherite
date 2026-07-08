@@ -60,15 +60,9 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
             "minecraft:client_entity": {
                 description: {
                     identifier: "",
-                    materials: {
-                        default: "entity_alphatest"
-                    },
-                    geometry: {
-                        default: "geometry.empty"
-                    },
-                    textures: {
-                        default: "textures/empty"
-                    },
+                    materials: {},
+                    geometry: {},
+                    textures: {},
                     render_controllers: []
                 },
             }

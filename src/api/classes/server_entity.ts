@@ -77,16 +77,6 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
             this.minecraftObj["minecraft:entity"].description.identifier = `$NAMESPACE:${this.minecraftObj["minecraft:entity"].description.identifier}`;
         }
 
-        const family = this.minecraftObj["minecraft:entity"].components?.["minecraft:type_family"]?.family
-        if (family) {
-            this.minecraftObj["minecraft:entity"]!.components!["minecraft:type_family"]!.family = family.map((f: string) => {
-                if (!f.includes(":")) {
-                    return `$NAMESPACE:${f}`;
-                }
-                return f;
-            });
-        }
-
         const properties = this.minecraftObj["minecraft:entity"].description.properties;
         if (properties) {
             for (const value of Object.values(properties)) {
