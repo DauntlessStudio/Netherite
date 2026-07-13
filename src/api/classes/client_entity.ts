@@ -11,9 +11,8 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
      * @param name The entity name.
      * @returns The Entity instance.
      */
-    public static dummy(name: string): MinecraftClientEntity {
-        return new MinecraftClientEntity(
-            {
+    public static dummy(name: string, subpath?: string): MinecraftClientEntity {
+        return new MinecraftClientEntity({
                 format_version: "$FORMATVERSION",
                 "minecraft:client_entity": {
                     description: {
@@ -32,8 +31,7 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
                         ],
                     }
                 }
-            }
-        );
+            }, subpath);
     }
     
     public get Entity() : ClientEntityLoose {
@@ -42,6 +40,11 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
     
     public get Identifier() : string {
         return this.minecraftObj["minecraft:client_entity"].description.identifier ?? "$NAMESPACE:SHORTNAME";
+    }
+
+    constructor(obj: ClientEntityLoose, protected readonly subpath: string = "") {
+        super(obj);
+        this.subpath &&= this.subpath + "/";
     }
 
     /**
@@ -81,7 +84,7 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
 
     protected generate(): WriteableResponse<ModuleResponse> {
         return {
-            endpoint: `RP/entity/${this.Shortname}.entity.json`,
+            endpoint: `RP/entity/${this.subpath}${this.Shortname}.entity.json`,
             response: {
                 name: this.Shortname,
                 data: this.encode(),

@@ -12,9 +12,10 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
      * @param identifier The item identifier.
      * @param stack_size An optional max stack size.
      * @param cooldown An optional cooldown duration.
+     * @param subpath An optional subpath the file should be output to.
      * @returns The Item instance.
      */
-    public static dummy(identifier: string, stack_size?: number, cooldown?: number): MinecraftServerItem {
+    public static dummy(identifier: string, stack_size?: number, cooldown?: number, subpath?: string): MinecraftServerItem {
         const cooldownComp: ServerItemCooldown|undefined = cooldown !== undefined ? {category: "SHORTNAME", duration: cooldown} : undefined;
 
         return new MinecraftServerItem({
@@ -34,7 +35,7 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                     "minecraft:cooldown": cooldownComp,
                 },
             }
-        });
+        }, subpath);
     }
 
     /**
@@ -112,6 +113,11 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
         return this.minecraftObj["minecraft:item"].description?.identifier ?? "$NAMESPACE:SHORTNAME";
     }
 
+    constructor(obj: ServerItemLoose, protected readonly subpath: string = "") {
+        super(obj);
+        this.subpath &&= this.subpath + "/";
+    }
+
     protected override validate(): ServerItemStrict {
         if (!this.minecraftObj["minecraft:item"]?.description?.identifier) {
             throw new Error("Item identifier is required");
@@ -139,7 +145,7 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
 
     protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
-            endpoint: `BP/items/${this.Shortname}.json`,
+            endpoint: `BP/items/${this.subpath}${this.Shortname}.json`,
             response: {
                 name: `${this.Shortname}`,
                 data: this.encode(),

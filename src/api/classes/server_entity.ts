@@ -13,7 +13,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
      * @param identifier The entity identifier.
      * @returns The Entity instance.
      */
-    public static dummy(identifier: string): MinecraftServerEntity {
+    public static dummy(identifier: string, subpath?: string): MinecraftServerEntity {
         return new MinecraftServerEntity({
             "minecraft:entity": {
                 description: {
@@ -64,7 +64,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
                     }
                 }
             }
-        });
+        }, subpath);
     }
 
     // #endregion
@@ -75,6 +75,11 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
     
     public get Identifier() : string {
         return this.minecraftObj["minecraft:entity"].description?.identifier ?? "$NAMESPACE:SHORTNAME";
+    }
+
+    constructor(obj: ServerEntityLoose, protected readonly subpath: string = "") {
+        super(obj);
+        this.subpath &&= this.subpath + "/";
     }
 
     protected override validate(): ServerEntityStrict {
@@ -128,7 +133,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
 
     protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
-            endpoint: `BP/entities/${this.Shortname}.json`,
+            endpoint: `BP/entities/${this.subpath}${this.Shortname}.json`,
             response: {
                 name: `${this.Shortname}`,
                 data: this.encode(),

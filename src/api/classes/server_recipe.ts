@@ -25,6 +25,11 @@ export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerReci
         ?? "$NAMESPACE:SHORTNAME";
     }
 
+    constructor(obj: Partial<ServerRecipe>, protected readonly subpath: string = "") {
+        super(obj);
+        this.subpath &&= this.subpath + "/";
+    }
+
     protected override validate(): ServerRecipe {
         if (RecipeTypes.every(value => !(value in this.minecraftObj))) {
             throw new Error(`Recipe must include one of ${RecipeTypes.join(", ")}`);
@@ -37,7 +42,7 @@ export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerReci
 
     protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
-            endpoint: `BP/recipes/${this.Shortname}.json`,
+            endpoint: `BP/recipes/${this.subpath}${this.Shortname}.json`,
             response: {
                 name: `${this.Shortname}`,
                 data: this.encode(),

@@ -16,9 +16,10 @@ export class MinecraftServerTradeTable extends MinecraftWriteable<ServerTradeTab
         return this.identifier;
     }
 
-    constructor(name: string, obj: ServerTradeTable) {
+    constructor(name: string, obj: ServerTradeTable, protected readonly subpath: string = "") {
         super(obj);
         this.identifier = name;
+        this.subpath &&= this.subpath + "/";
     }
 
     protected override validate(): ServerTradeTable {
@@ -27,7 +28,7 @@ export class MinecraftServerTradeTable extends MinecraftWriteable<ServerTradeTab
 
     protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
-            endpoint: `BP/trading/$PATH/${this.Identifier}.json`,
+            endpoint: `BP/trading/$PATH/${this.subpath}${this.Identifier}.json`,
             response: {
                 name: `${this.Identifier}`,
                 data: this.encode(),

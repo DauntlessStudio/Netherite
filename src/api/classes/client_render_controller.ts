@@ -11,7 +11,7 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
      * @param name The entity name.
      * @returns The RenderController instance.
      */
-    public static default(name: string): MinecraftClientRenderController {
+    public static default(name: string, subpath?: string): MinecraftClientRenderController {
         return new MinecraftClientRenderController({
                 format_version: "1.10.0",
                 render_controllers: {
@@ -25,7 +25,7 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
                         ]
                     }
                 }
-            }, name);
+            }, name, subpath);
     }
     
     public get RenderController() : ClientRenderControllerLoose {
@@ -36,8 +36,9 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
         return `$NAMESPACE:${this.name}`;
     }
 
-    constructor(obj: ClientRenderControllerLoose, protected readonly name: string) {
+    constructor(obj: ClientRenderControllerLoose, protected readonly name: string, protected readonly subpath: string = "") {
         super(obj);
+        this.subpath &&= this.subpath + "/";
     }
     
     protected validate(): ClientRenderControllerStrict {
@@ -51,7 +52,7 @@ export class MinecraftClientRenderController extends MinecraftWriteable<ClientRe
 
     protected generate(): WriteableResponse<ModuleResponse> {
         return {
-            endpoint: `RP/render_controllers/${this.Shortname}.rc.json`,
+            endpoint: `RP/render_controllers/${this.subpath}${this.Shortname}.rc.json`,
             response: {
                 name: this.Shortname,
                 data: this.encode(),
