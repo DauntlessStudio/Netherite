@@ -1,3 +1,7 @@
+/**
+ * This module contains a lightweight install script for Netherite to run with minimal required permissions.
+ * @module
+ */
 import { Config } from "../core/classes/index.ts";
 
 const arg = Deno.args[0] ?? "latest";
