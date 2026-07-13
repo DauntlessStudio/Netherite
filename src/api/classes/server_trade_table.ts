@@ -2,6 +2,9 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ServerTradeTable } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Server Trade Tables.
+ */
 export class MinecraftServerTradeTable extends MinecraftWriteable<ServerTradeTable, ServerTradeTable> {
     private readonly identifier: string;
 

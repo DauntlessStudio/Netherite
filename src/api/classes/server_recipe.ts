@@ -9,6 +9,9 @@ const RecipeTypes = [
     "minecraft:recipe_brewing_mix",
 ];
 
+/**
+ * A class for creating and working with Server Recipes.
+ */
 export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerRecipe>, ServerRecipe> {
     public get Recipe() : Partial<ServerRecipe> {
         return this.minecraftObj;

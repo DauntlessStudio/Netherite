@@ -3,8 +3,16 @@ import { Float } from "../types/float.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Server Entities.
+ */
 export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose, ServerEntityStrict> {
     // #region Static
+    /**
+     * Generates a dummy entity with no physics, collision, damage handling, or targeting.
+     * @param identifier The entity identifier.
+     * @returns The Entity instance.
+     */
     public static dummy(identifier: string): MinecraftServerEntity {
         return new MinecraftServerEntity({
             "minecraft:entity": {
@@ -21,7 +29,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
                 components: {
                     "minecraft:type_family": {
                         family: [
-                            identifier,
+                            "$NAMESPACE:" + identifier,
                         ]
                     },
                     "minecraft:collision_box": {
@@ -32,6 +40,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
                         has_collision: false,
                         has_gravity: false,
                     },
+                    "minecraft:cannot_be_attacked": {},
                     "minecraft:damage_sensor": {
                         triggers: [
                             {

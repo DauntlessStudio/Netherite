@@ -2,6 +2,9 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientTerrainTexture } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Terrain Textures.
+ */
 export class MinecraftClientTerrainTexture extends MinecraftWriteable<Partial<ClientTerrainTexture>, ClientTerrainTexture> {
     public get TerrainTexture() : Partial<ClientTerrainTexture> {
         return this.minecraftObj;

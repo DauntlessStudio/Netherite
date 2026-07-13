@@ -2,7 +2,15 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientAnimationControllerLoose, ClientAnimationControllerStrict } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Animation Controllers `*.ac.json`.
+ */
 export class MinecraftClientAnimationController extends MinecraftWriteable<ClientAnimationControllerLoose, ClientAnimationControllerStrict> {
+    /**
+     * Creates a new animation controller using the skeletal attachable pattern.
+     * @param name The unique item name.
+     * @returns The AnimationController instance.
+     */
     public static skeletalAttachable(name: string): MinecraftClientAnimationController {
         return new MinecraftClientAnimationController({
             format_version: "1.10.0",

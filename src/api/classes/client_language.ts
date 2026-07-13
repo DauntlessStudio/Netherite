@@ -2,6 +2,9 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientLanguage, LangType } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Language files.
+ */
 export class MinecraftClientLanguage extends MinecraftWriteable<ClientLanguage, ClientLanguage> {
     /**
      * Adds a new entry to the lang file.

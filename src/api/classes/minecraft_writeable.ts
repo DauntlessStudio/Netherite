@@ -1,5 +1,8 @@
 import { type WriteableResponse, type ModuleWriteable, ModuleWriter, deepMerge, type ModuleResponse } from "../../core/core.ts";
 
+/**
+ * The base class for working with writeable files using Netherite's `*.mod.ts` pattern. Should not be used directly.
+ */
 export abstract class MinecraftWriteable<Loose extends object, Strict extends Loose> {
     protected minecraftObj: Loose;
     protected warnings?: string[];

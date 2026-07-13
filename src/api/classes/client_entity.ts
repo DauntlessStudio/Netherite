@@ -2,7 +2,15 @@ import { type WriteableResponse, type ModuleResponse, deepMerge } from "../../co
 import type { ClientEntityStrict, ClientEntityLoose, Molang } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Entities `*.entity.json`.
+ */
 export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose, ClientEntityStrict> {
+    /**
+     * Creates a new entity with default options.
+     * @param name The entity name.
+     * @returns The Entity instance.
+     */
     public static dummy(name: string): MinecraftClientEntity {
         return new MinecraftClientEntity(
             {

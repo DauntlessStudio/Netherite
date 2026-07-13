@@ -2,6 +2,9 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ServerLootTable } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Server Loot Tables.
+ */
 export class MinecraftServerLootTable extends MinecraftWriteable<ServerLootTable, ServerLootTable> {
     private readonly identifier: string;
 

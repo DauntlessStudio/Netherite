@@ -2,7 +2,15 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientAnimationLoose, ClientAnimationStrict } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Animation `*.anim.json`.
+ */
 export class MinecraftClientAnimation extends MinecraftWriteable<ClientAnimationLoose, ClientAnimationStrict> {
+    /**
+     * Creates an animation entry for a given item using the skeletal attachable pattern.
+     * @param name The unique item name.
+     * @returns The Animation instance.
+     */
     public static skeletalAttachable(name: string): MinecraftClientAnimation {
         return new MinecraftClientAnimation({
             format_version: "1.10.0",

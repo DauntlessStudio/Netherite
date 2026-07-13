@@ -2,6 +2,9 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientItemTexture } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Item Textures.
+ */
 export class MinecraftClientItemTexture extends MinecraftWriteable<Partial<ClientItemTexture>, ClientItemTexture> {
     public get ItemTexture() : Partial<ClientItemTexture> {
         return this.minecraftObj;

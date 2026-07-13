@@ -2,7 +2,16 @@ import { type WriteableResponse, type ModuleResponse, deepMerge } from "../../co
 import type { ClientAttachableStrict, ClientAttachableLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Attachables.
+ */
 export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachableLoose, ClientAttachableStrict> {
+    /**
+     * Creates a new attachable as a piece of armor.
+     * @param name The unique item name.
+     * @param piece The piece type (i.e. helmet, chestplate, etc).
+     * @returns The Attachable instance.
+     */
     public static armor(name: string, piece: string): MinecraftClientAttachable {
         const setName = name.replace(`_${piece}`, "");
 
@@ -40,6 +49,11 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
         });
     }
 
+    /**
+     * Creates an attachable for a given item using the skeletal attachable pattern.
+     * @param name The unique item name.
+     * @returns The Attachable instance.
+     */
     public static skeletal(name: string): MinecraftClientAttachable {
         return new MinecraftClientAttachable({
             format_version: "1.10.0",
@@ -102,15 +116,9 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
             "minecraft:attachable": {
                 description: {
                     identifier: "",
-                    materials: {
-                        default: "entity_alphatest"
-                    },
-                    geometry: {
-                        default: "geometry.empty"
-                    },
-                    textures: {
-                        default: "textures/empty"
-                    },
+                    materials: {},
+                    geometry: {},
+                    textures: {},
                     render_controllers: []
                 },
             }

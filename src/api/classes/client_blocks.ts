@@ -2,6 +2,9 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientBlocks } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Blocks.
+ */
 export class MinecraftClientBlocks extends MinecraftWriteable<ClientBlocks, ClientBlocks> {
     public get Blocks() : ClientBlocks {
         return this.minecraftObj;

@@ -4,8 +4,16 @@ import type { BlockGeometry, BlockMaterialInstances } from "../types/server_bloc
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 import { MinecraftServerItem } from "./server_item.ts";
 
+/**
+ * A class for creating and working with Server Blocks.
+ */
 export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, ServerBlockStrict> {
     // #region Static
+    /**
+     * Creates a template block.
+     * @param identifier The block identifier.
+     * @returns The Block instance.
+     */
     public static dummy(identifier: string): MinecraftServerBlock {
         if (!identifier.includes(":")) identifier = "$NAMESPACE:" + identifier;
 
