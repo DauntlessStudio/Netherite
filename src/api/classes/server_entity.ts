@@ -3,9 +3,17 @@ import { Float } from "../types/float.ts";
 import type { ServerEntityStrict, ServerEntityLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Server Entities.
+ */
 export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose, ServerEntityStrict> {
     // #region Static
-    public static dummy(identifier: string): MinecraftServerEntity {
+    /**
+     * Generates a dummy entity with no physics, collision, damage handling, or targeting.
+     * @param identifier The entity identifier.
+     * @returns The Entity instance.
+     */
+    public static dummy(identifier: string, subpath?: string): MinecraftServerEntity {
         return new MinecraftServerEntity({
             "minecraft:entity": {
                 description: {
@@ -21,7 +29,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
                 components: {
                     "minecraft:type_family": {
                         family: [
-                            identifier,
+                            "$NAMESPACE:" + identifier,
                         ]
                     },
                     "minecraft:collision_box": {
@@ -32,6 +40,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
                         has_collision: false,
                         has_gravity: false,
                     },
+                    "minecraft:cannot_be_attacked": {},
                     "minecraft:damage_sensor": {
                         triggers: [
                             {
@@ -55,7 +64,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
                     }
                 }
             }
-        });
+        }, subpath);
     }
 
     // #endregion
@@ -66,6 +75,11 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
     
     public get Identifier() : string {
         return this.minecraftObj["minecraft:entity"].description?.identifier ?? "$NAMESPACE:SHORTNAME";
+    }
+
+    constructor(obj: ServerEntityLoose, protected readonly subpath: string = "") {
+        super(obj);
+        this.subpath &&= this.subpath + "/";
     }
 
     protected override validate(): ServerEntityStrict {
@@ -119,7 +133,7 @@ export class MinecraftServerEntity extends MinecraftWriteable<ServerEntityLoose,
 
     protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
-            endpoint: `BP/entities/${this.Shortname}.json`,
+            endpoint: `BP/entities/${this.subpath}${this.Shortname}.json`,
             response: {
                 name: `${this.Shortname}`,
                 data: this.encode(),

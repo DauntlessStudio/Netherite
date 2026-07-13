@@ -1,11 +1,21 @@
-import { Language, type WriteableResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
+import { type WriteableResponse, type ModuleResponse, deepMerge } from "../../core/core.ts";
 import type { ServerItemStrict, ServerItemLoose, ServerItemCooldown } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Server Items.
+ */
 export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, ServerItemStrict> {
     // #region Static
-
-    public static dummy(identifier: string, stack_size?: number, cooldown?: number): MinecraftServerItem {
+    /**
+     * Creates a template item file.
+     * @param identifier The item identifier.
+     * @param stack_size An optional max stack size.
+     * @param cooldown An optional cooldown duration.
+     * @param subpath An optional subpath the file should be output to.
+     * @returns The Item instance.
+     */
+    public static dummy(identifier: string, stack_size?: number, cooldown?: number, subpath?: string): MinecraftServerItem {
         const cooldownComp: ServerItemCooldown|undefined = cooldown !== undefined ? {category: "SHORTNAME", duration: cooldown} : undefined;
 
         return new MinecraftServerItem({
@@ -25,9 +35,16 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
                     "minecraft:cooldown": cooldownComp,
                 },
             }
-        });
+        }, subpath);
     }
 
+    /**
+     * Creates a new item file using the skeletal attachable pattern.
+     * @param identifier The item identifier.
+     * @param stack_size An optional max stack size.
+     * @param cooldown An optional cooldown duration.
+     * @returns The Item instance.
+     */
     public static attachable(identifier: string, stack_size?: number, cooldown?: number): MinecraftServerItem {
         const cooldownComp: ServerItemCooldown|undefined = cooldown !== undefined ? {category: "SHORTNAME", duration: cooldown} : undefined;
 
@@ -55,6 +72,13 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
         });
     }
 
+    /**
+     * Creates a weareable armor-type item.
+     * @param identifier The item identifier.
+     * @param slot The weapon slot, (i.e. helmet, chestplate, leggings, boots).
+     * @param protection The protection level for the armor.
+     * @returns The Item instance.
+     */
     public static armor(identifier: string, slot: string, protection?: number): MinecraftServerItem {
         return new MinecraftServerItem({
             "minecraft:item": {
@@ -89,6 +113,11 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
         return this.minecraftObj["minecraft:item"].description?.identifier ?? "$NAMESPACE:SHORTNAME";
     }
 
+    constructor(obj: ServerItemLoose, protected readonly subpath: string = "") {
+        super(obj);
+        this.subpath &&= this.subpath + "/";
+    }
+
     protected override validate(): ServerItemStrict {
         if (!this.minecraftObj["minecraft:item"]?.description?.identifier) {
             throw new Error("Item identifier is required");
@@ -116,7 +145,7 @@ export class MinecraftServerItem extends MinecraftWriteable<ServerItemLoose, Ser
 
     protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
-            endpoint: `BP/items/${this.Shortname}.json`,
+            endpoint: `BP/items/${this.subpath}${this.Shortname}.json`,
             response: {
                 name: `${this.Shortname}`,
                 data: this.encode(),

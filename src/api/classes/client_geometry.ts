@@ -2,7 +2,16 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientGeometryLoose, ClientGeometryStrict } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Geometries `*.geo.json`.
+ */
 export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLoose, ClientGeometryStrict> {
+    /**
+     * Creates a Geometry as a standard cube shape.
+     * @param name The geo shortname.
+     * @param subpath The subpath (i.e. `entities` for `geos/entities/<name>`).
+     * @returns The Geometry instance.
+     */
     public static cube(name: string, subpath: string): MinecraftClientGeometry {
         return new MinecraftClientGeometry({
             format_version: "1.12.0",
@@ -34,6 +43,11 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
         }, name, subpath);
     }
 
+    /**
+     * Creates a set of armor from a template.
+     * @param name The unique item name.
+     * @returns The Geometry instance.
+     */
     public static armor(name: string): MinecraftClientGeometry {
         return new MinecraftClientGeometry({
             format_version: "1.8.0",
@@ -277,6 +291,11 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
         }, name, "entity/player");
     }
 
+    /**
+     * Creates a geometry for a given item using the skeletal attachable pattern.
+     * @param name The unique item name.
+     * @returns The Attachable instance.
+     */
     public static skeletalAttachable(name: string): MinecraftClientGeometry {
         return new MinecraftClientGeometry({
             format_version: "1.12.0",
@@ -397,6 +416,12 @@ export class MinecraftClientGeometry extends MinecraftWriteable<ClientGeometryLo
         return this.name;
     }
 
+    /**
+     * Creates a new `MinecraftClientGeometry`.
+     * @param obj The source Geometry object.
+     * @param name The geometry shortname.
+     * @param subpath The subpath (i.e. `entities` for `geos/entities/<name>`).
+     */
     constructor(obj: ClientGeometryLoose, protected readonly name: string, protected readonly subpath: string) {
         super(obj);
     }

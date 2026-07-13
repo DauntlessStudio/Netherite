@@ -28,6 +28,9 @@ export interface CommandOptions<T extends CommandData> {
     action?: (args: T) => Promise<void>|void;
 }
 
+/**
+ * A custom command with parsing and execution support.
+ */
 export class Command<T extends CommandData> {
     private static registry: Command<CommandData>[] = [];
 

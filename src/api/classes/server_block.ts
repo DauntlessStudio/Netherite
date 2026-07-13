@@ -4,9 +4,17 @@ import type { BlockGeometry, BlockMaterialInstances } from "../types/server_bloc
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 import { MinecraftServerItem } from "./server_item.ts";
 
+/**
+ * A class for creating and working with Server Blocks.
+ */
 export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, ServerBlockStrict> {
     // #region Static
-    public static dummy(identifier: string): MinecraftServerBlock {
+    /**
+     * Creates a template block.
+     * @param identifier The block identifier.
+     * @returns The Block instance.
+     */
+    public static dummy(identifier: string, subpath?: string): MinecraftServerBlock {
         if (!identifier.includes(":")) identifier = "$NAMESPACE:" + identifier;
 
         return new MinecraftServerBlock({
@@ -21,7 +29,7 @@ export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, S
                     "minecraft:display_name": `tile.${identifier}.name`,
                 }
             }
-        });
+        }, subpath);
     }
 
     // #endregion
@@ -33,6 +41,11 @@ export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, S
     
     public get Identifier() : string {
         return this.minecraftObj["minecraft:block"]?.description?.identifier ?? "$NAMESPACE:SHORTNAME";
+    }
+
+    constructor(obj: ServerBlockLoose, protected readonly subpath: string = "") {
+        super(obj);
+        this.subpath &&= this.subpath + "/";
     }
 
     /**
@@ -111,7 +124,7 @@ export class MinecraftServerBlock extends MinecraftWriteable<ServerBlockLoose, S
 
     protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
-            endpoint: `BP/blocks/${this.Shortname}.json`,
+            endpoint: `BP/blocks/${this.subpath}${this.Shortname}.json`,
             response: {
                 name: `${this.Shortname}`,
                 data: this.encode(),

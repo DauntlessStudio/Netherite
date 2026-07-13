@@ -1,4 +1,4 @@
-import type { MinecraftWriteable } from "../../api/api.ts";
+import type { MinecraftWriteable } from "../../api/classes/minecraft_writeable.ts";
 import { composites, writeBufferToSrc } from "../../core/core.ts";
 import encoded from "../../templates/encoded.ts";
 

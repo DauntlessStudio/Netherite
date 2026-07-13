@@ -2,10 +2,17 @@ import { type WriteableResponse, type ModuleResponse, deepMerge } from "../../co
 import type { ClientEntityStrict, ClientEntityLoose, Molang } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Entities `*.entity.json`.
+ */
 export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose, ClientEntityStrict> {
-    public static dummy(name: string): MinecraftClientEntity {
-        return new MinecraftClientEntity(
-            {
+    /**
+     * Creates a new entity with default options.
+     * @param name The entity name.
+     * @returns The Entity instance.
+     */
+    public static dummy(name: string, subpath?: string): MinecraftClientEntity {
+        return new MinecraftClientEntity({
                 format_version: "$FORMATVERSION",
                 "minecraft:client_entity": {
                     description: {
@@ -24,8 +31,7 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
                         ],
                     }
                 }
-            }
-        );
+            }, subpath);
     }
     
     public get Entity() : ClientEntityLoose {
@@ -34,6 +40,11 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
     
     public get Identifier() : string {
         return this.minecraftObj["minecraft:client_entity"].description.identifier ?? "$NAMESPACE:SHORTNAME";
+    }
+
+    constructor(obj: ClientEntityLoose, protected readonly subpath: string = "") {
+        super(obj);
+        this.subpath &&= this.subpath + "/";
     }
 
     /**
@@ -73,7 +84,7 @@ export class MinecraftClientEntity extends MinecraftWriteable<ClientEntityLoose,
 
     protected generate(): WriteableResponse<ModuleResponse> {
         return {
-            endpoint: `RP/entity/${this.Shortname}.entity.json`,
+            endpoint: `RP/entity/${this.subpath}${this.Shortname}.entity.json`,
             response: {
                 name: this.Shortname,
                 data: this.encode(),

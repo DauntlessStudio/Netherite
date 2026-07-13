@@ -92,7 +92,7 @@ export class Project {
         emptyDirectorySync(path.join(Deno.cwd(), "dist"));
         
         if (Config.Options.type !== "skin-pack") {
-            if (options?.ignoreSymlinks !== true) this.createSymlinks();
+            if (options?.ignoreSymlinks !== true) this.createSymlinks(options?.environment ?? "development");
             emptyDirectorySync(Config.Paths.bp.root);
             emptyDirectorySync(Config.Paths.rp.root);
         }
@@ -128,13 +128,14 @@ export class Project {
 
     private static createDirectories(): void {
         Deno.mkdirSync(path.join(Deno.cwd(), "src/modules"), {recursive: true});
-        this.createSymlinks();
+        this.createSymlinks("development");
     }
 
-    private static createSymlinks(): void {
+    private static createSymlinks(env: EnvironmentType): void {
         if (Config.Options.type === "skin-pack") return;
 
-        const projectNamespace = Config.PackName;
+        // Split prevents pack names from exceeding 10 characters which violates publishing rules
+        const projectNamespace = env === "production" ? Config.PackName.slice(-7) : Config.PackName;
 
         const mojangBP = path.join(Config.MojangDirectory, "development_behavior_packs", projectNamespace + "_bp");
         const mojangRP = path.join(Config.MojangDirectory, "development_resource_packs", projectNamespace + "_rp");

@@ -3,6 +3,7 @@ import { Config } from "./config.ts";
 import { copyDirSync, JSONCParse, Logger } from "../utils/index.ts";
 import { publishToGitHub } from "../../cli/utils/github.ts";
 import { doesPathExist, emptyDirectorySync, sleep } from "../core.ts";
+import { commandWrap } from "../utils/error.ts";
 
 interface NetheritePackage {
     /**
@@ -571,14 +572,4 @@ export class Package {
             return packageValue;
         }
     }
-}
-
-async function commandWrap(command: Deno.Command): Promise<void> {
-    const result = await command.output();
-    if (result.success) return;
-
-    const err = new TextDecoder().decode(result.stderr);
-    const out = new TextDecoder().decode(result.stdout);
-
-    throw new Error(out + err);
 }

@@ -9,6 +9,9 @@ const RecipeTypes = [
     "minecraft:recipe_brewing_mix",
 ];
 
+/**
+ * A class for creating and working with Server Recipes.
+ */
 export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerRecipe>, ServerRecipe> {
     public get Recipe() : Partial<ServerRecipe> {
         return this.minecraftObj;
@@ -20,6 +23,11 @@ export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerReci
         ?? (this.minecraftObj as ServerRecipeFurnace)["minecraft:recipe_furnace"]?.description?.identifier
         ?? (this.minecraftObj as ServerRecipeBrewingMix)["minecraft:recipe_brewing_mix"]?.description?.identifier
         ?? "$NAMESPACE:SHORTNAME";
+    }
+
+    constructor(obj: Partial<ServerRecipe>, protected readonly subpath: string = "") {
+        super(obj);
+        this.subpath &&= this.subpath + "/";
     }
 
     protected override validate(): ServerRecipe {
@@ -34,7 +42,7 @@ export class MinecraftServerRecipe extends MinecraftWriteable<Partial<ServerReci
 
     protected generate(): WriteableResponse<ModuleResponse> {
         const response = {
-            endpoint: `BP/recipes/${this.Shortname}.json`,
+            endpoint: `BP/recipes/${this.subpath}${this.Shortname}.json`,
             response: {
                 name: `${this.Shortname}`,
                 data: this.encode(),

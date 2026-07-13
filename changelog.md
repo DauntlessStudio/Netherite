@@ -1,4 +1,6 @@
 # Changelog
+## [1.0.1] - 07/13/2026
+- Fixed issue where the validator for Server and Client entities was overly opinionated.
 ## [1.0.0] - 06/10/2026
 - Updated `package create` and `package publish` to work around git tags instead of versioned folders.
 - Added `package update` command

@@ -179,7 +179,6 @@ export class Language {
 
     /**
      * Adds a lang entry to the `src` lang files, *not* the dist.
-     * **This will remove any comments not formatted as categories (i.e. ## NAME =).**
      * @param category The category comment the entry should be added to.
      * @param key The lang key.
      * @param value The lang entry.
@@ -191,45 +190,18 @@ export class Language {
         for (const entry of Deno.readDirSync(path)) {
             if (!entry.name.endsWith(".lang")) continue;
             
+            let output = "";
             const fileContent = Deno.readTextFileSync(path + "/" + entry.name);
-            const categoryGroups = fileContent.split(/\n(?=#.+=+)/g);
-            const langMap = new Map<string, LangEntries>();
-            let contents = "";
+            const match = fileContent.match(new RegExp(`#+\\s*${category.toUpperCase()}.+`));
 
-            for (const categoryData of categoryGroups) {
-                const lines = categoryData
-                    .split("\n")
-                    .map(line => line.trim())
-                    .filter(line => line.length > 0);
-
-                if (lines.length === 0) continue;
-
-                const categoryName = (lines.shift() ?? "misc").replace(/#+ | =+/g, "").toLowerCase().trim();
-                const categoryMap: LangEntries = new Map();
-
-                for (const line of lines) {
-                    const [key, value] = line.split("=");
-                    categoryMap.set(key, value);
-                }
-
-                if (categoryName === category) categoryMap.set(key, value);
-
-                langMap.set(categoryName, categoryMap);
+            if (match) {
+                const index = match.index! + match[0].length;
+                output = fileContent.slice(0, index) + `\n${key}=${value}` + fileContent.slice(index);
+            } else {
+                output = fileContent + `\n${key}=${value}`;
             }
 
-            if (!langMap.has(category)) langMap.set(category, new Map([[key, value]]));
-
-            langMap.entries().forEach(([category, entry]) => {
-                contents += `## ${category.toUpperCase()} ${"=".repeat(117 - category.length)}\n`;
-
-                for (const [key, value] of entry) {
-                    contents += `${key}=${value}\n`;
-                }
-
-                contents += "\n";
-            });
-
-            Deno.writeTextFileSync(path + "/" + entry.name, contents.trim());
+            Deno.writeTextFileSync(path + "/" + entry.name, output.trim());
         }
     }
 

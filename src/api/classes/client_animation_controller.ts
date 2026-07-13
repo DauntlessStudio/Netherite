@@ -2,8 +2,16 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientAnimationControllerLoose, ClientAnimationControllerStrict } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Animation Controllers `*.ac.json`.
+ */
 export class MinecraftClientAnimationController extends MinecraftWriteable<ClientAnimationControllerLoose, ClientAnimationControllerStrict> {
-    public static skeletalAttachable(name: string): MinecraftClientAnimationController {
+    /**
+     * Creates a new animation controller using the skeletal attachable pattern.
+     * @param name The unique item name.
+     * @returns The AnimationController instance.
+     */
+    public static skeletalAttachable(name: string, subpath?: string): MinecraftClientAnimationController {
         return new MinecraftClientAnimationController({
             format_version: "1.10.0",
             animation_controllers: {
@@ -64,7 +72,7 @@ export class MinecraftClientAnimationController extends MinecraftWriteable<Clien
                     }
                 }
             }
-        }, name);
+        }, name, subpath);
     }
     
     public get AnimationController() : ClientAnimationControllerLoose {
@@ -75,8 +83,9 @@ export class MinecraftClientAnimationController extends MinecraftWriteable<Clien
         return this.name;
     }
 
-    constructor(obj: ClientAnimationControllerLoose, protected readonly name: string) {
+    constructor(obj: ClientAnimationControllerLoose, protected readonly name: string, protected readonly subpath: string = "") {
         super(obj);
+        this.subpath &&= this.subpath + "/";
     }
     
     protected validate(): ClientAnimationControllerStrict {
@@ -85,7 +94,7 @@ export class MinecraftClientAnimationController extends MinecraftWriteable<Clien
 
     protected generate(): WriteableResponse<ModuleResponse> {
         return {
-            endpoint: `RP/animation_controllers/${this.name}.ac.json`,
+            endpoint: `RP/animation_controllers/${this.subpath}${this.name}.ac.json`,
             response: {
                 name: name,
                 data: this.encode(),

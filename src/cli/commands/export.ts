@@ -1,5 +1,6 @@
 import { Command, type CommandData } from "../command.ts";
 import { Config, Exporter, type ExportType } from "../../core/classes/index.ts";
+import { runCached } from "../utils/jsr.ts";
 
 interface ExportCommandData extends CommandData {
     options: {
@@ -44,19 +45,7 @@ export default new Command<ExportCommandData>({
     async action(_args) {
         // The export command delegates to the installed version of Netherite, passing the hidden --local flag.
         if (!_args.options.local) {
-            new Deno.Command("deno", {
-                args: [
-                    "run",
-                    "-A",
-                    `jsr:@coldiron/netherite@${Config.LocalNetheriteVersion}/cli`,
-                    ...Deno.args,
-                    "--local",
-                ],
-                stdin: "inherit",
-                stdout: "inherit",
-                stderr: "inherit",
-            }).outputSync();
-
+            await runCached([...Deno.args, "--local"]);
             return;
         }
         

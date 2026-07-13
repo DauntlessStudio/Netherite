@@ -2,8 +2,17 @@ import { type WriteableResponse, type ModuleResponse, deepMerge } from "../../co
 import type { ClientAttachableStrict, ClientAttachableLoose } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Attachables.
+ */
 export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachableLoose, ClientAttachableStrict> {
-    public static armor(name: string, piece: string): MinecraftClientAttachable {
+    /**
+     * Creates a new attachable as a piece of armor.
+     * @param name The unique item name.
+     * @param piece The piece type (i.e. helmet, chestplate, etc).
+     * @returns The Attachable instance.
+     */
+    public static armor(name: string, piece: string, subpath?: string): MinecraftClientAttachable {
         const setName = name.replace(`_${piece}`, "");
 
         return new MinecraftClientAttachable({
@@ -37,9 +46,14 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
                     ]
                 }
             }
-        });
+        }, subpath);
     }
 
+    /**
+     * Creates an attachable for a given item using the skeletal attachable pattern.
+     * @param name The unique item name.
+     * @returns The Attachable instance.
+     */
     public static skeletal(name: string): MinecraftClientAttachable {
         return new MinecraftClientAttachable({
             format_version: "1.10.0",
@@ -87,6 +101,11 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
     public get Identifier() : string {
         return this.minecraftObj["minecraft:attachable"].description.identifier ?? "$NAMESPACE:SHORTNAME";
     }
+
+    constructor(obj: ClientAttachableLoose, protected readonly subpath: string = "") {
+        super(obj);
+        this.subpath &&= this.subpath + "/";
+    }
     
     protected validate(): ClientAttachableStrict {
         if (!this.minecraftObj["minecraft:attachable"]?.description?.identifier) {
@@ -102,15 +121,9 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
             "minecraft:attachable": {
                 description: {
                     identifier: "",
-                    materials: {
-                        default: "entity_alphatest"
-                    },
-                    geometry: {
-                        default: "geometry.empty"
-                    },
-                    textures: {
-                        default: "textures/empty"
-                    },
+                    materials: {},
+                    geometry: {},
+                    textures: {},
                     render_controllers: []
                 },
             }
@@ -123,7 +136,7 @@ export class MinecraftClientAttachable extends MinecraftWriteable<ClientAttachab
         const data = this.encode();
 
         return {
-            endpoint: `RP/attachables/${this.Shortname}.json`,
+            endpoint: `RP/attachables/${this.subpath}${this.Shortname}.json`,
             response: {
                 name: this.Shortname,
                 data,

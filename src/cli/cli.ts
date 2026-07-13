@@ -1,3 +1,7 @@
+/**
+ * This module contains the command parser and handler for all of the CLI options.
+ * @module
+ */
 import { Logger, ModuleManager } from "../core/core.ts";
 import { Command } from "./command.ts";
 import "./commands/index.ts";
@@ -10,7 +14,7 @@ Command.parseCommands(Deno.args).then(result => {
     }
 }).catch(error => {
     Logger.error(error);
-}).finally(async () => {
-    await ModuleManager.shutdown();
+}).finally(() => {
+    ModuleManager.shutdown();
     Deno.exit(1);
 }); 

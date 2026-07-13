@@ -2,8 +2,16 @@ import type { WriteableResponse, ModuleResponse } from "../../core/core.ts";
 import type { ClientAnimationLoose, ClientAnimationStrict } from "../types/index.ts";
 import { MinecraftWriteable } from "./minecraft_writeable.ts";
 
+/**
+ * A class for creating and working with Client Animation `*.anim.json`.
+ */
 export class MinecraftClientAnimation extends MinecraftWriteable<ClientAnimationLoose, ClientAnimationStrict> {
-    public static skeletalAttachable(name: string): MinecraftClientAnimation {
+    /**
+     * Creates an animation entry for a given item using the skeletal attachable pattern.
+     * @param name The unique item name.
+     * @returns The Animation instance.
+     */
+    public static skeletalAttachable(name: string, subpath?: string): MinecraftClientAnimation {
         return new MinecraftClientAnimation({
             format_version: "1.10.0",
             animations: {
@@ -17,7 +25,7 @@ export class MinecraftClientAnimation extends MinecraftWriteable<ClientAnimation
                 [`animation.$NAMESPACE.item.${name}.attack.first_person`]: { loop: "hold_on_last_frame", animation_length: 0.5, bones: { [name]: { "rotation": { "0.0": [-40, 60, -40], "0.1": { "pre": [-33, 56, -60], "post": [-33, 56, -60], "lerp_mode": "catmullrom" }, "0.2": [-39, 57, -81], "0.3": [-90, 40, -100], "0.4": [-40, 60, -40], "0.5": [-40, 60, -40] }, "position": { "0.0": [-3, 0, 0], "0.1": { "pre": [-3, 4, -8], "post": [-3, 4, -8], "lerp_mode": "catmullrom" }, "0.2": [19, -8, -10], "0.3": [23, -10, -15], "0.4": [17, -10, -11], "0.5": [-3, 0, 0] } } }, timeline: { 0.0: "v.playing_custom_attack = 1;", 0.5: "v.playing_custom_attack = 0;" } },
                 [`animation.$NAMESPACE.item.${name}.attack.third_person`]: {},
             }
-        }, name);
+        }, name, subpath);
     }
     
     public get Animation() : ClientAnimationLoose {
@@ -28,8 +36,9 @@ export class MinecraftClientAnimation extends MinecraftWriteable<ClientAnimation
         return this.name;
     }
 
-    constructor(obj: ClientAnimationLoose, protected readonly name: string) {
+    constructor(obj: ClientAnimationLoose, protected readonly name: string, protected readonly subpath: string = "") {
         super(obj);
+        this.subpath &&= this.subpath + "/";
     }
     
     protected validate(): ClientAnimationStrict {
@@ -38,7 +47,7 @@ export class MinecraftClientAnimation extends MinecraftWriteable<ClientAnimation
 
     protected generate(): WriteableResponse<ModuleResponse> {
         return {
-            endpoint: `RP/animations/${this.name}.anim.json`,
+            endpoint: `RP/animations/${this.subpath}${this.name}.anim.json`,
             response: {
                 name: name,
                 data: this.encode(),
