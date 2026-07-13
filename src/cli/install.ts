@@ -1,6 +1,6 @@
 import { Config } from "../core/classes/index.ts";
 
-const arg = Deno.args[0];
+const arg = Deno.args[0] ?? "latest";
 
 if (arg.match(/\d\.\d\.\d?.+/)) {
     new Deno.Command("deno", {
