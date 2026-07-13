@@ -1,6 +1,7 @@
 // deno-lint-ignore-file ban-types
 import type { ServerFilters, ServerFilterSubject } from "./filters.ts";
 import type { Float } from "./float.ts";
+import type { Trigger } from "./index.ts";
 import type { Molang } from "./molang.ts";
 import type { Components } from "./server_entity_components.ts";
 
@@ -57,7 +58,7 @@ export interface ServerEntityEvents {
     remove?: {
         component_groups: string[];
     };
-    trigger?: string;
+    trigger?: Trigger|string;
     randomize?: ServerEntityEvents[];
     sequence?: ServerEntityEvents[];
     set_property?: {

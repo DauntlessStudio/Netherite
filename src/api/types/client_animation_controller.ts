@@ -1,11 +1,11 @@
-interface ClientAnimationController {
+export interface ClientAnimationController {
     initial_state?: string;
     states: {
         [key: string]: ClientAnimationControllerState
     }
 }
 
-interface ClientAnimationControllerState {
+export interface ClientAnimationControllerState {
     animations?: (string|{[key: string]: string})[];
     transitions?: {[key: string]: string}[];
     blend_transition?: number;
