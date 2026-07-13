@@ -16,3 +16,13 @@ export async function attemptRepeater(func: () => unknown, prefix: string = "Act
 
     Logger.error(`${prefix} failed due to: ${lastError}`);
 }
+
+export async function commandWrap(command: Deno.Command): Promise<void> {
+    const result = await command.output();
+    if (result.success) return;
+
+    const err = new TextDecoder().decode(result.stderr);
+    const out = new TextDecoder().decode(result.stdout);
+
+    throw new Error(out + err);
+}

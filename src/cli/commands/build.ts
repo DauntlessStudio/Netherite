@@ -2,7 +2,7 @@ import * as path from "@std/path";
 import { Command, type CommandData } from "../command.ts";
 import { Project } from "../../core/classes/project.ts";
 import { abortOnKeypress, Logger } from "../../core/utils/index.ts";
-import { Config } from "../../core/classes/config.ts";
+import { runCached } from "../utils/jsr.ts";
 
 interface BuildCommandData extends CommandData {
     options: {
@@ -63,19 +63,7 @@ export default new Command<BuildCommandData>({
     async action(_args) {
         // The build command delegates to the installed version of Netherite, passing the hidden --local flag.
         if (!_args.options.local) {
-            new Deno.Command("deno", {
-                args: [
-                    "run",
-                    "-A",
-                    `jsr:@coldiron/netherite@${Config.LocalNetheriteVersion}/cli`,
-                    ...Deno.args,
-                    "--local",
-                ],
-                stdin: "inherit",
-                stdout: "inherit",
-                stderr: "inherit",
-            }).outputSync();
-
+            await runCached([...Deno.args, "--local"]);
             return;
         }
 
