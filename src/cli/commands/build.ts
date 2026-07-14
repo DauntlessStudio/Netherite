@@ -118,4 +118,4 @@ export default new Command<BuildCommandData>({
             }
         }
     },
-});
+}).register();

@@ -51,4 +51,4 @@ export default new Command<ExportCommandData>({
         
         await Exporter.export(_args.options.type, _args.options.out);
     },
-});
+}).register();
