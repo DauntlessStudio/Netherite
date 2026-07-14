@@ -1,5 +1,5 @@
 import { Command, type CommandData } from "../command.ts";
-import { Config, Exporter, type ExportType } from "../../core/classes/index.ts";
+import { Exporter, type ExportType } from "../../core/classes/index.ts";
 import { runCached } from "../utils/jsr.ts";
 
 interface ExportCommandData extends CommandData {
@@ -14,16 +14,16 @@ export default new Command<ExportCommandData>({
     name: "export",
     usage: {
         description: "Exports the project",
-        usage: "--type world|template|publish [--out <directory>]",
+        usage: "--type world|template|addon|publish [--out <directory>]",
         flags: {
             "type": {
                 type: "string",
-                description: "The output type to be exported",
+                description: "The output type, options are: world = .mcworld with packs, template = .mctemplate with packs, addon = .mcaddon with packs, publish = .zip with marketplace content.",
                 optional: false,
             },
             "out": {
                 type: "string",
-                description: "The directory to send to the export to",
+                description: "The directory to send to the export to. Defaults to user Downloads folder.",
                 optional: true,
             },
         },
@@ -37,7 +37,7 @@ export default new Command<ExportCommandData>({
         }
     },
     validateArgs(_args) {
-        const typeValid = _args.options.type === "world" || _args.options.type === "template" || _args.options.type === "publish";
+        const typeValid = _args.options.type === "world" || _args.options.type === "template" || _args.options.type === "addon" || _args.options.type === "publish";
         const outValid = _args.options.out === undefined || typeof _args.options.out === "string";
         const localValid = _args.options.local === undefined || typeof _args.options.local === "boolean";
         return typeValid && outValid && localValid;
