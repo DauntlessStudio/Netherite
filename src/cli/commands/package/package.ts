@@ -21,4 +21,5 @@ export default new Command<CommandData>({
 .addSubCommand(Install)
 .addSubCommand(Update)
 .addSubCommand(Validate)
-.addSubCommand(Uninstall);
+.addSubCommand(Uninstall)
+.register();

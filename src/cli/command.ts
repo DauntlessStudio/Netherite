@@ -109,17 +109,16 @@ export class Command<T extends CommandData> {
         return this.options.parent !== undefined;
     }
     
-    constructor(private readonly options: CommandOptions<T>) {
-        if (this.options.parent) {
-            this.options.parent.addSubCommand(this as unknown as Command<CommandData>);
-        } else {
-            Command.registry.push(this as unknown as Command<CommandData>);
-        }
-    }
+    constructor(private readonly options: CommandOptions<T>) {}
 
     public addSubCommand(command: Command<CommandData>): Command<T> {
         command.options.parent = this as unknown as Command<CommandData>;
         this.subcommands.push(command);
+        return this;
+    }
+
+    public register(): this {
+        Command.registry.push(this as unknown as Command<CommandData>);
         return this;
     }
 

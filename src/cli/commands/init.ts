@@ -1,4 +1,3 @@
-import { Package } from "../../core/classes/index.ts";
 import { Project, type ProjectType, type ProjectOptions } from "../../core/classes/project.ts";
 import { Logger } from "../../core/utils/logger.ts";
 import { Command } from "../command.ts";
@@ -111,7 +110,7 @@ new Command<InitCommandData>({
 
 		return validName && validAuthor && validNamespace && validFormatVersion && validType && validSkinpack && validPublish && validVibrantVisuals;
 	},
-});
+}).register();
 
 async function getProjectBuildData(args: InitCommandData): Promise<ProjectOptions> {
     const buildOptions: Partial<ProjectOptions> = {

@@ -22,3 +22,4 @@ export default new Command<CommandData>({
 .addSubCommand(armor)
 .addSubCommand(attachable)
 .addSubCommand(entity)
+.register()
