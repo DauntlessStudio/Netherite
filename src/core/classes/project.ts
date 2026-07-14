@@ -100,7 +100,6 @@ export class Project {
         await Module.build();
         await Static.build(options?.watch);
         await Script.build(options?.watch);
-        await World.build();
         Language.build();
         CompositeJSON.build();
         await Manifest.build();

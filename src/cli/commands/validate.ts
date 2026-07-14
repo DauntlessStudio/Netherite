@@ -26,4 +26,4 @@ export default new Command<CommandData>({
 
         Deno.exit(result.success ? 0 : 1);
     },
-});
+}).register();

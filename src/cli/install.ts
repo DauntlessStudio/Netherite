@@ -2,46 +2,7 @@
  * This module contains a lightweight install script for Netherite to run with minimal required permissions.
  * @module
  */
-import { Config } from "../core/classes/index.ts";
+import { installNetherite } from "./utils/install.ts";
 
-const arg = Deno.args[0] ?? "latest";
-
-if (arg.match(/\d\.\d\.\d?.+/)) {
-    new Deno.Command("deno", {
-        args: [
-            "install",
-            "-f",
-            "-g",
-            "--name", "netherite",
-            "--allow-import",
-            "--allow-read",
-            "--allow-write",
-            "--allow-run",
-            "--allow-env",
-            "--allow-net=localhost,jsr.io,raw.githubusercontent.com",
-            `jsr:@coldiron/netherite@${arg}/cli`
-        ],
-        stdout: "inherit",
-        stderr: "inherit",
-    }).outputSync();
-} else if (!arg || ["stable", "latest"].includes(arg)) {
-    const latest = await Config.LatestNetheriteVersion;
-
-    new Deno.Command("deno", {
-        args: [
-            "install",
-            "-f",
-            "-g",
-            "--name", "netherite",
-            "--allow-import",
-            "--allow-read",
-            "--allow-write",
-            "--allow-run",
-            "--allow-env",
-            "--allow-net=localhost,jsr.io,raw.githubusercontent.com",
-            `jsr:@coldiron/netherite@${latest}/cli`
-        ],
-        stdout: "inherit",
-        stderr: "inherit",
-    }).outputSync();
-}
+const arg = Deno.args[0];
+await installNetherite(arg);

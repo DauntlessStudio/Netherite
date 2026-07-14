@@ -4,8 +4,9 @@ import { Project } from "./project.ts";
 import { Config, World } from "./index.ts";
 import { sendToDist } from "../utils/index.ts";
 import { Logger } from "../utils/logger.ts";
+import { emptyDirectorySync } from "../core.ts";
 
-export type ExportType = "world"|"template"|"publish";
+export type ExportType = "world"|"template"|"addon"|"publish";
 
 export class Exporter {
     public static async export(type: ExportType, out: string = Config.DownloadDirectory): Promise<void> {
@@ -16,13 +17,20 @@ export class Exporter {
         
         Logger.Spinner.start("Exporting Project...");
 
-        if (type !== "publish" && Config.Options.type === "add-on") {
-            await World.build(true);
-        }
-
-        if (type === "publish") {
-            await this.publish(out);
-            return;
+        switch (type) {
+            case "publish":
+                await this.publish(out);
+                return;
+            case "template":
+                await World.build(true);
+                break;
+            case "world":
+                await World.build(true);
+                break;
+            case "addon":
+                Deno.removeSync(path.join(Config.Paths.root, "manifest.json"));
+                Deno.removeSync(path.join(Config.Paths.root, "texts"), {recursive: true});
+                break;
         }
 
         const filename = `${Config.Options.name}_v${Config.Options.version}.mc${type}`;
