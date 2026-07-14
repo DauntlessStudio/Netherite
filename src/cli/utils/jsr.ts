@@ -5,13 +5,9 @@ export async function runCached(args: string[]): Promise<void> {
     try {
         await commandWrap(new Deno.Command("deno", {
             args: [
-                "run",
-                "-A",
-                "--cached-only",
+                "info",
                 `jsr:@coldiron/netherite@${Config.LocalNetheriteVersion}/cli`,
-                ...args
-            ],
-            stdout: "inherit",
+            ]
         }));
     } catch (_error) {
         Logger.log(`Version ${Config.LocalNetheriteVersion} is not cached, attempting to download...`);
@@ -22,17 +18,6 @@ export async function runCached(args: string[]): Promise<void> {
                     "cache",
                     `jsr:@coldiron/netherite@${Config.LocalNetheriteVersion}/cli`,
                 ],
-            stdout: "inherit",
-            }));
-
-            await commandWrap(new Deno.Command("deno", {
-                args: [
-                    "run",
-                    "-A",
-                    "--cached-only",
-                    `jsr:@coldiron/netherite@${Config.LocalNetheriteVersion}/cli`,
-                    ...args
-                ],
                 stdout: "inherit",
             }));
         } catch (_error) {
@@ -40,4 +25,17 @@ export async function runCached(args: string[]): Promise<void> {
             Deno.exit(1);
         }
     }
+
+    new Deno.Command("deno", {
+        args: [
+            "run",
+            "-A",
+            "--cached-only",
+            `jsr:@coldiron/netherite@${Config.LocalNetheriteVersion}/cli`,
+            ...args
+        ],
+        stdout: "inherit",
+        stderr: "inherit",
+        stdin: "inherit",
+    }).outputSync();
 }
