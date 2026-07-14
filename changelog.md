@@ -1,4 +1,12 @@
 # Changelog
+## [1.1.0] - 07/14/2026
+- Added `netherite update` command which can be used to install a global version of Netherite.
+- Added a version check step to `netherite init` which will prompt the user to update if they are not on the latest version.
+- Added `--type addon` option to `netherite export` which exports the packs into an `.mcaddon` file.
+- Fixed issue where `MinecraftServerEntity` expected a string for event triggers rather than an event trigger object.
+- Fixed issue where `netherite new ...` commands could fail depending on how the lang file was configured.
+- Fixed issue where the pack names when using `netherite export --type publish` were not clamped to 10 characters as Auger requires.
+- Improvements to `netherite build` and `netherite export` which now utilize Deno's caching process. This prevents issues related to build failing when offline, and hotfixes failing because the JSR remote locks updates for 24 hours to prevent supply-chain attacks.
 ## [1.0.1] - 07/13/2026
 - Fixed issue where the validator for Server and Client entities was overly opinionated.
 ## [1.0.0] - 06/10/2026

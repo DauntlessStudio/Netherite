@@ -1,11 +1,27 @@
 import { Command, type CommandData } from "../command.ts";
 import { installNetherite } from "../utils/install.ts";
 
-export default new Command<CommandData>({
+interface UpdateCommandData extends CommandData {
+    options: {
+        force?: boolean;
+    }
+}
+
+export default new Command<UpdateCommandData>({
     name: "update",
+    parse: {
+        boolean: ["force"]
+    },
     usage: {
         description: "Updates the global version of Netherite on this machine.",
-        usage: "<version> (as SemVer or latest)",
+        usage: "[--force] <version> (as SemVer or latest)",
+        flags: {
+            force: {
+                type: "boolean",
+                description: "Forces this version to be installed even if JSR's 24 window has not elapsed",
+                optional: true,
+            }
+        }
     },
     validateArgs(_args) {
         _args.arguments[0] ||= "latest";
@@ -14,7 +30,7 @@ export default new Command<CommandData>({
         return validVersion && _args.arguments.length === 1;
     },
     async action(_args) {
-        await installNetherite(_args.arguments[0] as string);
+        await installNetherite(_args.arguments[0] as string, _args.options.force);
         Deno.exit(0);
     },
 }).register();
