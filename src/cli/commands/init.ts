@@ -1,8 +1,11 @@
 import { Project, type ProjectType, type ProjectOptions } from "../../core/classes/project.ts";
+import { Config } from "../../core/core.ts";
+import { commandWrap } from "../../core/utils/error.ts";
 import { Logger } from "../../core/utils/logger.ts";
 import { Command } from "../command.ts";
 import type { CommandData } from "../command.ts";
 import { addLabelsToRepo, getNewRepoOwner, publishToGitHub, type GitHubPublishData } from "../utils/github.ts";
+import { installNetherite } from "../utils/install.ts";
 
 interface InitCommandData extends CommandData {
     options: {
@@ -80,6 +83,7 @@ new Command<InitCommandData>({
 		},
 	},
 	async action(_args) {
+        await versionCheck();
         const projectOptions = await getProjectBuildData(_args);
 
 		await Project.init(projectOptions);
@@ -111,6 +115,32 @@ new Command<InitCommandData>({
 		return validName && validAuthor && validNamespace && validFormatVersion && validType && validSkinpack && validPublish && validVibrantVisuals;
 	},
 }).register();
+
+async function versionCheck(): Promise<void> {
+    try {
+        const installed = Config.InstalledNetheriteVersion;
+        const remote = await Config.LatestNetheriteVersion;
+
+        if (installed !== remote) {
+            const val = confirm(`Your global version of Netherite is ${installed}, latest is ${remote}. Do you want to update before creating this project?`);
+            if (val) {
+                await installNetherite();
+                new Deno.Command("netherite", {
+                    args: Deno.args,
+                    stdin: "inherit",
+                    stdout: "inherit",
+                    stderr: "inherit",
+                }).outputSync()
+
+                Deno.exit(0);
+            }
+        }
+    } catch (_error) {
+        Logger.warn(String(_error));
+        const val = confirm(`Netherite was not able to confirm if your global version ${Config.InstalledNetheriteVersion} is the latest version. Proceed anyway?`);
+        if (!val) Deno.exit(0);
+    }
+}
 
 async function getProjectBuildData(args: InitCommandData): Promise<ProjectOptions> {
     const buildOptions: Partial<ProjectOptions> = {
