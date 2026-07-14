@@ -1,6 +1,5 @@
 import { Project, type ProjectType, type ProjectOptions } from "../../core/classes/project.ts";
 import { Config } from "../../core/core.ts";
-import { commandWrap } from "../../core/utils/error.ts";
 import { Logger } from "../../core/utils/logger.ts";
 import { Command } from "../command.ts";
 import type { CommandData } from "../command.ts";
