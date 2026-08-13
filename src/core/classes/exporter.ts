@@ -28,8 +28,16 @@ export class Exporter {
                 await World.build(true);
                 break;
             case "addon":
-                Deno.removeSync(path.join(Config.Paths.root, "manifest.json"));
-                Deno.removeSync(path.join(Config.Paths.root, "texts"), {recursive: true});
+                try {
+                    Deno.removeSync(path.join(Config.Paths.root, "manifest.json"));
+                } catch (_error) {
+                    // Do nothing
+                }
+                try {
+                    Deno.removeSync(path.join(Config.Paths.root, "texts"), {recursive: true});
+                } catch (_error) {
+                    // Do nothing
+                }
                 break;
         }
 

@@ -3,6 +3,7 @@ import { Command, type CommandData } from "../command.ts";
 import { Project } from "../../core/classes/project.ts";
 import { abortOnKeypress, Logger } from "../../core/utils/index.ts";
 import { runCached } from "../utils/jsr.ts";
+import { Script } from "../../core/core.ts";
 
 interface BuildCommandData extends CommandData {
     options: {
@@ -11,6 +12,7 @@ interface BuildCommandData extends CommandData {
         verbose?: boolean;
         all?: string;
         local?: string;
+        obfuscated?: boolean;
     }
 }
 
@@ -18,7 +20,7 @@ export default new Command<BuildCommandData>({
     name: "build",
     usage: {
         description: "Builds the project",
-        usage: "[--watch --silent --all <directory>]",
+        usage: "[--watch --silent --verbose --obfuscate --all <directory>]",
         flags: {
             "watch": {
                 type: "boolean",
@@ -35,6 +37,11 @@ export default new Command<BuildCommandData>({
                 description: "Increase logging verbosity",
                 optional: true,
             },
+            "obfuscated": {
+                type: "boolean",
+                description: "Minifies and fragments output code",
+                optional: true,
+            },
             "all": {
                 type: "string",
                 description: "Build all projects in the specified directory",
@@ -43,12 +50,13 @@ export default new Command<BuildCommandData>({
         },
     },
     parse: {
-        boolean: ["watch", "silent", "local", "verbose"],
+        boolean: ["watch", "silent", "local", "verbose", "obfuscated"],
         string: ["all"],
         alias: {
             watch: "w",
             silent: "s",
             verbose: "v",
+            obfuscated: "o",
             all: "a",
         }
     },
@@ -58,7 +66,8 @@ export default new Command<BuildCommandData>({
         const allValid = _args.options.all === undefined || typeof _args.options.all === "string";
         const localValid = _args.options.local === undefined || typeof _args.options.local === "boolean";
         const verboseValid = _args.options.verbose === undefined || typeof _args.options.verbose === "boolean";
-        return watchValid && silentValid && allValid && localValid && verboseValid;
+        const obfuscatedValid = _args.options.obfuscated === undefined || typeof _args.options.obfuscated === "boolean";
+        return watchValid && silentValid && allValid && localValid && verboseValid && obfuscatedValid;
     },
     async action(_args) {
         // The build command delegates to the installed version of Netherite, passing the hidden --local flag.
@@ -68,6 +77,8 @@ export default new Command<BuildCommandData>({
         }
 
         if (!_args.options.all) {
+            Script.minify = _args.options.obfuscated ?? false;
+
             if (_args.options.verbose) {
                 Logger.Verbose = true;
                 Logger.log(`Verbose Loggings Enabled`, true);

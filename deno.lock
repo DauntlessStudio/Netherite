@@ -36,6 +36,7 @@
     "jsr:@std/uuid@^1.0.4": "1.0.4",
     "jsr:@zip-js/zip-js@2.7.53": "2.7.53",
     "npm:@types/node@*": "22.5.4",
+    "npm:esbuild-wasm@~0.28.2": "0.28.2",
     "npm:esbuild@*": "0.24.2",
     "npm:esbuild@~0.24.2": "0.24.2",
     "npm:path@*": "0.12.7",
@@ -290,6 +291,10 @@
         "undici-types"
       ]
     },
+    "esbuild-wasm@0.28.2": {
+      "integrity": "sha512-GccVwhv3mmOUVQHCQm2Ox/rby8n/EqUwvZxE6Pjfikrq/lWw9g9WX/u9EykWnpot3Ko6j426DgQdea2xWKIAQA==",
+      "bin": true
+    },
     "esbuild@0.24.2": {
       "integrity": "sha512-+9egpBW8I3CD5XPe0n6BfT5fxLzxrlDzqydF3aviG+9ni1lDC/OvMHcxqEFV0+LANZG5R1bFMWfUrjVsdwxJvA==",
       "optionalDependencies": [
@@ -451,6 +456,7 @@
       "jsr:@std/fmt@^1.0.6",
       "jsr:@std/path@^1.0.8",
       "jsr:@std/uuid@^1.0.4",
+      "npm:esbuild-wasm@~0.28.2",
       "npm:esbuild@~0.24.2",
       "npm:uuid@^11.1.0"
     ]

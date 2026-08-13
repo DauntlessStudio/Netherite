@@ -11,6 +11,8 @@ export class Script {
     private static buildError: boolean = false;
     private static endWatchCallback: () => Promise<void>;
 
+    public static minify: boolean = false;
+
     public static async build(watch?: boolean): Promise<void> {
         if (Config.Options.type === "skin-pack") return;
         
@@ -31,6 +33,7 @@ export class Script {
             format: "esm",
             logLevel: watch ? "info" : undefined,
             write: false,
+            minify: this.minify,
         };
     
         if (watch) {

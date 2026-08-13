@@ -6,7 +6,7 @@
     "check": "deno check src/core/core.ts && deno check src/cli/cli.ts && deno check src/api/api.ts && deno check src/cli/install.ts",
     "encode": "deno run -A src/templates/encode.ts",
     "init": "cd .. && rm -rf Test && netherite init --name 'Test' --author 'Caleb Coldiron' --namespace 'cld_test' --format_version 'latest' --type 'world' --skinpack --vibrant_visuals --no-publish",
-    "install": "deno install -f -g -c deno.json --compile --name netherite --allow-import --allow-read --allow-write --allow-run --allow-env --allow-net=localhost,jsr.io,raw.githubusercontent.com src/cli/cli.ts",
+    "install": "deno install -f -g -c deno.json --name netherite --allow-import --allow-read --allow-write --allow-run --allow-env --allow-net=localhost,jsr.io,raw.githubusercontent.com src/cli/cli.ts",
     "test": "deno task install && deno task init"
   },
   "license": "MIT",
@@ -29,6 +29,7 @@
     "@std/path": "jsr:@std/path@^1.0.8",
     "@std/uuid": "jsr:@std/uuid@^1.0.4",
     "esbuild": "npm:esbuild@^0.24.2",
+    "esbuild-wasm": "npm:esbuild-wasm@^0.28.2",
     "uuid": "npm:uuid@^11.1.0"
   }
 }
