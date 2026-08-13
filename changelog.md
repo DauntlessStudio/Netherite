@@ -1,4 +1,7 @@
 # Changelog
+## [1.2.0] - 08/13/2026
+- Added `--obfuscate` flag to `netherite build` which obfuscates the compile JavaScript.
+- Added `--no-obfuscate` flag to `netherite export` which prevents the default obfuscatation of the compiled JavaScript.
 ## [1.1.0] - 07/14/2026
 - Added `netherite update` command which can be used to install a global version of Netherite.
 - Added a version check step to `netherite init` which will prompt the user to update if they are not on the latest version.
