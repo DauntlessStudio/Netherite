@@ -2,6 +2,7 @@
 ## [1.2.1] - 09/9/2026
 - Fixed issue where the `netherite build --obfuscated` flag wasn't processed.
 - Fixed issue where `netherite package update` did not properfly fetch the package state making it difficult to install the latest package correctly.
+- Fixed issues related to the `netherite update` command.
 ## [1.2.0] - 08/13/2026
 - Added `--obfuscate` flag to `netherite build` which obfuscates the compile JavaScript.
 - Added `--no-obfuscate` flag to `netherite export` which prevents the default obfuscatation of the compiled JavaScript.
