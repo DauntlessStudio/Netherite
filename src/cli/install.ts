@@ -5,4 +5,4 @@
 import { installNetherite } from "./utils/install.ts";
 
 const arg = Deno.args[0];
-await installNetherite(arg);
+await installNetherite(arg, Deno.args.includes("--force"));

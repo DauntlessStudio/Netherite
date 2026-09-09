@@ -12,7 +12,7 @@ interface BuildCommandData extends CommandData {
         verbose?: boolean;
         all?: string;
         local?: string;
-        obfuscated?: boolean;
+        obfuscate?: boolean;
     }
 }
 
@@ -37,7 +37,7 @@ export default new Command<BuildCommandData>({
                 description: "Increase logging verbosity",
                 optional: true,
             },
-            "obfuscated": {
+            "obfuscate": {
                 type: "boolean",
                 description: "Minifies and fragments output code",
                 optional: true,
@@ -50,13 +50,13 @@ export default new Command<BuildCommandData>({
         },
     },
     parse: {
-        boolean: ["watch", "silent", "local", "verbose", "obfuscated"],
+        boolean: ["watch", "silent", "local", "verbose", "obfuscate"],
         string: ["all"],
         alias: {
             watch: "w",
             silent: "s",
             verbose: "v",
-            obfuscated: "o",
+            obfuscate: "o",
             all: "a",
         }
     },
@@ -66,8 +66,8 @@ export default new Command<BuildCommandData>({
         const allValid = _args.options.all === undefined || typeof _args.options.all === "string";
         const localValid = _args.options.local === undefined || typeof _args.options.local === "boolean";
         const verboseValid = _args.options.verbose === undefined || typeof _args.options.verbose === "boolean";
-        const obfuscatedValid = _args.options.obfuscated === undefined || typeof _args.options.obfuscated === "boolean";
-        return watchValid && silentValid && allValid && localValid && verboseValid && obfuscatedValid;
+        const obfuscateValid = _args.options.obfuscate === undefined || typeof _args.options.obfuscate === "boolean";
+        return watchValid && silentValid && allValid && localValid && verboseValid && obfuscateValid;
     },
     async action(_args) {
         // The build command delegates to the installed version of Netherite, passing the hidden --local flag.
@@ -77,7 +77,7 @@ export default new Command<BuildCommandData>({
         }
 
         if (!_args.options.all) {
-            Script.minify = _args.options.obfuscated ?? false;
+            Script.minify = _args.options.obfuscate ?? false;
 
             if (_args.options.verbose) {
                 Logger.Verbose = true;
