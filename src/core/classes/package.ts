@@ -140,8 +140,9 @@ export class Package {
             Deno.chdir(path.join(Config.NetheriteDirectory, "packages", packageName));
 
             try {
+                await commandWrap(new Deno.Command("git", {args: ["fetch"]}));
                 await commandWrap(new Deno.Command("git", {args: ["checkout", tag]}));
-                if (tag === "latest") await commandWrap(new Deno.Command("git", {args: ["pull"]}));
+                if (tag === "main") await commandWrap(new Deno.Command("git", {args: ["pull"]}));
             } catch (error) {
                 Logger.Spinner.fail("Failed to update package, is git installed and are you connected to the internet?");
                 Logger.error((error as Error).message);
@@ -227,9 +228,7 @@ export class Package {
         Logger.Spinner.start(`Loading ${Logger.Colors.green(nPackage.manifest.name)}...`);
 
         if (!doesPathExist(path.join(nPackage.dir, "src"))) {
-            Logger.Spinner.fail(`Failed to validate ${nPackage.manifest.name} package, attempting recovery`);
-            await this.convert(nPackage);
-            Logger.Spinner.start(`Finished recovery, reloading ${Logger.Colors.green(nPackage.manifest.name)}...`);
+            Logger.Spinner.fail(`Failed to validate ${nPackage.manifest.name} package`);
         }
 
         const outPath = path.join(Deno.cwd(), "src", "modules", nPackage.manifest.name);

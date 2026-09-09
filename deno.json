@@ -1,6 +1,6 @@
 {
   "name": "@coldiron/netherite",
-  "version": "1.2.0",
+  "version": "1.2.1-beta.0",
   "tasks": {
     "dev": "deno run --allow-read --allow-write --allow-run --allow-env src/cli/cli.ts",
     "check": "deno check src/core/core.ts && deno check src/cli/cli.ts && deno check src/api/api.ts && deno check src/cli/install.ts",
