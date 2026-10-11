@@ -26,7 +26,7 @@ export class Script {
         this.buildOptions = {
             plugins: [...denoPlugins()],
             entryPoints: ["./src/behavior_pack/scripts/main.ts"],
-            external: ["@minecraft/server", "@minecraft/server-ui"],
+            external: ["@minecraft/*"],
             outfile: Config.Paths.bp.scripts + `/main.js`,
             bundle: true,
             sourcemap: "inline",
