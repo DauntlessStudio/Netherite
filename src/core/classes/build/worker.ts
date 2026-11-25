@@ -58,10 +58,21 @@ export class ModuleManager {
 
         script = script.replaceAll("\\", "/");
 
-        const response = await fetch(`http://localhost:${this.port}`, {
-            method: "POST",
-            body: JSON.stringify({script, options}),
-        });
+        // The daemon needs a moment to start listening. Windows retries refused
+        // connections for ~1s so this race is hidden there; Linux/macOS fail instantly.
+        let response: Response | undefined;
+        for (let attempt = 0; ; attempt++) {
+            try {
+                response = await fetch(`http://localhost:${this.port}`, {
+                    method: "POST",
+                    body: JSON.stringify({script, options}),
+                });
+                break;
+            } catch (error) {
+                if (attempt >= 100) throw error;
+                await new Promise((resolve) => setTimeout(resolve, 100));
+            }
+        }
 
         switch (response.status) {
             case 200:
